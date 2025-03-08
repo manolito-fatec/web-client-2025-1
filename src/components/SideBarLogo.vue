@@ -19,16 +19,16 @@
 
 .imageflex img {
   top: 40px;
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   position: fixed;
   z-index: 1;
 }
 
 .imageflexcontent {
   position: fixed;
-  left: 100px;
-  top: 35px;
+  left: 80px;
+  top: 25px;
   z-index: 2;
   color: rgb(255, 255, 255); /* Adjust the color as needed */
   white-space: nowrap;
