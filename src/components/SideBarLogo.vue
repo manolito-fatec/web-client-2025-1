@@ -18,16 +18,17 @@
 }
 
 .imageflex img {
-  width: 3vw;
-  height: 6vh; /* Always the double of the width */
-  position: relative;
+  top: 40px;
+  width: 80px;
+  height: 80px;
+  position: fixed;
   z-index: 1;
 }
 
 .imageflexcontent {
-  position: relative;
-  left: 4vw;
-  top: -7vh;
+  position: fixed;
+  left: 100px;
+  top: 35px;
   z-index: 2;
   color: rgb(255, 255, 255); /* Adjust the color as needed */
   white-space: nowrap;
@@ -35,7 +36,7 @@
 
 .imageflexcontent h1 {
   font-weight: 900; /* Make the text bolder */
-  font-size: 1.5rem; /* Adjust the font size as needed */
+  font-size: 2rem; /* Adjust the font size as needed */
 }
 
 

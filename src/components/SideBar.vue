@@ -24,7 +24,7 @@ const goRoute = () => {
 }
 /* Barra lateral */
 .sidebar {
-  width: 15%;
+  width: 300px;
   background-color: #01081f;
   padding: 1rem;
   display: flex;
