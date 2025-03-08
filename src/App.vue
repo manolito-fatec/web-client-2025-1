@@ -18,34 +18,10 @@ import { RouterView } from 'vue-router'
   height: 100vh;
 }
 
-/* Barra lateral */
-.sidebar {
-  width: 10vh;
-  background-color: #01081f;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  height: 100vh;
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
-}
+
 .button {
   border: 1rem;
   border-color: rgb(206, 134, 0);
-}
-
-.sidebar a {
-  color: white;
-  text-decoration: none;
-  border-radius: 5px;
-  transition: background 0.3s;
-}
-
-.sidebar a:hover {
-  background: rgba(255, 255, 255, 0.2);
 }
 
 /* Conteúdo principal */
