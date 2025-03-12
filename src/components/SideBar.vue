@@ -77,29 +77,4 @@ aside {
     z-index: 99;
   }
 }
-
-.sidebarLogo {
-  display: block;
-  width: 4vw;
-  height: 8vh; 
-}
-
-.sidebar {
-  width: 300px;
-  background-color: #01081f;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  height: 100vh;
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
-}
-
-
-
-
-
 </style>
