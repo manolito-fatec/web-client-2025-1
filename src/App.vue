@@ -4,10 +4,10 @@ import Sidebar from '@/components/SideBar.vue'
 </script>
 
 <template>
-  <div class="sidebar">
-    <Sidebar />
+  <div>
+    <Sidebar/>
   </div>
-  <div class="content">
+  <div class="router-view">
     <RouterView />
   </div>
 </template>
@@ -43,22 +43,5 @@ button {
       padding: 6rem;
     }
   }
-}
-
-.content {
-  margin-left: 5rem; 
-  padding: 1rem;
-  flex: 1; 
-  box-sizing: border-box;
-  overflow: auto;
-}
-
-header {
-  text-align: left;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
 }
 </style>
