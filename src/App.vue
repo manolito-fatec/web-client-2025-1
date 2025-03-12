@@ -4,18 +4,18 @@ import Sidebar from '@/components/SideBar.vue'
 </script>
 
 <template>
-  <div>
+  <div class="app">
     <Sidebar/>
-  </div>
-  <div class="router-view">
-    <RouterView />
+    <main>
+      <RouterView/>
+    </main>
   </div>
 </template>
 
 <style lang="scss" scoped>
 :root{
-  --color-primary: #ff8c00;
-  --color-secondary: #01081f;
+  --color-primary: #01081F;
+  --color-secondary: #010e38;
   --color-contrast: #fff;
 }
 
@@ -35,6 +35,7 @@ button {
 
 .app {
   display: flex;
+  height: 100vh;
   main {
     flex: 1 1 0;
     padding: 2rem;
