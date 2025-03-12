@@ -12,26 +12,45 @@ import Sidebar from '@/components/SideBar.vue'
   </div>
 </template>
 
-<style scoped>
-/* Layout principal */
-.layout {
+<style lang="scss" scoped>
+:root{
+  --color-primary: #ff8c00;
+  --color-secondary: #01081f;
+  --color-contrast: #fff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+button {
+  cursor: pointer;
+  appearance: none;
+  border: none;
+  background: none;
+  outline: none;
+}
+
+.app {
   display: flex;
-  height: 100vh;
+  main {
+    flex: 1 1 0;
+    padding: 2rem;
+
+    @media (max-width: 768px) {
+      padding: 6rem;
+    }
+  }
 }
 
-
-.button {
-  border: 1rem;
-  border-color: rgb(206, 134, 0);
-}
-
-/* Conteúdo principal */
 .content {
-  margin-left: 5rem; /* Adjust margin-left to match the sidebar width */
+  margin-left: 5rem; 
   padding: 1rem;
-  flex: 1; /* Allow the content to grow and fill the remaining space */
-  box-sizing: border-box; /* Include padding in the element's total width and height */
-  overflow: auto; /* Add overflow to handle content overflow */
+  flex: 1; 
+  box-sizing: border-box;
+  overflow: auto;
 }
 
 header {
