@@ -15,7 +15,7 @@ import Sidebar from '@/components/SideBar.vue'
 <style lang="scss" scoped>
 :root{
   --color-primary: #01081F;
-  --color-secondary: #010e38;
+  --color-secondary: #0C1635;
   --color-contrast: #fff;
 }
 
