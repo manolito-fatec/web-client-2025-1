@@ -35,7 +35,7 @@ button {
 
 .app {
   display: flex;
-  background-color: #051340;
+  background-color: #0C1635;
   height: 100vh;
 
   @media only screen and (orientation: portrait) and (max-width: 768px) {
