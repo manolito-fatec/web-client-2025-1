@@ -10,24 +10,27 @@ const goDash = () => {
 const goHome = () => {
   router.push('/home');
 };
+const goProfile = () => {
+  router.push('/profile');
+};
 </script>
 
 <template>
-  <aside>
+  <div class="sidebar">
     <div class="logo">
       <img src="../assets/icons/Manolito.png" alt="ManolitoLogo"/>
       <span class="text">Youtan Dash</span>
     </div>
-    <div class="sidebar-button-grid">
+    <div class="sidebar-button-grid" >
       <Button icon="pi pi-objects-column" label="Dashboard" @click="goDash" severity="contrast" variant="text" class="sidebar-routers"></Button>
       <Button icon="pi pi-home" label="Home" @click="goHome" severity="contrast" variant="text" class="sidebar-routers"></Button>
-      <Button icon="pi pi-user" label="Profile"  @click="goHome" severity="contrast" variant="text" class="sidebar-routers"></Button>
+      <Button icon="pi pi-user" label="Profile"  @click="goProfile" severity="contrast" variant="text" class="sidebar-routers"></Button>
     </div>
-  </aside>
+  </div>
 </template>
 
 <style lang="scss" scoped>
-aside {
+.sidebar {
   display: flex;
   flex-direction: column;
   padding: 1rem;
@@ -36,39 +39,89 @@ aside {
   height: 100vh;
   overflow: hidden;
   left: 0;
-  top: 0;
-  bottom: 0;
 
   .text {
     color: #fff;
     font-size: 1.6rem;
     font-weight: 700;
   }
-  .logo{
+
+  .logo {
     margin-bottom: 1rem;
+
     img {
       width: 4rem;
     }
   }
 
   .sidebar-button-grid {
-  display: grid;
-  position: relative;
-  gap: 0.2rem;
+    display: grid;
+    position: relative;
+    gap: 0.2rem;
+
+    .sidebar-routers {
+      width: 16rem;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      font-size: 1.5rem;
+      gap: 0.5rem;
+
+      &:hover {
+        background-color: #010e38;
+        color: #FFFFFF;
+      }
+    }
+  }
+
+  // Modo retrato (portrait)
+  @media only screen and (orientation: portrait) and (max-width: 768px) {
+    bottom: 0;
+
+    .logo {
+      display: none;
+    }
+
+    .sidebar-button-grid {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: center;
+      width: 100%;
 
       .sidebar-routers {
-        width: 100%;
+        width: 80%;
         display: flex;
-        justify-content: flex-start;
+        justify-content: center;
         align-items: center;
-
         padding: 0.5rem 1rem;
-        font-size: 1.5rem;
-      
-        &:hover {
-          background-color: #010e38;
-          color: #FFFFFF;
+        font-size: 1rem;
+        gap: 0.3rem;
+
+        .p-button-label, .p-button-icon {
+          display: block;
         }
+
+        .p-button-icon {
+          margin: 0;
+        }
+
+        .p-button-icon, .p-button-label {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        & > .p-button-icon, & > .p-button-label {
+          flex-direction: column;
+        }
+
+        & {
+          flex-direction: column;
+          gap: 0.2rem;
+        }
+      }
     }
   }
 
@@ -77,4 +130,5 @@ aside {
     z-index: 99;
   }
 }
+
 </style>
