@@ -5,7 +5,7 @@ import Sidebar from '@/components/SideBar.vue'
 
 <template>
   <div class="app">
-    <Sidebar/>
+    <Sidebar class="sidebar"/>
     <main>
       <RouterView/>
     </main>
@@ -36,6 +36,17 @@ button {
 .app {
   display: flex;
   height: 100vh;
+
+  @media only screen and (orientation: portrait) and (max-width: 768px) {
+    .sidebar {
+      width: 100vw;
+      height: 60px;
+      bottom: 0;
+      left: 0;
+      flex-direction: row;
+    }
+  }
+
   main {
     flex: 1 1 0;
     padding: 2rem;
