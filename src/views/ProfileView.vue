@@ -10,7 +10,4 @@
 </template>
 
 <style lang="scss" scoped>
-.profile{
-    background-color: var(--color-secondary);
-}
 </style>
