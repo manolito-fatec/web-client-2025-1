@@ -2,11 +2,13 @@
 import { ref, watch } from 'vue';
 import Chart from 'primevue/chart';
 
-// Datas selecionadas
 const startDate = ref<string>('');
 const endDate = ref<string>('');
 
-// Dados mockados do gráfico (inicialmente fixos)
+/**
+ * Mocked data and color configuration for chart.
+ * @param backgroundColor - Sets the color of the bars.
+ */
 const chartData = ref({
   labels: ['Created', 'Done'],
   datasets: [
@@ -18,7 +20,12 @@ const chartData = ref({
   ],
 });
 
-// Opções do gráfico
+/**
+ * Chart configuration params.
+ * @property {boolean} responsive - Boolean value to toggle responsiveness.
+ * @property {string} indexAxis - Sets the orientation of the bars based on the X or Y dimensions.
+ * @property {object} plugins - Sets additional spans/components on the chart.
+ */
 const chartOptions = ref({
   responsive: true,
   indexAxis: 'y',
@@ -29,7 +36,12 @@ const chartOptions = ref({
   },
 });
 
-// Atualizar o gráfico ao mudar as datas (simulado)
+/**
+ * Mocked watch function to set the value of the chart based on the period.
+ * @param {string} startDate - Value from date input.
+ * @param {string} endDate - Value from date input.
+ * @returns {void} - Updates the chart dataset based on random mocked data.
+ */
 watch([startDate, endDate], ([newStart, newEnd]) => {
   console.log('Datas selecionadas:', newStart, newEnd);
   if (newStart && newEnd) {
@@ -44,16 +56,11 @@ watch([startDate, endDate], ([newStart, newEnd]) => {
 
 <template>
   <div class="chart-wrapper">
-    <!-- Título -->
     <h2 class="chart-title">Cards created and completed by period</h2>
-
-    <!-- Inputs de data -->
     <div class="chart-inputs">
       <input type="date" v-model="startDate" />
       <input type="date" v-model="endDate" />
     </div>
-
-    <!-- Gráfico -->
     <Chart type="bar" :data="chartData" :options="chartOptions" class="chart" />
   </div>
 </template>
@@ -62,7 +69,7 @@ watch([startDate, endDate], ([newStart, newEnd]) => {
 .chart-wrapper {
   position: relative;
   display: flex;
-  flex-direction: column; // Coloca os elementos em coluna
+  flex-direction: column; 
   align-items: center;
   gap: 1rem;
   padding: 1rem;
@@ -70,8 +77,8 @@ watch([startDate, endDate], ([newStart, newEnd]) => {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 30rem; // Limita a largura máxima
-  margin: 0 auto; // Centraliza horizontalmente
+  max-width: 30rem;
+  margin: 0 auto;
 
   .chart-title {
     color: #3D7EFF;
