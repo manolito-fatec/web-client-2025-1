@@ -7,7 +7,7 @@ import TotalOfCards from '@/components/TotalOfCards.vue'
     <div class="dashboard">
         <h1>Dashboard</h1>
     </div>
-    <TotalOfCards />
+    <TotalOfCards title="Total de Cards" :total="0"/>
 </template>
 
 <style lang="scss" scoped>

@@ -1,21 +1,13 @@
-<script lang="ts">
-import {type Ref, ref} from "vue";
-
-const toc:Ref<number> = ref(0);
-const tec:Ref<string> = ref('Total of Cards');
-toc.value = 10;
-
-export default {
-  name: "TotalOfCards",
-  setup(){
-    return {toc, tec};
-  }
-}
+<script setup lang="ts">
+const props = defineProps<{
+  title: string;
+  total: number;
+}>();
 </script>
 <template>
   <div class="total-of-cards">
-    <h1>{{ tec }}</h1>
-    <span>{{ toc }}</span>
+    <h1>{{ props.title }}</h1>
+    <span>{{ props.total }}</span>
   </div>
 </template>
 <style lang="scss" scoped>
