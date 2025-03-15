@@ -37,28 +37,36 @@ export default {
 
 <style lang="scss" scoped>
 .avarege-time-card {
-    background-color: #0a0f2b;
-    padding: 20px;
-    border-radius: 12px;
+    background-color: #01081F;
+    padding: 10px;
+    border-radius: 20px;
     text-align: center;
     color: white;
-    width: 250px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    width: 280px;
+    height: 120px;
+    font-weight: normal;
+    font-family: inter;
 }
 
 h3 {
-    font-size: 0.9rem;
-    color: #4a90e2;
-    margin-bottom: 5px;
+    font-size: 15px;
+    font-weight: normal;
+    color: #3D7EFF;
+    margin: 2px;
+    margin-top: -6px;
+    text-align: center;
 }
 
 p {
-    font-size: 2rem;
-    font-weight: bold;
+    font-size: 40px;
+    margin: 0px;
+    color: #FFFFFF;
 }
 
 h2 {
-    font-size: 0.9rem;
-    color: gray;
+    font-size: 15px;
+    font-weight: normal;
+    margin-top: 0%;
+    color: #FFFFFF;
 }
 </style>
