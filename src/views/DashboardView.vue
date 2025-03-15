@@ -21,10 +21,8 @@ const averageTime = ref(0);
 <template>
     <div class="dashboard">
         <h1>Dashboard</h1>
-
         <div class="cards-container">
-            <AvaregeTimeCard titulo="Average Completion Time of Finished Cards" :valor="averageTime"
-                unidade="Cards/week" />
+            <AvaregeTimeCard :valor="averageTime" />
         </div>
     </div>
 </template>
