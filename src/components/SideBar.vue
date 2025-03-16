@@ -34,6 +34,7 @@ const goProfile = () => {
   display: flex;
   flex-direction: column;
   padding: 1rem;
+  position: fixed;
   background-color: #01081F;
   width: 300px;
   height: 100vh;
