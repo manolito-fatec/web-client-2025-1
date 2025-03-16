@@ -34,6 +34,9 @@ button {
 }
 
 .app {
+  .chart-wrapper, .comp-grid, main {
+  transition: all 0.3s ease-in-out; // ✅ Aplica animação suave
+}
   display: flex;
   background-color: #0C1635;
   height: 100vh;
@@ -66,7 +69,10 @@ button {
 
   @media only screen and (orientation: portrait) and (max-width: 768px) {
     main {
+      min-height: calc(100vh - 60px);
+      padding-top: 0px;
       margin-left: none;
+      padding-bottom: 70px;
     }
     
     .sidebar {

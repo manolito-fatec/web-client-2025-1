@@ -32,7 +32,6 @@ import GraphsByTime from '@/components/GraphsByTime.vue';
   padding: 1rem;
   max-width: 100%;
   box-sizing: border-box;
-  overflow-wrap: anywhere;
 
   @media (max-width: 1286px) {
     grid-template-columns: repeat(2, 1fr);
@@ -48,8 +47,8 @@ import GraphsByTime from '@/components/GraphsByTime.vue';
   
   }
 
-  @media (max-width: 480px) {
-    grid-template-columns: 1fr; 
+  @media (max-height: 860px) {
+    gap: 8px;
   }
 }
 </style>
