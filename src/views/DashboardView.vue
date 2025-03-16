@@ -9,11 +9,11 @@ import GraphsByTime from '@/components/GraphsByTime.vue';
         <h1>Dashboard</h1>
     </div>
     <div class="comp-grid">
-        <TotalOfCards title="Total de Cards" :total="0"/>
-        <TotalOfCards title="Total de Cards" :total="0"/>
-        <TotalOfCards title="Total de Cards" :total="0"/>
-        <TotalOfCards title="Total de Cards" :total="0"/>
-        <TotalOfCards title="Total de Cards" :total="0"/>
+        <TotalOfCards title="Total of Cards" :total="0"/>
+        <TotalOfCards title="Total of Cards" :total="1"/>
+        <TotalOfCards title="Total of Cards" :total="2"/>
+        <TotalOfCards title="Total of Cards" :total="3"/>
+        <TotalOfCards title="Total of Cards" :total="4"/>
         <GraphsByTime></GraphsByTime>
     </div>
 </template>
