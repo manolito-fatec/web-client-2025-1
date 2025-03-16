@@ -35,5 +35,24 @@ const props = defineProps<{
 
   font-size: 2rem;
   color: #fff;
+
+  @media only screen and (orientation: portrait) and (max-width: 768px) {
+    width: 100%;
+    padding: 0.2rem;
+    box-sizing: border-box;
+    height: 4rem;
+    
+    border-radius: 8px;
+    align-items: start;
+    h1 {
+      font-size: 0.9rem;
+      margin-left: 10px;
+      color: #FFF;
+    }
+    span {
+      font-size: 1rem;
+      margin-left: 20px;
+    }
+  }
 }
 </style>
