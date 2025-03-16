@@ -38,22 +38,43 @@ button {
   background-color: #0C1635;
   height: 100vh;
 
+  main {
+    flex: 1 1 0;
+    padding: 2rem;
+  }
+  @media only screen and (min-width: 768px) {
+    main {
+      margin-left: 300px;
+    }
+    
+  }
+
+  
+
+  @media only screen and (orientation: landscape) and (min-width: 768px) {
+    main {
+    flex: 1 1 0;
+    padding: 2rem;
+    margin-left: 300px;
+
+    @media (max-width: 768px) {
+      padding: 6rem;
+      min-height: 100vh;
+    }
+  }
+  }
+
   @media only screen and (orientation: portrait) and (max-width: 768px) {
+    main {
+      margin-left: none;
+    }
+    
     .sidebar {
       width: 100vw;
       height: 60px;
       bottom: 0;
       left: 0;
       flex-direction: row;
-    }
-  }
-
-  main {
-    flex: 1 1 0;
-    padding: 2rem;
-
-    @media (max-width: 768px) {
-      padding: 6rem;
     }
   }
 }
