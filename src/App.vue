@@ -1,68 +1,87 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
+import Sidebar from '@/components/SideBar.vue'
 </script>
 
 <template>
-  <div class="sidebar">
-    <Sidebar />
-  </div>
-  <div class="content">
-    <RouterView />
+  <div class="app">
+    <Sidebar class="sidebar"/>
+    <main>
+      <RouterView/>
+    </main>
   </div>
 </template>
 
-<style scoped>
-/* Layout principal */
-.layout {
+<style lang="scss" scoped>
+:root{
+  --color-primary: #01081F;
+  --color-secondary: #0C1635;
+  --color-contrast: #fff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+button {
+  cursor: pointer;
+  appearance: none;
+  border: none;
+  background: none;
+  outline: none;
+}
+
+.app {
+  .chart-wrapper, .comp-grid, main {
+  transition: all 0.3s ease-in-out;
+}
   display: flex;
+  background-color: #0C1635;
   height: 100vh;
-}
 
-/* Barra lateral */
-.sidebar {
-  width: 10vh;
-  background-color: #01081f;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  height: 100vh;
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
-}
-.button {
-  border: 1rem;
-  border-color: rgb(206, 134, 0);
-}
+  main {
+    flex: 1 1 0;
+    padding: 2rem;
+  }
+  @media only screen and (min-width: 768px) {
+    main {
+      margin-left: 300px;
+    }
+    
+  }
 
-.sidebar a {
-  color: white;
-  text-decoration: none;
-  border-radius: 5px;
-  transition: background 0.3s;
-}
+  
 
-.sidebar a:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
+  @media only screen and (orientation: landscape) and (min-width: 768px) {
+    main {
+    flex: 1 1 0;
+    padding: 2rem;
+    margin-left: 300px;
 
-/* Conteúdo principal */
-.content {
-  margin-left: 5rem; /* Adjust margin-left to match the sidebar width */
-  padding: 1rem;
-  flex: 1; /* Allow the content to grow and fill the remaining space */
-  box-sizing: border-box; /* Include padding in the element's total width and height */
-  overflow: auto; /* Add overflow to handle content overflow */
-}
+    @media (max-width: 768px) {
+      padding: 6rem;
+      min-height: 100vh;
+    }
+  }
+  }
 
-header {
-  text-align: left;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+  @media only screen and (orientation: portrait) and (max-width: 768px) {
+    main {
+      min-height: calc(100vh - 60px);
+      padding-top: 0px;
+      margin-left: none;
+      padding-bottom: 70px;
+    }
+    
+    .sidebar {
+      width: 100vw;
+      height: 60px;
+      bottom: 0;
+      left: 0;
+      flex-direction: row;
+    }
+  }
 }
 </style>
