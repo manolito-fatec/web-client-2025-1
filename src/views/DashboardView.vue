@@ -6,7 +6,7 @@ import GraphsByTime from '@/components/GraphsByTime.vue';
 
 <template>
     <div class="dashboard">
-        <h1>Dashboard</h1>
+        <h1>Projects Dashboard</h1>
     </div>
     <div class="comp-grid">
         <TotalOfCards title="Total of Cards" :total="0"/>

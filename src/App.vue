@@ -35,7 +35,7 @@ button {
 
 .app {
   .chart-wrapper, .comp-grid, main {
-  transition: all 0.3s ease-in-out; // ✅ Aplica animação suave
+  transition: all 0.3s ease-in-out;
 }
   display: flex;
   background-color: #0C1635;

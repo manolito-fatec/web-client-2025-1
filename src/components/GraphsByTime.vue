@@ -72,9 +72,16 @@ watch([startDate, endDate], ([newStart, newEnd]) => {
   <div class="chart-wrapper">
     <h2 class="chart-title">Cards created and completed by period</h2>
     <div class="chart-inputs">
-      <input type="date" v-model="startDate" />
-      <input type="date" v-model="endDate" />
+      <div class="input-group">
+        <p>Start date</p>
+        <input type="date" v-model="startDate" />
+      </div>
+      <div class="input-group">
+        <p>End date</p>
+        <input type="date" v-model="endDate" />
+      </div>
     </div>
+
     <Chart type="bar" :data="chartData" :options="chartOptions" class="chart" />
   </div>
 </template>
@@ -88,13 +95,17 @@ watch([startDate, endDate], ([newStart, newEnd]) => {
   gap: 1rem;
   padding: 1rem;
   background: #01081F;
-  border-radius: 8px;
+  border-radius: 25px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   width: 100%;
-  height: 20rem;
+  height: 100%;
   overflow-x: visible;
   max-width: 30rem;
   margin: 0 auto;
+
+  p {
+    color: #FFF;
+    }
 
   .chart-title {
     color: #3D7EFF;
@@ -104,35 +115,64 @@ watch([startDate, endDate], ([newStart, newEnd]) => {
 
   .chart-inputs {
     display: flex;
-    gap: 5rem;
+    gap: 2rem; 
     background: none;
     padding: 0.5rem 1rem;
     border-radius: 4px;
     backdrop-filter: blur(3px);
-
+  
+    .input-group {
+      display: flex;
+      flex-direction: column;  // 🔥 Coloca o <p> acima do <input>
+      align-items: center;
+      gap: 0.25rem;
+    }
+  
     input[type='date'] {
       padding: 0.25rem 0.5rem;
       font-size: 0.6rem;
       border-radius: 8px;
       color: #FFF;
       background-color: #5E6A81;
-      min-width: 60px;
+      min-width: 100px; // Deixa o input mais legível
+      text-align: center;
     }
   }
 
   .chart {
     width: 100%;
-    height: 20rem;
+    height: 100%;
   }
   
 
   @media only screen and (orientation: portrait) and (max-width: 768px) {
-    height: 18rem;
+    height: 15rem;
+    gap: 0px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; 
+    height: auto;
+    
+  
     .chart {
-      height: 12rem;
+      display: flex;
+      justify-content: center; 
+      align-items: center;
+      height: 8rem;
+      width: 100%;
+    }
+  
+    .p-chart.chart {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .p-chart.chart {
+      align-content: center;
     }
     .chart-inputs {
-      padding: 0px;
+      padding: 0px;;
 
       input[type='date'] {
         padding: 2px;

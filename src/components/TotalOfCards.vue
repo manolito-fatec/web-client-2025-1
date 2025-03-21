@@ -21,19 +21,19 @@ const props = defineProps<{
 <style lang="scss" scoped>
 .total-of-cards {
   background-color: #01081F;
-  border-radius: 10px;
+  border-radius: 25px;
   flex-direction: column;
-  width: 11rem;
-  height: 6rem;
+  width: 20rem;
+  height: 10rem;
   display: flex;
   align-items: center;
 
   h1 {
-    font-size: 1rem;
+    font-size: 1.5rem;
     color: #3D7EFF;
   }
 
-  font-size: 2rem;
+  font-size: 3rem;
   color: #fff;
 
   @media only screen and (orientation: portrait) and (max-width: 768px) {
@@ -41,13 +41,12 @@ const props = defineProps<{
     padding: 0.2rem;
     box-sizing: border-box;
     height: 4rem;
+    align-items: start;
     
     border-radius: 8px;
-    align-items: start;
     h1 {
       font-size: 0.9rem;
       margin-left: 10px;
-      color: #FFF;
     }
     span {
       font-size: 1rem;

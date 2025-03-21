@@ -42,11 +42,12 @@ const goProfile = () => {
   left: 0;
 
   .sidebar-routers {
-  ::v-deep(.p-button-label) {
+    width: 100%;
+    display: flex;
+
+    ::v-deep(.p-button-label) {
     color: #FFFFFF !important;
     }
-  }
-  .sidebar-routers {
     ::v-deep(.p-button-icon) {
     color: #FFFFFF !important;
     }
