@@ -23,7 +23,8 @@
     "primeicons": "^7.0.0",
     "primevue": "^4.3.1",
     "vue": "^3.5.13",
-    "vue-router": "^4.5.0"
+    "vue-router": "^4.5.0",
+    "web-client-2025-1": "file:"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.0",
@@ -43,12 +44,12 @@
     "jsdom": "^26.0.0",
     "npm-run-all2": "^7.0.2",
     "prettier": "^3.5.1",
-    "sass": "^1.85.1",
+    "sass": "^1.86.0",
     "start-server-and-test": "^2.0.10",
     "typescript": "~5.7.3",
     "vite": "^6.1.0",
     "vite-plugin-vue-devtools": "^7.7.2",
-    "vitest": "^3.0.5",
+    "vitest": "^3.0.9",
     "vue-tsc": "^2.2.2"
   }
 }

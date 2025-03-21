@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import TotalOfCards from '@/components/TotalOfCards.vue'
 import GraphsByTime from '@/components/GraphsByTime.vue';
+import GraphQuantityForStatus from '@/components/GraphQuantityForStatus.vue';
+import TotalOfCards from '@/components/TotalOfCards.vue';
 
 </script>
 
@@ -13,9 +14,10 @@ import GraphsByTime from '@/components/GraphsByTime.vue';
         <TotalOfCards title="Total of Cards" :total="1"/>
         <TotalOfCards title="Total of Cards" :total="2"/>
         <TotalOfCards title="Total of Cards" :total="3"/>
-        <TotalOfCards title="Total of Cards" :total="4"/>
         <GraphsByTime></GraphsByTime>
+        <GraphQuantityForStatus></GraphQuantityForStatus>
     </div>
+    
 </template>
 
 <style lang="scss" scoped>
@@ -27,29 +29,20 @@ import GraphsByTime from '@/components/GraphsByTime.vue';
 }
 .comp-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); 
-  gap: 10%;
+  grid-template-columns: repeat(3, 1fr); /* Define 3 colunas */
+  grid-template-rows: repeat(2, 1fr); /* Define 2 linhas */
+  gap: 1rem; /* Espaçamento entre os itens */
+  width: 100%;
+  height: 80vh; /* Faz o grid ocupar a altura total da tela */
   padding: 1rem;
-  max-width: 100%;
   box-sizing: border-box;
-  overflow-wrap: anywhere;
 
-  @media (max-width: 1286px) {
-    grid-template-columns: repeat(2, 1fr);
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr; /* Ajusta para 1 coluna em telas menores */
+  }
+}
 
-  }
-  @media (max-width: 1000px) {
-    column-gap: 10px;
-  }
-  @media only screen and (orientation: portrait) and (max-width: 768px) {
-    grid-template-columns: 1fr;
-    row-gap: 20px;
-    padding: 0.5rem;
-  
-  }
-
-  @media (max-width: 480px) {
-    grid-template-columns: 1fr; 
-  }
+.comp-grid > * {
+  margin: 0 auto; /* Centraliza os gráficos individualmente */
 }
 </style>
