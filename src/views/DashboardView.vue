@@ -1,7 +1,21 @@
 <script setup lang="ts">
 import TotalOfCards from '@/components/TotalOfCards.vue'
 import GraphsByTime from '@/components/GraphsByTime.vue';
+import { fetchTotalOfCards } from '@/api/TotalOfCardsApi';
+import { ref, type Ref } from 'vue';
+import { onMounted } from 'vue';
 
+let totalOfCardsCurrentUser:number = 1;
+
+onMounted(async () => {
+  try {
+    const total = await fetchTotalOfCards(1);
+    totalOfCardsCurrentUser = total !== undefined ? total : 1;
+  } catch (error) {
+    console.error("Erro ao buscar total de cartões:", error);
+    totalOfCardsCurrentUser = 1; 
+  }
+});
 </script>
 
 <template>
@@ -9,11 +23,11 @@ import GraphsByTime from '@/components/GraphsByTime.vue';
         <h1>Projects Dashboard</h1>
     </div>
     <div class="comp-grid">
-        <TotalOfCards title="Total of Cards" :total="0"/>
-        <TotalOfCards title="Total of Cards" :total="1"/>
-        <TotalOfCards title="Total of Cards" :total="2"/>
-        <TotalOfCards title="Total of Cards" :total="3"/>
-        <TotalOfCards title="Total of Cards" :total="4"/>
+        <TotalOfCards title="Total of Cards" :total="totalOfCardsCurrentUser"/>
+        <TotalOfCards title="Total of Cards" :total="totalOfCardsCurrentUser"/>
+        <TotalOfCards title="Total of Cards" :total="totalOfCardsCurrentUser"/>
+        <TotalOfCards title="Total of Cards" :total="totalOfCardsCurrentUser"/>
+        <TotalOfCards title="Total of Cards" :total="totalOfCardsCurrentUser"/>
         <GraphsByTime></GraphsByTime>
     </div>
 </template>
