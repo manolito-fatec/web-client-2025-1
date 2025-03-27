@@ -1,20 +1,39 @@
 <script setup lang="ts">
+import { fetchTotalOfCards } from '@/api/TotalOfCardsApi';
+import type { Ref } from 'vue';
+import { ref } from 'vue';
+import { onMounted } from 'vue';
+
 /**
  * Props for the TotalOfCards component.
  * @property {string} title - The title to be displayed.
  * @property {number} total - The total number to be displayed.
  * @author Cauê Vieira
  */
+const titleRef: Ref<string> = ref<string>('');
+const totalRef: Ref<number> = ref<number>(0);
+
 const props = defineProps<{
   title: string;
-  total: number;
 }>();
+
+onMounted(() => {
+  titleRef.value = props.title;
+  try {
+    fetchTotalOfCards(1).then((total) => {
+      totalRef.value = total !== undefined ? total : 1;
+    });
+  } catch (error) {
+    console.error("Erro ao buscar total de cartões:", error);
+    totalRef.value = 1; 
+  }
+});
 </script>
 
 <template>
   <div class="total-of-cards">
-    <h1>{{ props.title }}</h1>
-    <span>{{ props.total }}</span>
+    <h1>{{ titleRef }}</h1>
+    <span>{{ totalRef }}</span>
   </div>
 </template>
 
