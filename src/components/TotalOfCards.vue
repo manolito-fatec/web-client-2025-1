@@ -15,12 +15,13 @@ const totalRef: Ref<number> = ref<number>(0);
 
 const props = defineProps<{
   title: string;
+  userIdProp: number;
 }>();
 
 onMounted(() => {
   titleRef.value = props.title;
   try {
-    fetchTotalOfCards(1).then((total) => {
+    fetchTotalOfCards(props.userIdProp).then((total) => {
       totalRef.value = total !== undefined ? total : 1;
     });
   } catch (error) {
