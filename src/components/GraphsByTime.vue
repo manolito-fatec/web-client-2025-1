@@ -145,7 +145,7 @@ watch([startDate, endDate], () => {
   
     .input-group {
       display: flex;
-      flex-direction: column;  // 🔥 Coloca o <p> acima do <input>
+      flex-direction: column; 
       align-items: center;
       gap: 0.25rem;
     }
@@ -154,10 +154,11 @@ watch([startDate, endDate], () => {
       padding: 0.25rem 0.5rem;
       font-size: 0.6rem;
       border-radius: 8px;
-      color: #FFF;
+      border: none;
       background-color: #5E6A81;
-      min-width: 100px; // Deixa o input mais legível
+      min-width: 100px;
       text-align: center;
+      color: #FFF;
     }
   }
 
