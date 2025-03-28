@@ -38,7 +38,7 @@ const endDate = ref<string>('');
  * @type {number}
  * @default 1
  */
-const operatorId = ref<number>(1);
+const operatorId = ref<number>(3);
 
 /**
  * Dados do gráfico
@@ -75,11 +75,11 @@ const chartOptions = ref({
   },
   scales: {
     x: {
-      grid: { display: false }, // Remove as linhas de grade no eixo X
+      grid: {  color: '#FFF'  }, 
       ticks: { color: '#FFF' },
     },
     y: {
-      grid: { display: false }, // Remove as linhas de grade no eixo Y
+      grid: {  color: '#FFF'  }, 
       ticks: { color: '#FFF' },
     },
   },
@@ -93,40 +93,54 @@ const chartOptions = ref({
  */
 const fetchData = async () => {
   try {
-    console.log('Iniciando requisição para o backend...');
-
-    // Chamada ao endpoint do backend
-    const response = await axios.get('http://localhost:8080/status/3/1637322', {
+    const response = await axios.get(`http://localhost:8080/status/${operatorId.value}/1637322`, {
       params: {
-        operatorId: operatorId.value,
         startDate: startDate.value,
         endDate: endDate.value,
       },
     });
 
-    const data = response.data;
+    // Processamento dos dados conforme a nova estrutura
+    const statusData = {
+      New: 0,
+      'In Progress': 0,
+      'Ready for Test': 0,
+      Closed: 0,
+      'Needs Info': 0,
+    };
 
-    // Atualiza chartData com os dados retornados pela API
+    // Preenche os valores baseado na resposta da API
+    response.data.forEach((item: { statusName: string; count: number }) => {
+      if (statusData.hasOwnProperty(item.statusName)) {
+        statusData[item.statusName] = item.count;
+      }
+    });
+
+    // Atualiza o chartData
     chartData.value = {
       labels: ['New', 'In Progress', 'Ready for Test', 'Closed', 'Needs Info'],
       datasets: [
         {
           label: 'Cards',
           data: [
-            data.quantityStatusNew,
-            data.quantityStatusInProgress,
-            data.quantityStatusReadyForTest,
-            data.quantityStatusClosed,
-            data.quantityStatusNeedsInfo,
+            statusData.New,
+            statusData['In Progress'],
+            statusData['Ready for Test'],
+            statusData.Closed,
+            statusData['Needs Info'],
           ],
           backgroundColor: ['#FF8181', '#61E1A1', '#61A1E1', '#A181FF', '#FFB681'],
         },
       ],
     };
 
-    console.log('Dados da API aplicados:', chartData.value);
+    console.log('Dados formatados:', chartData.value);
   } catch (error) {
-    console.error('Erro ao buscar dados da API:', error);
+    console.error('Erro detalhado:', {
+      message: error.message,
+      response: error.response?.data,
+      config: error.config,
+    });
   }
 };
 
@@ -165,7 +179,7 @@ onMounted(fetchData);
   width: 100%;
   max-width: 100%;
   height: auto;
-  overflow-x: hidden;
+  overflow: hidden; /* Remove qualquer overflow que cause a barra de rolagem */
   margin: 0 auto;
 
   .chart-title {
