@@ -17,7 +17,7 @@
  * @requires primevue/chart - Componente de gráfico do PrimeVue
  */
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import Chart from 'primevue/chart';
 
@@ -39,12 +39,6 @@ const endDate = ref<string>('');
  * @default 1
  */
 const operatorId = ref<number>(1);
-/**
- * Tipo de projeto selecionado
- * @type {'KANBAN' | 'SCRUM'}
- * @default 'KANBAN'
- */
-const typeProject = ref<'KANBAN' | 'SCRUM'>('KANBAN');
 
 /**
  * Dados do gráfico
@@ -56,12 +50,12 @@ const chartData = ref<{
   labels: string[];
   datasets: { label: string; data: number[]; backgroundColor: string[] }[];
 }>({
-  labels: ['New', 'Ready', 'In Progress', 'Ready for Test', 'Done', 'Archived'],
+  labels: ['New', 'In Progress', 'Ready for Test', 'Closed', 'Needs Info'],
   datasets: [
     {
       label: 'Cards',
-      data: [10, 20, 30, 40, 50, 60],
-      backgroundColor: ['#FF8181', '#FFB681', '#61E1A1', '#61A1E1', '#A181FF', '#8181FF'],
+      data: [], // Inicialmente vazio, será preenchido pela API
+      backgroundColor: ['#FF8181', '#61E1A1', '#61A1E1', '#A181FF', '#FFB681'],
     },
   ],
 });
@@ -81,12 +75,12 @@ const chartOptions = ref({
   },
   scales: {
     x: {
-      grid: { color: '#FFF' },
-      ticks: { color: '#FFF' }
+      grid: { display: false }, // Remove as linhas de grade no eixo X
+      ticks: { color: '#FFF' },
     },
     y: {
-      grid: { color: '#FFF' },
-      ticks: { color: '#FFF' }
+      grid: { display: false }, // Remove as linhas de grade no eixo Y
+      ticks: { color: '#FFF' },
     },
   },
 });
@@ -99,118 +93,43 @@ const chartOptions = ref({
  */
 const fetchData = async () => {
   try {
-    // Dados mockados para teste
-    const mockData = typeProject.value === 'KANBAN'
-      ? { 
-          quantityStatusNew: 10,
-          quantityStatusReady: 30,
-          quantityStatusInProgress: 50,
-          quantityStatusReadyForTest: 20,
-          quantityStatusDone: 50,
-          quantityStatusArchived: 40,
-        }
-      : { 
-          quantityStatusNew: 5,
-          quantityStatusInProgress: 3,
-          quantityStatusReadyForTest: 2,
-          quantityStatusClosed: 1,
-          quantityStatusNeedsInfo: 4,
-        };
+    console.log('Iniciando requisição para o backend...');
 
-    // Atualiza chartData com os dados mockados
-    if (typeProject.value === 'KANBAN') {
-      chartData.value = {
-        labels: ['New', 'Ready', 'In Progress', 'Ready for Test', 'Done', 'Archived'],
-        datasets: [
-          {
-            label: 'Cards',
-            data: [
-              mockData.quantityStatusNew,
-              mockData.quantityStatusReady ?? 0,
-              mockData.quantityStatusInProgress,
-              mockData.quantityStatusReadyForTest,
-              mockData.quantityStatusDone ?? 0,
-              mockData.quantityStatusArchived ?? 0,
-            ],
-            backgroundColor: ['#FF8181', '#FFB681', '#61E1A1', '#61A1E1', '#A181FF', '#8181FF'],
-          },
-        ],
-      };
-    } else if (typeProject.value === 'SCRUM') {
-      chartData.value = {
-        labels: ['New', 'In Progress', 'Ready for Test', 'Closed', 'Needs Info'],
-        datasets: [
-          {
-            label: 'Cards',
-            data: [
-              mockData.quantityStatusNew,
-              mockData.quantityStatusInProgress,
-              mockData.quantityStatusReadyForTest,
-              mockData.quantityStatusClosed ?? 0,
-              mockData.quantityStatusNeedsInfo ?? 0,
-            ],
-            backgroundColor: ['#FF8181', '#61E1A1', '#61A1E1', '#A181FF', '#FFB681'],
-          },
-        ],
-      };
-    }
-
-    console.log('Dados mockados aplicados:', chartData.value); // Para depuração
-
-    // Requisição à API (comentada para testes)
-    /*
-    const response = await axios.get('/api/cards/status', {
+    // Chamada ao endpoint do backend
+    const response = await axios.get('http://localhost:8080/status/3/1637322', {
       params: {
         operatorId: operatorId.value,
-        typeProject: typeProject.value,
+        startDate: startDate.value,
+        endDate: endDate.value,
       },
     });
 
     const data = response.data;
 
-    if (typeProject.value === 'KANBAN') {
-      chartData.value = {
-        labels: ['New', 'Ready', 'In Progress', 'Ready for Test', 'Done', 'Archived'],
-        datasets: [
-          {
-            label: 'Cards',
-            data: [
-              data.quantityStatusNew,
-              data.quantityStatusReady,
-              data.quantityStatusInProgress,
-              data.quantityStatusReadyForTest,
-              data.quantityStatusDone,
-              data.quantityStatusArchived,
-            ],
-            backgroundColor: ['#FF8181', '#FFB681', '#61E1A1', '#61A1E1', '#A181FF', '#8181FF'],
-          },
-        ],
-      };
-    } else if (typeProject.value === 'SCRUM') {
-      chartData.value = {
-        labels: ['New', 'In Progress', 'Ready for Test', 'Closed', 'Needs Info'],
-        datasets: [
-          {
-            label: 'Cards',
-            data: [
-              data.quantityStatusNew,
-              data.quantityStatusInProgress,
-              data.quantityStatusReadyForTest,
-              data.quantityStatusClosed,
-              data.quantityStatusNeedsInfo,
-            ],
-            backgroundColor: ['#FF8181', '#61E1A1', '#61A1E1', '#A181FF', '#FFB681'],
-          },
-        ],
-      };
-    }
-    */
+    // Atualiza chartData com os dados retornados pela API
+    chartData.value = {
+      labels: ['New', 'In Progress', 'Ready for Test', 'Closed', 'Needs Info'],
+      datasets: [
+        {
+          label: 'Cards',
+          data: [
+            data.quantityStatusNew,
+            data.quantityStatusInProgress,
+            data.quantityStatusReadyForTest,
+            data.quantityStatusClosed,
+            data.quantityStatusNeedsInfo,
+          ],
+          backgroundColor: ['#FF8181', '#61E1A1', '#61A1E1', '#A181FF', '#FFB681'],
+        },
+      ],
+    };
+
+    console.log('Dados da API aplicados:', chartData.value);
   } catch (error) {
-    console.error('Error fetching data:', error);
+    console.error('Erro ao buscar dados da API:', error);
   }
 };
 
-watch([startDate, endDate, typeProject], fetchData);
 onMounted(fetchData);
 </script>
 
@@ -218,19 +137,20 @@ onMounted(fetchData);
   <div class="chart-wrapper">
     <h2 class="chart-title"> Quantity of Cards per Status</h2>
     <div class="chart-inputs">
-      <input type="date" v-model="startDate" />
-      <input type="date" v-model="endDate" />
-      <select v-model="typeProject">
-        <option value="KANBAN">Kanban</option>
-        <option value="SCRUM">Scrum</option>
-      </select>
+      <div class="input-group">
+        <label for="start-date">Start Date</label>
+        <input id="start-date" type="date" v-model="startDate" />
+      </div>
+      <div class="input-group">
+        <label for="end-date">End Date</label>
+        <input id="end-date" type="date" v-model="endDate" />
+      </div>
     </div>
     <Chart type="bar" :data="chartData" :options="chartOptions" class="chart" />
   </div>
 </template>
 
 <style lang="scss" scoped>
-/* Estilos mantidos sem alterações */
 .chart-wrapper {
   position: relative;
   display: flex;
@@ -262,42 +182,32 @@ onMounted(fetchData);
     justify-content: center; /* Centraliza os inputs horizontalmente */
     padding: 0.5rem 1rem;
     border-radius: 4px;
-    backdrop-filter: blur(3px);
 
-    input[type='date'],
-    select {
-      padding: 0.25rem 0.5rem;
-      font-size: 0.8rem;
-      border-radius: 8px;
-      color: #FFF;
-      background-color: #5E6A81;
-      min-width: 120px; /* Define uma largura mínima para os inputs */
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+
+      label {
+        font-size: 0.9rem;
+        color: #FFF;
+      }
+
+      input[type='date'] {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+        border-radius: 8px;
+        color: #FFF;
+        background-color: #5E6A81;
+        min-width: 120px;
+      }
     }
   }
 
   .chart {
     width: 100%;
     height: auto;
-  }
-
-  @media only screen and (orientation: portrait) and (max-width: 768px) {
-    height: auto;
-
-    .chart {
-      height: 12rem;
-    }
-
-    .chart-inputs {
-      padding: 0;
-      gap: 0.5rem;
-
-      input[type='date'],
-      select {
-        padding: 0.2rem;
-        font-size: 0.7rem;
-        min-width: 100px; /* Ajusta a largura mínima em telas menores */
-      }
-    }
   }
 }
 </style>
