@@ -1,29 +1,60 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, onMounted, ref , watch, type Ref } from 'vue';
+import { fetchGraphsByTime } from '@/api/GraphsByTimeApi';
 import Chart from 'primevue/chart';
+import type { chartDataObj } from '@/types/ChartObjT';
 
-const startDate = ref<string>('');
-const endDate = ref<string>('');
+const userId:Ref<number> = ref<number>(1);
+const startDate = ref();
+const endDate = ref();
+
+const apiBody  =computed(() => 
+  ({
+  userIdRef: userId.value, 
+  startDate: startDate.value,
+  endDate: endDate.value
+  })
+);
+
+const chartDataObjValue: Ref<chartDataObj> = ref<chartDataObj>({
+  created: 0,
+  done: 0,
+});
+
+const props = defineProps<{
+  userIdProp:number;
+}>();
+
+function getChartDataFromApi() {
+  fetchGraphsByTime(apiBody.value).then((data) => {
+    chartDataObjValue.value.done = data[0].completedTaskCount;
+    chartDataObjValue.value.created = data[0].completedTaskCount;
+  });
+}
+
+onMounted(() => {
+  userId.value = props.userIdProp;
+});
 
 /**
  * Mocked data and color configuration for chart.
  * @param backgroundColor - Sets the color of the bars.
  */
- const chartData = ref({
+ const chartData = computed(() => ({
   labels: [''],
   datasets: [
     {
       label: 'Created', 
-      data: [150],
-      backgroundColor: '#FF8181', 
+      data: [chartDataObjValue.value.created], 
+      backgroundColor: '#FF8181',
     },
     {
       label: 'Done', 
-      data: [200],
-      backgroundColor: '#61E1A1', 
+      data: [chartDataObjValue.value.done],
+      backgroundColor: '#61E1A1',
     },
   ],
-});
+}));
 
 
 
@@ -35,7 +66,7 @@ const endDate = ref<string>('');
  */
 const chartOptions = ref({
   responsive: true,
-  barPercentage: 0.5, // ✅ Funciona para barras horizontais
+  barPercentage: 0.5,
   indexAxis: 'y',
   plugins: {
     legend: {
@@ -51,19 +82,10 @@ const chartOptions = ref({
   }
 });
 
-/**
- * Mocked watch function to set the value of the chart based on the period.
- * @param {string} startDate - Value from date input.
- * @param {string} endDate - Value from date input.
- * @returns {void} - Updates the chart dataset based on random mocked data.
- */
-watch([startDate, endDate], ([newStart, newEnd]) => {
-  console.log('Datas selecionadas:', newStart, newEnd);
-  if (newStart && newEnd) {
-    chartData.value.datasets[0].data = [
-      Math.floor(Math.random() * 200),
-      Math.floor(Math.random() * 200),
-    ];
+
+watch([startDate, endDate], () => {
+  if (startDate.value && endDate.value) {
+    getChartDataFromApi();
   }
 });
 </script>
