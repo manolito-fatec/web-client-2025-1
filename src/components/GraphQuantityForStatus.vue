@@ -17,7 +17,7 @@
  * @requires primevue/chart - Componente de gráfico do PrimeVue
  */
 <script setup lang="ts">
-import { computed, onMounted, ref, type Ref } from 'vue';
+import { ref, onMounted, type Ref } from 'vue';
 import axios from 'axios';
 import Chart from 'primevue/chart';
 
@@ -32,7 +32,13 @@ export type TaskByStatusGraphObj = {
 /**
  * ID do operador para filtragem
  */
-const operatorId: Ref<number> = ref<number>(2);
+const operatorId = ref<number>(1);
+
+/**
+ * Datas de início e fim para filtragem
+ */
+const startDate = ref<string>(''); // Inicializa como string vazia
+const endDate = ref<string>('');   // Inicializa como string vazia
 
 /**
  * Dados do gráfico
@@ -60,22 +66,18 @@ function getChartDataFromApi() {
 /**
  * Computed para os dados do gráfico
  */
-const chartData = computed(() => {
-  const labels = chartDataObjValue.value.map((item) => item.statusName); // Extrai os nomes dos status
-  const data = chartDataObjValue.value.map((item) => item.count); // Extrai os valores de contagem
-
-  return {
-    labels,
-    datasets: [
-      {
-        label: 'Cards',
-        data,
-        backgroundColor: ['#FF8181', '#61E1A1', '#61A1E1', '#A181FF', '#FFB681'], // Cores para as colunas
-        borderColor: '#FFFFFF', // Cor da borda das barras
-        borderWidth: 2, // Largura da borda
-      },
-    ],
-  };
+const chartData = ref<{
+  labels: string[];
+  datasets: { label: string; data: number[]; backgroundColor: string[] }[];
+}>({
+  labels: ['New', 'In Progress', 'Ready for Test', 'Closed', 'Needs Info'],
+  datasets: [
+    {
+      label: 'Cards',
+      data: [], // Inicialmente vazio, será preenchido pela API
+      backgroundColor: ['#FF8181', '#61E1A1', '#61A1E1', '#A181FF', '#FFB681'],
+    },
+  ],
 });
 
 /**
@@ -91,43 +93,78 @@ const chartOptions = ref({
     },
   },
   scales: {
-    y: {
-      ticks: {
-        callback: function (value: unknown) {
-          // Mostra apenas números inteiros
-          if (Number.isInteger(value)) {
-            return value;
-          }
-          return ''; // Não exibe nada para números decimais
-        },
-        color: '#FFF', // Cor dos números no eixo
-      },
-      grid: {
-        display: false, // Remove as linhas horizontais do fundo
-      },
-    },
     x: {
-      ticks: {
-        color: '#FFF', // Cor dos rótulos no eixo
-      },
-      grid: {
-        display: false, // Remove as linhas verticais do fundo
-      },
+      grid: { display: false }, // Remove as linhas de grade no eixo X
+      ticks: { color: '#FFF' },
+    },
+    y: {
+      grid: { display: false }, // Remove as linhas de grade no eixo Y
+      ticks: { color: '#FFF' },
     },
   },
 });
 
 /**
- * Busca os dados ao montar o componente
+ * Busca dados da API e atualiza o gráfico
+ * @async
+ * @function fetchData
+ * @throws {Error} Erro na requisição à API
  */
-onMounted(() => {
-  getChartDataFromApi();
-});
+const fetchData = async () => {
+  try {
+    console.log('Iniciando requisição para o backend...');
+
+    // Chamada ao endpoint do backend
+    const response = await axios.get('http://localhost:8080/status/3/1637322', {
+      params: {
+        operatorId: operatorId.value,
+        startDate: startDate.value,
+        endDate: endDate.value,
+      },
+    });
+
+    const data = response.data;
+
+    // Atualiza chartData com os dados retornados pela API
+    chartData.value = {
+      labels: ['New', 'In Progress', 'Ready for Test', 'Closed', 'Needs Info'],
+      datasets: [
+        {
+          label: 'Cards',
+          data: [
+            data.quantityStatusNew,
+            data.quantityStatusInProgress,
+            data.quantityStatusReadyForTest,
+            data.quantityStatusClosed,
+            data.quantityStatusNeedsInfo,
+          ],
+          backgroundColor: ['#FF8181', '#61E1A1', '#61A1E1', '#A181FF', '#FFB681'],
+        },
+      ],
+    };
+
+    console.log('Dados da API aplicados:', chartData.value);
+  } catch (error) {
+    console.error('Erro ao buscar dados da API:', error);
+  }
+};
+
+onMounted(fetchData);
 </script>
 
 <template>
   <div class="chart-wrapper">
-    <h2 class="chart-title">Cards by Status</h2>
+    <h2 class="chart-title"> Quantity of Cards per Status</h2>
+    <div class="chart-inputs">
+      <div class="input-group">
+        <label for="start-date">Start Date</label>
+        <input id="start-date" type="date" v-model="startDate" />
+      </div>
+      <div class="input-group">
+        <label for="end-date">End Date</label>
+        <input id="end-date" type="date" v-model="endDate" />
+      </div>
+    </div>
     <Chart type="bar" :data="chartData" :options="chartOptions" class="chart" />
   </div>
 </template>
@@ -156,9 +193,38 @@ onMounted(() => {
   .chart-title {
     color: #3D7EFF;
     margin: 0;
-    font-size: 1.2rem;
-    font-weight: bold;
-    text-align: center;
+    font-size: 1rem;
+    text-align: center; /* Centraliza o título */
+  }
+
+  .chart-inputs {
+    display: flex;
+    flex-wrap: wrap; /* Permite que os inputs fiquem em várias linhas em telas menores */
+    gap: 1rem; /* Espaçamento entre os inputs */
+    justify-content: center; /* Centraliza os inputs horizontalmente */
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+
+      label {
+        font-size: 0.9rem;
+        color: #FFF;
+      }
+
+      input[type='date'] {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+        border-radius: 8px;
+        color: #FFF;
+        background-color: #5E6A81;
+        min-width: 120px;
+      }
+    }
   }
 
   .chart {
@@ -168,34 +234,6 @@ onMounted(() => {
     border: 2px solid #3D7EFF; /* Borda ao redor do gráfico */
     border-radius: 15px; /* Bordas arredondadas */
     background: rgba(255, 255, 255, 0.05); /* Fundo levemente transparente */
-  }
-
-  @media only screen and (orientation: portrait) and (max-width: 768px) {
-    height: 15rem;
-    gap: 0px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: auto;
-
-    .chart {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 8rem;
-      width: 100%;
-    }
-
-    .p-chart.chart {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .p-chart.chart {
-      align-content: center;
-    }
   }
 }
 </style>
