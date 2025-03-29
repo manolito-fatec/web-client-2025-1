@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import TotalOfCards from '@/components/TotalOfCards.vue'
 import GraphsByTime from '@/components/GraphsByTime.vue';
+import TotalOfProjects from '@/components/TotalOfProjects.vue';
 import { ref, type Ref } from 'vue';
 
 const currentUserId: Ref<number> = ref<number>(1);
@@ -14,7 +15,7 @@ const currentUserId: Ref<number> = ref<number>(1);
     <div class="comp-grid">
         <TotalOfCards title="Total of Cards" :userIdProp="currentUserId"/>
         <TotalOfCards title="Total of Cards" :userIdProp="currentUserId"/>
-        <TotalOfCards title="Total of Cards" :userIdProp="currentUserId"/>
+        <TotalOfProjects title="Total of Projects" :userIdProp="currentUserId"/>
         <TotalOfCards title="Total of Cards" :userIdProp="currentUserId"/>
         <TotalOfCards title="Total of Cards" :userIdProp="currentUserId"/>
         <GraphsByTime :userIdProp=currentUserId></GraphsByTime>
