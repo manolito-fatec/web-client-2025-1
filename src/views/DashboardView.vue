@@ -1,43 +1,39 @@
 <script setup lang="ts">
 import TotalOfCards from '@/components/TotalOfCards.vue'
 import GraphsByTime from '@/components/GraphsByTime.vue';
+import AverageTimeCard from '@/components/AverageTimeCard.vue';
+
 import { ref, type Ref } from 'vue';
 
 const currentUserId: Ref<number> = ref<number>(1);
+const averageTime = ref(0);
 
 </script>
 
 <template>
-    <div class="dashboard">
-        <h1>Projects Dashboard</h1>
-    </div>
-    <div class="comp-grid">
-        <TotalOfCards title="Total of Cards" :userIdProp="currentUserId"/>
-        <TotalOfCards title="Total of Cards" :userIdProp="currentUserId"/>
-        <TotalOfCards title="Total of Cards" :userIdProp="currentUserId"/>
-        <TotalOfCards title="Total of Cards" :userIdProp="currentUserId"/>
-        <TotalOfCards title="Total of Cards" :userIdProp="currentUserId"/>
-        <GraphsByTime :userIdProp=currentUserId></GraphsByTime>
-    </div>
+  <div class="dashboard">
+    <h1>Projects Dashboard</h1>
+  </div>
+  <div class="comp-grid">
+    <TotalOfCards title="Total of Cards" :userIdProp="currentUserId" />
+    <AverageTimeCard :userIdProp="currentUserId" :averageTime="averageTime" />
+    <TotalOfCards title="Total of Cards" :userIdProp="currentUserId" />
+    <GraphsByTime :userIdProp=currentUserId></GraphsByTime>
+  </div>
 </template>
-
-<script setup lang="ts">
-import { ref } from 'vue';
-import AvaregeTimeCard from '@/components/AverageTimeCard.vue';
-
-const averageTime = ref(0);
-</script>
 
 <style lang="scss" scoped>
 .dashboard {
-    background-color: var(--color-secondary);
-    h1{
-        color: #fff;
-    }
+  background-color: var(--color-secondary);
+
+  h1 {
+    color: #fff;
+  }
 }
+
 .comp-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); 
+  grid-template-columns: repeat(3, 1fr);
   gap: 10%;
   padding: 1rem;
   max-width: 100%;
@@ -47,14 +43,16 @@ const averageTime = ref(0);
     grid-template-columns: repeat(2, 1fr);
 
   }
+
   @media (max-width: 1000px) {
     column-gap: 10px;
   }
+
   @media only screen and (orientation: portrait) and (max-width: 768px) {
     grid-template-columns: 1fr;
     row-gap: 20px;
     padding: 0.5rem;
-  
+
   }
 
   @media (max-height: 860px) {

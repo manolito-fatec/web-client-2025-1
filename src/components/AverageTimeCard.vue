@@ -1,42 +1,41 @@
-<script>
-import axios from 'axios';
+<script lang="ts" setup>
+import { fetchAverageTime } from '../api/AverageTimeApi';
+import { ref, type Ref } from 'vue';
+import { onMounted } from 'vue';
 
-export default {
-    data() {
-        return {
-            avaregeTimeDay: 0,
-        };
-    },
+const userIdRef:Ref<number> = ref<number>(0); 
 
-    mounted() {
-        this.fetchAverageTime();
-    },
+const props = defineProps<{
+    userIdProp: number
+}>();
 
-    // methods: {
-    //     async fetchAverageTime() {
-    //         try {
-    //             const response = await axios.get('/api/average-time'); // alterar URL
-    //             this.avaregeTimeDay = response.data.averageTimeDay; // Ajustar de acordo com a resposta da API
-    //         } catch (error) {
-    //             console.error("Erro ao buscar dados", error);
-    //         }
-    //     }
-    // },
-}
+const averageTimeDay:Ref<number> = ref<number>(0);
+
+onMounted(() => {
+    userIdRef.value = props.userIdProp;
+    try {
+        fetchAverageTime(userIdRef.value).then((response) => {
+            averageTimeDay.value = response;
+        });
+    } catch (error) {
+        console.error('Error fetching average time:', error);
+    }
+});
+
 </script>
 
 <template>
-    <div class="avarege-time-card">
+    <div class="average-time-card">
         <h3>Average Completion Time of Finished Cards</h3>
         <div>
-            <p>{{ avaregeTimeDay }}</p>
+            <p>{{ averageTimeDay }}</p>
         </div>
         <h2>Cards/Week</h2>
     </div>
 </template>
 
 <style lang="scss" scoped>
-.avarege-time-card {
+.average-time-card {
     background-color: #01081F;
     padding: 10px;
     border-radius: 20px;
