@@ -60,7 +60,7 @@ onMounted(() => {
     width: 100%;
     padding: 0.2rem;
     box-sizing: border-box;
-    height: 4rem;
+    height: 5rem;
     align-items: start;
     
     border-radius: 8px;

@@ -29,8 +29,9 @@ onMounted(() => {
         <h3>Average Completion Time of Finished Cards</h3>
         <div>
             <p>{{ averageTimeDay }}</p>
+            <h2>Cards/Week</h2>
         </div>
-        <h2>Cards/Week</h2>
+        
     </div>
 </template>
 
@@ -41,10 +42,8 @@ onMounted(() => {
     border-radius: 20px;
     text-align: center;
     color: white;
-    width: 280px;
-    height: 120px;
-}
-
+    width: 400px;
+    height: 180px;
 h3 {
     font-size: 15px;
     font-weight: normal;
@@ -53,17 +52,57 @@ h3 {
     margin-top: -6px;
     text-align: center;
 }
-
 p {
     font-size: 40px;
     margin: 0px;
     color: #FFFFFF;
 }
 
-h2 {
-    font-size: 15px;
-    font-weight: normal;
-    margin-top: 0%;
-    color: #FFFFFF;
+    @media only screen and (orientation: portrait) and (max-width: 768px) {
+    width: 100%;
+    padding: 0.2rem;
+    box-sizing: border-box;
+    text-align: start;
+    height: 5rem;
+    border-radius: 8px;
+
+    h1 {
+      font-size: 0.9rem;
+      margin-left: 10px;
+    }
+
+    h3 {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #3D7EFF;
+    margin: 2px;
+    text-align: start;
+    margin-left: 10px;
+    
+    }
+
+    p {
+        font-size: 0.9rem;
+        margin-left: 50px;
+        color: #FFFFFF;
+        padding-top: 0.2rem;
+    }
+
+    h2 {
+        font-size: 0.9rem;
+        font-weight: normal;
+        margin-left: 20px;
+        margin-bottom: 0px;
+
+        color: #FFFFFF;
+    }
+        span {
+        font-size: 1rem;
+        margin-left: 20px;
+        }
+    }
 }
+
+
+
 </style>

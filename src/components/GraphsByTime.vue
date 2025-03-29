@@ -76,7 +76,7 @@ const chartOptions = ref({
   scales: {
     x:{
       grid:{
-        color: '#FFF',
+        color: '#5b5b5b',
       }
     }
   }
@@ -120,7 +120,7 @@ watch([startDate, endDate], () => {
   border-radius: 25px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   width: 100%;
-  height: 100%;
+  height: 80%;
   overflow-x: visible;
   max-width: 30rem;
   margin: 0 auto;
@@ -137,7 +137,7 @@ watch([startDate, endDate], () => {
 
   .chart-inputs {
     display: flex;
-    gap: 2rem; 
+    gap: 8rem; 
     background: none;
     padding: 0.5rem 1rem;
     border-radius: 4px;
@@ -152,7 +152,7 @@ watch([startDate, endDate], () => {
   
     input[type='date'] {
       padding: 0.25rem 0.5rem;
-      font-size: 0.6rem;
+      font-size: 1rem;
       border-radius: 8px;
       border: none;
       background-color: #5E6A81;
@@ -169,20 +169,20 @@ watch([startDate, endDate], () => {
   
 
   @media only screen and (orientation: portrait) and (max-width: 768px) {
-    height: 15rem;
+    height: 20%;
+    width: 100%;
     gap: 0px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center; 
     height: auto;
-    
   
     .chart {
       display: flex;
       justify-content: center; 
       align-items: center;
-      height: 8rem;
+      height: 70%;
       width: 100%;
     }
   
@@ -195,9 +195,22 @@ watch([startDate, endDate], () => {
       align-content: center;
     }
     .chart-inputs {
-      padding: 0px;;
+      padding: 0px;
+      height: 3rem;
+      gap: 2rem; 
+
+      .input-group {
+      margin-top: -0.8rem;
+      display: flex;
+      height: 3rem;
+      flex-direction: column; 
+      align-items: center;
+      gap: 0rem;
+    }
 
       input[type='date'] {
+        font-size: 0.5rem;
+        margin-top: -0.8rem;
         padding: 2px;
       }
     }

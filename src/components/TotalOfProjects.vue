@@ -48,40 +48,27 @@ onMounted(() => {
   height: 10rem;
   display: flex;
   align-items: center;
-  justify-content: center;
 
   h1 {
     font-size: 1.5rem;
     color: #3D7EFF;
-    margin-bottom: 0.5rem;
   }
 
-  span {
-    font-size: 3rem;
-    color: #fff;
-  }
-
-  .error-message {
-    color: #ff6b6b;
-    font-size: 1rem;
-  }
+  font-size: 3rem;
+  color: #fff;
 
   @media only screen and (orientation: portrait) and (max-width: 768px) {
     width: 100%;
     padding: 0.2rem;
     box-sizing: border-box;
-    height: 4rem;
+    height: 5rem;
     align-items: start;
-
     border-radius: 8px;
-
     h1 {
       font-size: 0.9rem;
       margin-left: 10px;
     }
-
-    span,
-    .error-message {
+    span {
       font-size: 1rem;
       margin-left: 20px;
     }

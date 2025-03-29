@@ -173,8 +173,6 @@ onMounted(() => {
   width: 100%;
   height: 100%;
   overflow-x: visible;
-  height: 19rem;
-  max-width: 30rem;
   margin: 0 auto;
 
   p {
@@ -195,7 +193,8 @@ onMounted(() => {
   
 
   @media only screen and (orientation: portrait) and (max-width: 768px) {
-    height: 15rem;
+    height: 20%;
+    width: 100%;
     gap: 0px;
     display: flex;
     flex-direction: column;
@@ -203,12 +202,11 @@ onMounted(() => {
     justify-content: center; 
     height: auto;
     
-  
     .chart {
       display: flex;
       justify-content: center; 
       align-items: center;
-      height: 8rem;
+      height: 100%;
       width: 100%;
     }
   
@@ -217,6 +215,10 @@ onMounted(() => {
       justify-content: center;
       align-items: center;
     }
+    .p-chart.chart {
+      align-content: center;
+    }
+    
   }
 }
 </style>
