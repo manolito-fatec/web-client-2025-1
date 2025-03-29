@@ -17,7 +17,6 @@ const YoutanTheme = definePreset(Aura, {
       400: '{#01081f}',
     }
   },
-
 })
 
 app.use(createPinia())
@@ -28,8 +27,7 @@ app.use(Primevue, {
     preset: YoutanTheme,
     options: {
       prefix: 'p',
-      darkModeSelector: 'system',
-      cssLayer: false,
+      darkModeSelector:  'none',
     },
   },
 })

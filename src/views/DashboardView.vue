@@ -1,9 +1,23 @@
+<script setup lang="ts">
+import TotalOfCards from '@/components/TotalOfCards.vue'
+import GraphsByTime from '@/components/GraphsByTime.vue';
+import { ref, type Ref } from 'vue';
+
+const currentUserId: Ref<number> = ref<number>(1);
+
+</script>
+
 <template>
     <div class="dashboard">
-        <h1>Dashboard</h1>
-        <div class="cards-container">
-            <AvaregeTimeCard :valor="averageTime" />
-        </div>
+        <h1>Projects Dashboard</h1>
+    </div>
+    <div class="comp-grid">
+        <TotalOfCards title="Total of Cards" :userIdProp="currentUserId"/>
+        <TotalOfCards title="Total of Cards" :userIdProp="currentUserId"/>
+        <TotalOfCards title="Total of Cards" :userIdProp="currentUserId"/>
+        <TotalOfCards title="Total of Cards" :userIdProp="currentUserId"/>
+        <TotalOfCards title="Total of Cards" :userIdProp="currentUserId"/>
+        <GraphsByTime :userIdProp=currentUserId></GraphsByTime>
     </div>
 </template>
 
@@ -17,34 +31,34 @@ const averageTime = ref(0);
 <style lang="scss" scoped>
 .dashboard {
     background-color: var(--color-secondary);
-    color: white;
-    text-align: center;
-    padding: 20px;
+    h1{
+        color: #fff;
+    }
 }
+.comp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 10%;
+  padding: 1rem;
+  max-width: 100%;
+  box-sizing: border-box;
 
-/* Estilo para desktop */
-.cards-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-    gap: 20px;
-}
+  @media (max-width: 1286px) {
+    grid-template-columns: repeat(2, 1fr);
 
-@media (max-width: 768px) {
-    .dashboard {
-        padding: 0px;
-    }
+  }
+  @media (max-width: 1000px) {
+    column-gap: 10px;
+  }
+  @media only screen and (orientation: portrait) and (max-width: 768px) {
+    grid-template-columns: 1fr;
+    row-gap: 20px;
+    padding: 0.5rem;
+  
+  }
 
-    .cards-container {
-        flex-direction: column;
-        align-items: center;
-        gap: 10px; 
-        width: 100%;
-    }
-
-    .cards-container > * {
-        width: 90%;
-        max-width: 400px;
-    }
+  @media (max-height: 860px) {
+    gap: 8px;
+  }
 }
 </style>

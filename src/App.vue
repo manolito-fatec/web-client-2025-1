@@ -15,7 +15,7 @@ import Sidebar from '@/components/SideBar.vue'
 <style lang="scss" scoped>
 :root{
   --color-primary: #01081F;
-  --color-secondary: #010e38;
+  --color-secondary: #0C1635;
   --color-contrast: #fff;
 }
 
@@ -34,26 +34,53 @@ button {
 }
 
 .app {
+  .chart-wrapper, .comp-grid, main {
+  transition: all 0.3s ease-in-out;
+}
   display: flex;
-  background-color: #051340;
+  background-color: #0C1635;
   height: 100vh;
 
+  main {
+    flex: 1 1 0;
+    padding: 2rem;
+  }
+  @media only screen and (min-width: 768px) {
+    main {
+      margin-left: 300px;
+    }
+    
+  }
+
+  
+
+  @media only screen and (orientation: landscape) and (min-width: 768px) {
+    main {
+    flex: 1 1 0;
+    padding: 2rem;
+    margin-left: 300px;
+
+    @media (max-width: 768px) {
+      padding: 6rem;
+      min-height: 100vh;
+    }
+  }
+  }
+
   @media only screen and (orientation: portrait) and (max-width: 768px) {
+    main {
+      min-height: calc(100vh - 60px);
+      padding-top: 0px;
+      margin-left: none;
+      padding-bottom: 70px;
+    }
+    
     .sidebar {
       width: 100vw;
       height: 60px;
       bottom: 0;
       left: 0;
       flex-direction: row;
-    }
-  }
-
-  main {
-    flex: 1 1 0;
-    padding: 2rem;
-
-    @media (max-width: 768px) {
-      padding: 6rem;
     }
   }
 }
