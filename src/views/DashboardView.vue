@@ -2,7 +2,7 @@
 import TotalOfCards from '@/components/TotalOfCards.vue'
 import GraphsByTime from '@/components/GraphsByTime.vue';
 import AverageTimeCard from '@/components/AverageTimeCard.vue';
-
+import GraphQuantityForStatus from '@/components/GraphQuantityForStatus.vue';
 import { ref, type Ref } from 'vue';
 
 const currentUserId: Ref<number> = ref<number>(1);
@@ -19,6 +19,7 @@ const averageTime = ref(0);
     <AverageTimeCard :userIdProp="currentUserId" :averageTime="averageTime" />
     <TotalOfCards title="Total of Cards" :userIdProp="currentUserId" />
     <GraphsByTime :userIdProp=currentUserId></GraphsByTime>
+    <GraphQuantityForStatus :userIdProp=currentUserId></GraphQuantityForStatus>
   </div>
 </template>
 
