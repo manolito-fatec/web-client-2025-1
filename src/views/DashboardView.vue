@@ -15,7 +15,7 @@ import TotalOfCards from '@/components/TotalOfCards.vue';
         <TotalOfCards title="Total of Cards" :total="2"/>
         <TotalOfCards title="Total of Cards" :total="3"/>
         <GraphsByTime></GraphsByTime>
-        <GraphQuantityForStatus></GraphQuantityForStatus>
+        <GraphQuantityForStatus :operatorId="3"></GraphQuantityForStatus>
     </div>
     
 </template>
