@@ -43,8 +43,6 @@ onMounted(() => {
     color: white;
     width: 280px;
     height: 120px;
-    font-weight: normal;
-    font-family: inter;
 }
 
 h3 {
