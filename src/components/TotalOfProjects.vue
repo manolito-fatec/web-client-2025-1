@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { fetchTotalOfProjects } from '../api/TotalOfProjects';
+import { fetchTotalOfProjects } from '@/api/TotalOfProjects';
 import type { Ref } from 'vue';
 import { ref } from 'vue';
 import { onMounted } from 'vue';
@@ -14,15 +14,28 @@ const titleRef: Ref<string> = ref<string>('');
 const totalRef: Ref<number> = ref<number>(0);
 
 const props = defineProps<{
-  title: 'Total Projects'
+  title: string 
+  userIdProp: number;
 }>();
+
+onMounted(() => {
+  titleRef.value = props.title;
+  try {
+    fetchTotalOfProjects(props.userIdProp).then((total) => {
+      totalRef.value = total !== undefined ? total : 1;
+    });
+  } catch (error) {
+    console.error("Error fetching total projects:", error);
+    totalRef.value = 1; 
+  }
+});
 
 </script>
 
 <template>
   <div class="total-of-projects">
-    <h1>{{ props.title }}</h1>
-    <span>{{ total }}</span>
+    <h1>{{ titleRef }}</h1>
+    <span>{{ totalRef }}</span>
   </div>
 </template>
 
