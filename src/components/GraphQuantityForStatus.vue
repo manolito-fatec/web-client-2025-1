@@ -37,10 +37,6 @@ const props = defineProps({
 
 
 
-/**
- * Dados do gráfico
- */
-const chartDataObjValue: Ref<TaskByStatusGraphObj[]> = ref([])
 
 /**
  * Computed para os dados do gráfico
@@ -137,7 +133,7 @@ onMounted(() => {
   fetchTaskStatus(operatorIdRef.value, projectOriginalIdRef.value).then((apiData) => {
     const statusCounts = chartLabels.map(label => {
       const normalizedLabel = label.toLowerCase().trim();
-      const matchingStatus = apiData.find(item => 
+      const matchingStatus = apiData.find((item: { statusName: string; }) => 
         item.statusName.toLowerCase().trim() === normalizedLabel
       );
       return matchingStatus ? matchingStatus.count : 0;
