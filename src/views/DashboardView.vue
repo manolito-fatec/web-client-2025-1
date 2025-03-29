@@ -1,23 +1,19 @@
 <script setup lang="ts">
+import TotalOfCards from '@/components/TotalOfCards.vue'
 import GraphsByTime from '@/components/GraphsByTime.vue';
-import GraphQuantityForStatus from '@/components/GraphQuantityForStatus.vue';
-import TotalOfCards from '@/components/TotalOfCards.vue';
+import { ref, type Ref } from 'vue';
+
+const currentUserId: Ref<number> = ref<number>(1);
 
 </script>
 
 <template>
     <div class="dashboard">
-        <h1>Dashboard</h1>
+        <h1>Projects Dashboard</h1>
     </div>
     <div class="comp-grid">
-        <TotalOfCards title="Total of Cards" :total="0"/>
-        <TotalOfCards title="Total of Cards" :total="1"/>
-        <TotalOfCards title="Total of Cards" :total="2"/>
-        <TotalOfCards title="Total of Cards" :total="3"/>
-        <GraphsByTime></GraphsByTime>
-        <GraphQuantityForStatus :operatorId="3"></GraphQuantityForStatus>
+        <GraphsByTime :userIdProp=currentUserId></GraphsByTime>
     </div>
-    
 </template>
 
 <style lang="scss" scoped>
@@ -29,20 +25,28 @@ import TotalOfCards from '@/components/TotalOfCards.vue';
 }
 .comp-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* Define 3 colunas */
-  grid-template-rows: repeat(2, 1fr); /* Define 2 linhas */
-  gap: 1rem; /* Espaçamento entre os itens */
-  width: 100%;
-  height: 80vh; /* Faz o grid ocupar a altura total da tela */
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 10%;
   padding: 1rem;
+  max-width: 100%;
   box-sizing: border-box;
 
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr; /* Ajusta para 1 coluna em telas menores */
-  }
-}
+  @media (max-width: 1286px) {
+    grid-template-columns: repeat(2, 1fr);
 
-.comp-grid > * {
-  margin: 0 auto; /* Centraliza os gráficos individualmente */
+  }
+  @media (max-width: 1000px) {
+    column-gap: 10px;
+  }
+  @media only screen and (orientation: portrait) and (max-width: 768px) {
+    grid-template-columns: 1fr;
+    row-gap: 20px;
+    padding: 0.5rem;
+  
+  }
+
+  @media (max-height: 860px) {
+    gap: 8px;
+  }
 }
 </style>
