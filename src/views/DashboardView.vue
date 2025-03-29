@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import TotalOfCards from '@/components/TotalOfCards.vue'
-import GraphsByTime from '@/components/GraphsByTime.vue';
+import GraphQuantityForStatus from '@/components/GraphQuantityForStatus.vue';
 import { ref, type Ref } from 'vue';
 
 const currentUserId: Ref<number> = ref<number>(1);
@@ -12,12 +11,7 @@ const currentUserId: Ref<number> = ref<number>(1);
         <h1>Projects Dashboard</h1>
     </div>
     <div class="comp-grid">
-        <TotalOfCards title="Total of Cards" :userIdProp="currentUserId"/>
-        <TotalOfCards title="Total of Cards" :userIdProp="currentUserId"/>
-        <TotalOfCards title="Total of Cards" :userIdProp="currentUserId"/>
-        <TotalOfCards title="Total of Cards" :userIdProp="currentUserId"/>
-        <TotalOfCards title="Total of Cards" :userIdProp="currentUserId"/>
-        <GraphsByTime :userIdProp=currentUserId></GraphsByTime>
+        <GraphQuantityForStatus :userIdProp=currentUserId></GraphQuantityForStatus>
     </div>
 </template>
 
