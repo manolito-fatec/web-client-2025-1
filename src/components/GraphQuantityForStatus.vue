@@ -17,65 +17,46 @@
  * @requires primevue/chart - Componente de gráfico do PrimeVue
  */
 <script setup lang="ts">
-import { computed, onMounted, ref, type Ref } from 'vue';
-import axios from 'axios';
+import { onMounted, ref, type Ref } from 'vue';
 import Chart from 'primevue/chart';
+import { fetchTaskStatus } from '@/api/GraphQtdByStatusApi';
 
-/**
- * Tipo para os dados retornados pela API
- */
-export type TaskByStatusGraphObj = {
-  statusName: string;
-  count: number;
-};
+const operatorIdRef:Ref<number> = ref<number>(1);
+const projectOriginalIdRef:Ref<number> = ref<number>(1637322);
 
-/**
- * ID do operador para filtragem
- */
-const operatorId: Ref<number> = ref<number>(2);
+const props = defineProps({
+  operatorId: {
+    type: Number,
+    default: 1,
+  },
+  projectOriginalId: {
+    type: Number,
+    default: 1637322,
+  },
+});
+
+
 
 /**
  * Dados do gráfico
  */
-const chartDataObjValue: Ref<TaskByStatusGraphObj[]> = ref([]);
-
-/**
- * Função para buscar os dados da API
- */
-function getChartDataFromApi() {
-  axios
-    .get(`http://localhost:8080/status/${operatorId.value}/1637322`)
-    .then((response) => {
-      chartDataObjValue.value = response.data; // Atualiza os dados com o array retornado pela API
-    })
-    .catch((error) => {
-      console.error('Erro ao buscar dados da API:', {
-        message: error.message,
-        response: error.response?.data,
-        config: error.config,
-      });
-    });
-}
+const chartDataObjValue: Ref<TaskByStatusGraphObj[]> = ref([])
 
 /**
  * Computed para os dados do gráfico
  */
-const chartData = computed(() => {
-  const labels = chartDataObjValue.value.map((item) => item.statusName); // Extrai os nomes dos status
-  const data = chartDataObjValue.value.map((item) => item.count); // Extrai os valores de contagem
-
-  return {
-    labels,
-    datasets: [
-      {
-        label: 'Cards',
-        data,
-        backgroundColor: ['#FF8181', '#61E1A1', '#61A1E1', '#A181FF', '#FFB681'], // Cores para as colunas
-        borderColor: '#FFFFFF', // Cor da borda das barras
-        borderWidth: 2, // Largura da borda
-      },
-    ],
-  };
+const chartData = ref<{
+  labels: string[];
+  datasets: { label: string; data: number[]; backgroundColor: string[] }[];
+}>({
+  labels: ['Closed', 'In Progress','New', 'Ready for Test',  'Needs Info'],
+  datasets: [
+    {
+      label: 'Cards',
+      data: [],
+      backgroundColor: ['#A181FF', '#61E1A1', '#FF8181',  '#61A1E1',  '#FFB681'],
+    },
+  ],
 });
 
 /**
@@ -118,16 +99,66 @@ const chartOptions = ref({
 });
 
 /**
- * Busca os dados ao montar o componente
+ * Busca dados da API e atualiza o gráfico
+ * @async
+ * @function fetchData
+ * @throws {Error} Erro na requisição à API
  */
+
+
+const chartLabels = ['In Progress', 'New', 'Ready for Test', 'Closed', 'Needs Info'];
+// Processamento dos dados conforme a nova estrutura
+const statusData:Ref<statusDataObj> = ref<statusDataObj>({
+  statusName: 'In Progress',
+  count: 0,
+});
+
+type statusDataObj = {
+  statusName: string;
+  count: number;
+}
+
+
+chartData.value = {
+  labels: ['In Progress','New', 'Ready for Test', 'Closed', 'Needs Info'],
+  datasets: [
+    {
+      label: 'Cards',
+      data: [
+        statusData.value.count,
+      ],
+      backgroundColor: ['#61E1A1', '#FF8181', '#61A1E1', '#A181FF', '#FFB681'],
+    },
+  ],
+};
+
 onMounted(() => {
-  getChartDataFromApi();
+  operatorIdRef.value = props.operatorId;
+  fetchTaskStatus(operatorIdRef.value, projectOriginalIdRef.value).then((apiData) => {
+    const statusCounts = chartLabels.map(label => {
+      const normalizedLabel = label.toLowerCase().trim();
+      const matchingStatus = apiData.find(item => 
+        item.statusName.toLowerCase().trim() === normalizedLabel
+      );
+      return matchingStatus ? matchingStatus.count : 0;
+    });
+
+    // Update chart data
+    chartData.value = {
+      labels: chartLabels,
+      datasets: [{
+        label: 'Cards',
+        data: statusCounts,
+        backgroundColor: ['#61E1A1', '#FF8181', '#61A1E1', '#A181FF', '#FFB681']
+      }]
+    };
+  });
 });
 </script>
 
 <template>
   <div class="chart-wrapper">
-    <h2 class="chart-title">Cards by Status</h2>
+    <h2 class="chart-title"> Quantity of Cards per Status</h2>
     <Chart type="bar" :data="chartData" :options="chartOptions" class="chart" />
   </div>
 </template>
@@ -136,7 +167,7 @@ onMounted(() => {
 .chart-wrapper {
   position: relative;
   display: flex;
-  flex-direction: column;
+  flex-direction: column; 
   align-items: center;
   gap: 1rem;
   padding: 1rem;
@@ -146,29 +177,26 @@ onMounted(() => {
   width: 100%;
   height: 100%;
   overflow-x: visible;
+  height: 19rem;
   max-width: 30rem;
   margin: 0 auto;
 
   p {
     color: #FFF;
-  }
+    }
 
   .chart-title {
     color: #3D7EFF;
     margin: 0;
-    font-size: 1.2rem;
-    font-weight: bold;
-    text-align: center;
+    font-size: 1rem;
   }
+
 
   .chart {
     width: 100%;
     height: 100%;
-    padding: 1rem;
-    border: 2px solid #3D7EFF; /* Borda ao redor do gráfico */
-    border-radius: 15px; /* Bordas arredondadas */
-    background: rgba(255, 255, 255, 0.05); /* Fundo levemente transparente */
   }
+  
 
   @media only screen and (orientation: portrait) and (max-width: 768px) {
     height: 15rem;
@@ -176,25 +204,22 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: center; 
     height: auto;
-
+    
+  
     .chart {
       display: flex;
-      justify-content: center;
+      justify-content: center; 
       align-items: center;
       height: 8rem;
       width: 100%;
     }
-
+  
     .p-chart.chart {
       display: flex;
       justify-content: center;
       align-items: center;
-    }
-
-    .p-chart.chart {
-      align-content: center;
     }
   }
 }
