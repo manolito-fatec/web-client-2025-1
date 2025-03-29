@@ -12,6 +12,11 @@ const currentUserId: Ref<number> = ref<number>(1);
         <h1>Projects Dashboard</h1>
     </div>
     <div class="comp-grid">
+        <TotalOfCards title="Total of Cards" :userIdProp="currentUserId"/>
+        <TotalOfCards title="Total of Cards" :userIdProp="currentUserId"/>
+        <TotalOfCards title="Total of Cards" :userIdProp="currentUserId"/>
+        <TotalOfCards title="Total of Cards" :userIdProp="currentUserId"/>
+        <TotalOfCards title="Total of Cards" :userIdProp="currentUserId"/>
         <GraphsByTime :userIdProp=currentUserId></GraphsByTime>
     </div>
 </template>
