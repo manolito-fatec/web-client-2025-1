@@ -15,12 +15,15 @@ const averageTime = ref(0);
   <div class="dashboard">
     <h1>Projects Dashboard</h1>
   </div>
-  <div class="comp-grid">
+  <div class="top-grid">
     <TotalOfCards title="Total of Cards" :userIdProp="currentUserId" />
     <AverageTimeCard :userIdProp="currentUserId" :averageTime="averageTime" />
     <TotalOfProjects title="Total of Projects" :userIdProp="currentUserId"/>
-    <GraphsByTime :userIdProp=currentUserId></GraphsByTime>
-    <GraphQuantityForStatus :userIdProp=currentUserId></GraphQuantityForStatus>
+  </div>
+  
+  <div class="bottom-grid">
+    <GraphQuantityForStatus :userIdProp="currentUserId"/>
+    <GraphsByTime :userIdProp="currentUserId"/>
   </div>
 </template>
 
@@ -29,36 +32,57 @@ const averageTime = ref(0);
   background-color: var(--color-secondary);
 
   h1 {
+    margin: 0%;
     color: #fff;
   }
 }
 
-.comp-grid {
+.top-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10%;
+  gap: 5%;
+  height: 20%;
   padding: 1rem;
-  max-width: 100%;
-  box-sizing: border-box;
+}
 
-  @media (max-width: 1286px) {
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* 4 ocupa 66%, 5 ocupa 33% */
+  gap: 2%;
+  margin-top: 5%;
+  height: 60%;
+  padding: 0 1rem 1rem 1rem;
+}
+
+/* Responsividade Unificada */
+@media (max-width: 1286px) {
+  .top-grid {
     grid-template-columns: repeat(2, 1fr);
-
   }
 
-  @media (max-width: 1000px) {
-    column-gap: 10px;
+  .bottom-grid {
+    grid-template-columns: 1fr; /* Empilha verticalmente */
+  }
+}
+
+@media only screen and (orientation: portrait) and (max-width: 720px) {
+  h1 {
+    display: none;
   }
 
-  @media only screen and (orientation: portrait) and (max-width: 768px) {
+  .top-grid {
     grid-template-columns: 1fr;
-    row-gap: 20px;
-    padding: 0.5rem;
-
+    gap: 5px;
+    width: 100%;
+    height: 17rem;
+    padding: 0%;
   }
-
-  @media (max-height: 860px) {
-    gap: 8px;
+  
+  .bottom-grid {
+    grid-template-columns: 1fr;
+    padding: 0%;
+    gap: 5px;
+    height: 30rem;
   }
 }
 </style>

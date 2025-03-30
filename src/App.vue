@@ -44,6 +44,9 @@ button {
   main {
     flex: 1 1 0;
     padding: 2rem;
+    width: 100%;
+    display: fixed;
+    overflow: hidden;
   }
   @media only screen and (min-width: 768px) {
     main {
@@ -54,7 +57,7 @@ button {
 
   
 
-  @media only screen and (orientation: landscape) and (min-width: 768px) {
+  @media only screen and (orientation: landscape) and (min-width: 720px) {
     main {
     flex: 1 1 0;
     padding: 2rem;
@@ -70,9 +73,12 @@ button {
   @media only screen and (orientation: portrait) and (max-width: 768px) {
     main {
       min-height: calc(100vh - 60px);
-      padding-top: 0px;
+      height: 100%;
+      width: 100vw;
+      padding-top: 10px;
+      padding-left: 8px;
       margin-left: none;
-      padding-bottom: 70px;
+      overflow: scroll;
     }
     
     .sidebar {
