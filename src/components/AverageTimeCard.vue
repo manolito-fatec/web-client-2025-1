@@ -26,7 +26,7 @@ onMounted(() => {
 
 <template>
     <div class="average-time-card">
-        <h3>Average Completion Time of Finished Cards</h3>
+        <h1>Average Completion Time of Cards</h1>
         <div>
             <p>{{ averageTimeDay }}</p>
             <h2>Cards/Week</h2>
@@ -42,10 +42,29 @@ onMounted(() => {
     border-radius: 20px;
     text-align: center;
     color: white;
-    width: 400px;
-    height: 180px;
+    width: 100%;
+    height: 80%;
+
+h1 {
+    margin-top: 0%;
+    margin-bottom: 0%;
+    font-size: 50%;
+    font-weight: bolder;
+    color: #3D7EFF;
+  }
+
+  font-size: 2.5rem;
+  color: #fff;
+
+h2 {
+    font-size: 50%;
+    font-weight: normal;
+    color: #FFFFFF;
+    margin: 0px;
+    text-align: center;
+}
 h3 {
-    font-size: 15px;
+    font-size: 100%;
     font-weight: normal;
     color: #3D7EFF;
     margin: 2px;
@@ -53,11 +72,45 @@ h3 {
     text-align: center;
 }
 p {
-    font-size: 40px;
+    font-size: 1.5rem;
     margin: 0px;
     color: #FFFFFF;
 }
 
+    @media (max-width: 1366px) and (orientation: landscape) {
+        height: 100%;
+        h1 {
+            margin-top: 0%;
+            margin-bottom: 0%;
+            font-size: 50%;
+            font-weight: bolder;
+            color: #3D7EFF;
+        }
+
+        font-size: 1.5rem;
+        color: #fff;
+
+        h2 {
+            font-size: 50%;
+            font-weight: normal;
+            color: #FFFFFF;
+            margin: 0px;
+            text-align: center;
+        }
+        h3 {
+            font-size: 100%;
+            font-weight: normal;
+            color: #3D7EFF;
+            margin: 2px;
+            margin-top: -6px;
+            text-align: center;
+        }
+        p {
+            font-size: 1.5rem;
+            margin: 0px;
+            color: #FFFFFF;
+        }
+    }
     @media only screen and (orientation: portrait) and (max-width: 768px) {
     width: 100%;
     padding: 0.2rem;
@@ -75,7 +128,7 @@ p {
     font-size: 0.9rem;
     font-weight: bold;
     color: #3D7EFF;
-    margin: 2px;
+    margin-top: 0px;
     text-align: start;
     margin-left: 10px;
     
@@ -83,7 +136,7 @@ p {
 
     p {
         font-size: 0.9rem;
-        margin-left: 50px;
+        margin-left: 20px;
         color: #FFFFFF;
         padding-top: 0.2rem;
     }
@@ -91,7 +144,8 @@ p {
     h2 {
         font-size: 0.9rem;
         font-weight: normal;
-        margin-left: 20px;
+        margin-top: 10px;
+        margin-left: -350px;;
         margin-bottom: 0px;
 
         color: #FFFFFF;

@@ -60,11 +60,14 @@ const chartData = ref<{
  */
 const chartOptions = ref({
   responsive: true,
+  onresize: (chart: { resize: () => void }) => {
+    chart.resize();
+  },
   barPercentage: 0.5,
   indexAxis: 'x',
   plugins: {
     legend: {
-      display: false, // Remove a legenda inferior
+      display: false, 
     },
   },
   scales: {
@@ -165,14 +168,14 @@ onMounted(() => {
   display: flex;
   flex-direction: column; 
   align-items: center;
-  gap: 1rem;
+  gap: 1%;
   padding: 1rem;
   background: #01081F;
   border-radius: 25px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   width: 100%;
   height: 100%;
-  overflow-x: visible;
+  overflow:hidden;
   margin: 0 auto;
 
   p {
@@ -188,11 +191,11 @@ onMounted(() => {
 
   .chart {
     width: 100%;
-    height: 100%;
+    height: 90%;
   }
   
 
-  @media only screen and (orientation: portrait) and (max-width: 768px) {
+  @media only screen and (orientation: portrait) and (max-width: 720px) {
     height: 20%;
     width: 100%;
     gap: 0px;

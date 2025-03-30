@@ -32,6 +32,7 @@ const averageTime = ref(0);
   background-color: var(--color-secondary);
 
   h1 {
+    margin: 0%;
     color: #fff;
   }
 }
@@ -39,7 +40,8 @@ const averageTime = ref(0);
 .top-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10%;
+  gap: 5%;
+  height: 20%;
   padding: 1rem;
 }
 
@@ -47,6 +49,7 @@ const averageTime = ref(0);
   display: grid;
   grid-template-columns: 2fr 1fr; /* 4 ocupa 66%, 5 ocupa 33% */
   gap: 2%;
+  margin-top: 5%;
   height: 60%;
   padding: 0 1rem 1rem 1rem;
 }
@@ -62,7 +65,7 @@ const averageTime = ref(0);
   }
 }
 
-@media only screen and (orientation: portrait) and (max-width: 768px) {
+@media only screen and (orientation: portrait) and (max-width: 720px) {
   h1 {
     display: none;
   }

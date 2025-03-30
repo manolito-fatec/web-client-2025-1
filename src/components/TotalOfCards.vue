@@ -43,19 +43,41 @@ onMounted(() => {
   background-color: #01081F;
   border-radius: 25px;
   flex-direction: column;
-  width: 20rem;
-  height: 10rem;
+  width: 80%;
+  height: 80%;
   display: flex;
   align-items: center;
 
   h1 {
-    font-size: 1.5rem;
+    font-size: 60%;
+    margin-top: 3%;
+    margin-bottom: 0%;
     color: #3D7EFF;
   }
 
-  font-size: 3rem;
+  font-size: 2.5rem;
   color: #fff;
 
+  @media (max-width: 1366px) and (orientation: landscape) {
+        height: 100%;
+        h1 {
+            margin-top: 0%;
+            margin-bottom: 0%;
+            font-size: 100%;
+            font-weight: bolder;
+            color: #3D7EFF;
+        }
+
+        font-size: 1.5rem;
+        color: #fff;
+
+
+        span {
+            font-size: 2.5rem;
+            margin: 0px;
+            color: #FFFFFF;
+        }
+    }
   @media only screen and (orientation: portrait) and (max-width: 768px) {
     width: 100%;
     padding: 0.2rem;

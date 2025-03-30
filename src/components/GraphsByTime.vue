@@ -66,6 +66,10 @@ onMounted(() => {
  */
 const chartOptions = ref({
   responsive: true,
+  onresize: (chart: { resize: () => void }) => {
+    chart.resize();
+  },
+  maintainsAspectRatio: false,
   barPercentage: 0.5,
   indexAxis: 'y',
   plugins: {
@@ -114,15 +118,14 @@ watch([startDate, endDate], () => {
   display: flex;
   flex-direction: column; 
   align-items: center;
-  gap: 1rem;
+  gap: 1%;
   padding: 1rem;
   background: #01081F;
   border-radius: 25px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   width: 100%;
-  height: 80%;
-  overflow-x: visible;
-  max-width: 30rem;
+  height: 70%;
+  overflow: hidden;
   margin: 0 auto;
 
   p {
@@ -137,17 +140,20 @@ watch([startDate, endDate], () => {
 
   .chart-inputs {
     display: flex;
-    gap: 8rem; 
+    gap: 20%; 
     background: none;
-    padding: 0.5rem 1rem;
+    margin-left: 30%;
+    height: 20%;
+    width: 100%;
     border-radius: 4px;
-    backdrop-filter: blur(3px);
+  
   
     .input-group {
       display: flex;
       flex-direction: column; 
       align-items: center;
-      gap: 0.25rem;
+      font-size: 80%;
+      gap: 1%;
     }
   
     input[type='date'] {
@@ -155,8 +161,8 @@ watch([startDate, endDate], () => {
       font-size: 1rem;
       border-radius: 8px;
       border: none;
+      padding: 0.1rem;
       background-color: #5E6A81;
-      min-width: 100px;
       text-align: center;
       color: #FFF;
     }
@@ -168,11 +174,45 @@ watch([startDate, endDate], () => {
   }
   
 
-  @media only screen and (orientation: portrait) and (max-width: 768px) {
+  @media (max-width: 1366px) and (orientation: landscape) {
+    font-size: 0.6rem;
+    .chart-inputs{
+      display: flex;
+      gap: 38%; 
+      background: none;
+      margin-left: 0%;
+      height: 20%;
+      width: 100%;
+      border-radius: 4px;
+
+
+      .input-group {
+      display: flex;
+      flex-direction: column; 
+      align-items: center;
+      font-size: 80%;
+      gap: 1%;
+      margin-left: 0%;
+    
+    }
+  
+    input[type='date'] {
+      border-radius: 8px;
+      border: none;
+      font-size: 10px;
+      background-color: #5E6A81;
+      text-align: center;
+      color: #FFF;
+    }
+    }
+    
+
+  }
+  @media only screen and (orientation: portrait) and (max-width: 720px) {
     height: 20%;
-    width: 100%;
+    width: 90%;
     gap: 0px;
-    display: flex;
+    display: fixed;
     flex-direction: column;
     align-items: center;
     justify-content: center; 
