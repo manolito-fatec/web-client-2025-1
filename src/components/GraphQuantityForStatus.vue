@@ -17,15 +17,16 @@
  * @requires primevue/chart - Componente de gráfico do PrimeVue
  */
 <script setup lang="ts">
+import { computed, onMounted, ref, type Ref } from 'vue';
 <<<<<<< HEAD
 <<<<<<< HEAD
 import { ref, watch, onMounted } from 'vue';
 =======
 import { computed, onMounted, ref, type Ref } from 'vue';
->>>>>>> bae8bff (♻️ (Refactor)Refactor the component structure for responsiveness)
+>>>>>>> bae8bff (♻️ (Refactor):Refactor the component structure for responsiveness)
 =======
 import { ref, onMounted } from 'vue';
->>>>>>> 120b859 (♻️ (refactor) Removed the logic of mock data and addressed the backend server)
+>>>>>>> 120b859 (♻️ (refactor): Removed the logic of mock data and addressed the backend server)
 import axios from 'axios';
 import Chart from 'primevue/chart';
 
@@ -40,6 +41,7 @@ export type TaskByStatusGraphObj = {
 /**
  * ID do operador para filtragem
  */
+const operatorId: Ref<number> = ref<number>(2);
 <<<<<<< HEAD
 <<<<<<< HEAD
 const operatorId = ref<number>(1);
@@ -52,15 +54,38 @@ const operatorId = ref<number>(1);
 const typeProject = ref<'KANBAN' | 'SCRUM'>('KANBAN');
 =======
 const operatorId: Ref<number> = ref<number>(2);
->>>>>>> bae8bff (♻️ (Refactor)Refactor the component structure for responsiveness)
+>>>>>>> bae8bff (♻️ (Refactor):Refactor the component structure for responsiveness)
 =======
->>>>>>> 120b859 (♻️ (refactor) Removed the logic of mock data and addressed the backend server)
+>>>>>>> 120b859 (♻️ (refactor) :Removed the logic of mock data and addressed the backend server)
 =======
 const operatorId = ref<number>(3);
 >>>>>>> 3fb2510 (♻️ (refactor)change of logic for API calls")
 
 /**
  * Dados do gráfico
+ */
+const chartDataObjValue: Ref<TaskByStatusGraphObj[]> = ref([]);
+
+/**
+ * Função para buscar os dados da API
+ */
+function getChartDataFromApi() {
+  axios
+    .get(`http://localhost:8080/status/${operatorId.value}/1637322`)
+    .then((response) => {
+      chartDataObjValue.value = response.data; // Atualiza os dados com o array retornado pela API
+    })
+    .catch((error) => {
+      console.error('Erro ao buscar dados da API:', {
+        message: error.message,
+        response: error.response?.data,
+        config: error.config,
+      });
+    });
+}
+
+/**
+ * Computed para os dados do gráfico
  */
 <<<<<<< HEAD
 const chartData = ref<{
@@ -120,6 +145,8 @@ const chartData = computed(() => {
 
 /**
  * Configurações do gráfico
+ * Configurações do gráfico
+ * Configurações do gráfico
  */
 const chartOptions = ref({
   responsive: true,
@@ -131,6 +158,28 @@ const chartOptions = ref({
     },
   },
   scales: {
+    y: {
+      ticks: {
+        callback: function (value: unknown) {
+          // Mostra apenas números inteiros
+          if (Number.isInteger(value)) {
+            return value;
+          }
+          return ''; // Não exibe nada para números decimais
+        },
+        color: '#FFF', // Cor dos números no eixo
+      },
+      grid: {
+        display: false, // Remove as linhas horizontais do fundo
+      },
+    },
+    x: {
+      ticks: {
+        color: '#FFF', // Cor dos rótulos no eixo
+      },
+      grid: {
+        display: false, // Remove as linhas verticais do fundo
+      },
 <<<<<<< HEAD
     x: {
       grid: {  color: '#FFF'  }, 
@@ -177,6 +226,11 @@ const chartOptions = ref({
 });
 
 /**
+ * Busca os dados ao montar o componente
+ */
+onMounted(() => {
+  getChartDataFromApi();
+});
  * Busca os dados ao montar o componente
  */
 <<<<<<< HEAD
@@ -243,6 +297,7 @@ onMounted(() => {
 
 <template>
   <div class="chart-wrapper">
+    <h2 class="chart-title">Cards by Status</h2>
 <<<<<<< HEAD
     <h2 class="chart-title"> Quantity of Cards per Status</h2>
     <div class="chart-inputs">
@@ -268,12 +323,19 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  align-items: center;
+  align-items: center;
   gap: 1rem;
   padding: 1rem;
   background: #01081F;
   border-radius: 25px;
+  border-radius: 25px;
+  border-radius: 25px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   width: 100%;
+  height: 100%;
+  overflow-x: visible;
+  max-width: 30rem;
 <<<<<<< HEAD
   max-width: 100%;
   height: auto;
@@ -293,9 +355,20 @@ onMounted(() => {
     color: #FFF;
   }
 
+  p {
+    color: #FFF;
+  }
+
+  p {
+    color: #FFF;
+  }
+
   .chart-title {
     color: #3D7EFF;
     margin: 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
 <<<<<<< HEAD
     font-size: 1rem;
     text-align: center; /* Centraliza o título */
@@ -343,6 +416,11 @@ onMounted(() => {
     border: 2px solid #3D7EFF; /* Borda ao redor do gráfico */
     border-radius: 15px; /* Bordas arredondadas */
     background: rgba(255, 255, 255, 0.05); /* Fundo levemente transparente */
+    height: 100%;
+    padding: 1rem;
+    border: 2px solid #3D7EFF; /* Borda ao redor do gráfico */
+    border-radius: 15px; /* Bordas arredondadas */
+    background: rgba(255, 255, 255, 0.05); /* Fundo levemente transparente */
   }
 
   @media only screen and (orientation: portrait) and (max-width: 768px) {
@@ -352,9 +430,30 @@ onMounted(() => {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    height: 15rem;
+    gap: 0px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     height: auto;
 
     .chart {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 8rem;
+      width: 100%;
+    }
+
+    .p-chart.chart {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .p-chart.chart {
+      align-content: center;
       display: flex;
       justify-content: center;
       align-items: center;
