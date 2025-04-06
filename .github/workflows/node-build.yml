@@ -34,7 +34,7 @@ jobs:
     - name: Deploy to ManoLitoVM
       uses: appleboy/scp-action@master
       with:
-        host: 4.228.224.192
+        host: 191.232.189.186
         username: manolito
         password: ManolitoFateco@404!6793
         source: "dist/*"
