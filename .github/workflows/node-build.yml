@@ -39,3 +39,5 @@ jobs:
         password: ManolitoFateco@404!6793
         source: "dist/*"
         target: "/opt/tomcat/webapps/web-client"
+        exclude: ''
+        rm: true
