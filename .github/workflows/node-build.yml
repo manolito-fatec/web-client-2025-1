@@ -30,8 +30,14 @@ jobs:
     
     - name: Run Test ViTest
       run: npm run test
-      
-    - name: Deploy via rsync
-      run: |
-        rsync -avz --delete dist/ manolito@191.232.189.186:/opt/tomcat/webapps/web-client/
+
+    - name: Deploy to ManoLitoVM
+      uses: appleboy/scp-action@master
+      with:
+        host: 191.232.189.186
+        username: manolito
+        password: ManolitoFateco@404!6793
+        source: "dist/*"
+        target: "/opt/tomcat/webapps/web-client/"
+        strip_components: 0 
       
