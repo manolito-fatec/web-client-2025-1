@@ -37,7 +37,7 @@ jobs:
         host: 191.232.189.186
         username: manolito
         password: ManolitoFateco@404!6793
-        source: "dist/"
-        target: "/opt/tomcat/webapps/web-client/"
+        source: "dist/*"
+        target: "/opt/tomcat/webapps/web-client"
         strip_components: 0 
       
