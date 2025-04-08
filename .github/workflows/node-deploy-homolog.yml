@@ -6,7 +6,7 @@ on:
       - '*'
   pull_request:
     branches:
-      - '*'
+      - '[develop]'
 
 jobs:
   build:
@@ -31,13 +31,13 @@ jobs:
     - name: Run Test ViTest
       run: npm run test
 
-    - name: Deploy to ManoLitoVM
+    - name: Deploy to ManoLitoVM Homolog
       uses: appleboy/scp-action@master
       with:
-        host: 191.232.189.186
-        username: manolito
-        password: ManolitoFateco@404!6793
+        host: ${{ secrets.MANOLITO_VM_IP }}
+        username: ${{ secrets.MANOLITO_VM_USR }}
+        password: ${{ secrets.MANOLITO_VM_PSR }}
         source: "dist/*"
-        target: "/opt/tomcat/webapps/web-client/"
+        target: "/opt/tomcat/webapps/web-homolog/"
         strip_components: 1
       
