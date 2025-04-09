@@ -36,7 +36,7 @@ jobs:
       with:
         host: ${{ secrets.MANOLITO_VM_IP }}
         username: ${{ secrets.MANOLITO_VM_USR }}
-        password: ${{ secrets.MANOLITO_VM_PSR }}
+        password: ${{ secrets.MANOLITO_VM_PSW }}
         source: "dist/*"
         target: "/opt/tomcat/webapps/web-homolog/"
         strip_components: 1
