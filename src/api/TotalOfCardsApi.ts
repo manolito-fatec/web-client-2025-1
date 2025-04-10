@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 //const BASE_URL_TASKS = 'http://localhost:8080/tasks';
-const BASE_URL_PROD = 'http://191.232.189.186:8080/web-server/tasks';
+const BASE_URL_PROD = 'http://191.232.189.186:8080/tasks';
 
 export const fetchTotalOfCards = async (userId:number) => {
     try{
