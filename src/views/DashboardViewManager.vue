@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import KpiCard from '@/components/KpiCard.vue';
 
 </script>
 
@@ -11,14 +12,28 @@
     <main class="main-content">
       <DashboardHeader title="Projects Dashboard" />
 
+      <section class="kpi-grid">
+        <KpiCard title="Total cards assigned to me" value="0" />
+      </section>
+
+      <section class="charts-grid-top">
+        <StatusChart />
+        <CreatedCompletedChart />
+      </section>
+
+      <section class="charts-grid-bottom">
+        <IssueChart />
+        <TagsChart />
+      </section>
+
     </main>
   </div>
 </template>
 
 <style scoped>
 .dashboard {
-    margin: 0%;
-    color: #fff;
+  margin: 0%;
+  color: #fff;
 }
 
 .dashboard-layout {
@@ -45,6 +60,13 @@
 
   .main-content {
     padding: 20px;
+  }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
   }
 }
 </style>
