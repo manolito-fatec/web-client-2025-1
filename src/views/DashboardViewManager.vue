@@ -1,80 +1,50 @@
 <script setup lang="ts">
 
-import { ref, type Ref } from 'vue';
-
-const currentUserId: Ref<number> = ref<number>(1);
-
 </script>
 
 <template>
   <div class="dashboard">
     <h1>Projects Dashboard</h1>
   </div>
-  <div class="top-grid">
+  <div class="dashboard-layout">
+    <SidebarNav />
+    <main class="main-content">
+      <DashboardHeader title="Projects Dashboard" />
 
-  </div>
-  
-  <div class="bottom-grid">
-
+    </main>
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 .dashboard {
-  background-color: var(--color-secondary);
-
-  h1 {
     margin: 0%;
     color: #fff;
-  }
 }
 
-.top-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 5%;
-  height: 20%;
-  padding: 1rem;
+.dashboard-layout {
+  display: flex;
+  background-color: var(--color-secondary);
+  min-height: 100vh;
 }
 
-.bottom-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr; /* 4 ocupa 66%, 5 ocupa 33% */
-  gap: 2%;
-  margin-top: 5%;
-  height: 60%;
-  padding: 0 1rem 1rem 1rem;
+.main-content {
+  flex-grow: 1;
+  padding: 20px 40px;
+  overflow-y: auto;
 }
 
-/* Responsividade Unificada */
-@media (max-width: 1286px) {
-  .top-grid {
-    grid-template-columns: repeat(2, 1fr);
+@media (max-width: 768px) {
+  .dashboard-layout {
+    flex-direction: column;
   }
 
-  .bottom-grid {
-    grid-template-columns: 1fr; /* Empilha verticalmente */
-  }
-}
-
-@media only screen and (orientation: portrait) and (max-width: 720px) {
-  h1 {
-    display: none;
-  }
-
-  .top-grid {
-    grid-template-columns: 1fr;
-    gap: 5px;
+  .sidebar {
     width: 100%;
-    height: 17rem;
-    padding: 0%;
+    height: auto;
   }
-  
-  .bottom-grid {
-    grid-template-columns: 1fr;
-    padding: 0%;
-    gap: 5px;
-    height: 30rem;
+
+  .main-content {
+    padding: 20px;
   }
 }
 </style>
