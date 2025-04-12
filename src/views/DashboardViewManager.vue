@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import KpiCard from '@/components/KpiCard.vue';
+import IssueChart from '@/components/IssueChart.vue';
 
 </script>
 
@@ -46,6 +47,13 @@ import KpiCard from '@/components/KpiCard.vue';
   flex-grow: 1;
   padding: 20px 40px;
   overflow-y: auto;
+}
+
+.charts-grid-bottom {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-top: 30px;
 }
 
 @media (max-width: 768px) {
