@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import Chart from 'primevue/chart';
 import ChartSelectlist from './ChartSelectlist.vue';
 import { PriorityEnum } from '../enums/PriorityEnum';
@@ -11,6 +11,7 @@ const chartData = ref({
       label: 'Issues', 
       backgroundColor: ['#FF6384', '#4BC0C0', '#FFCE56'],
       borderColor: ['#FF6384', '#4BC0C0', '#FFCE56'],
+      //Mocked data, todo: replace with real data from API when André makes the endpoint
       data: [8, 13, 5], 
     },
   ],
@@ -44,11 +45,17 @@ const chartOptions = ref({
       display: false, 
     },
   },
+  datasets: {
+    bar: {
+      barPercentage: 0.5, 
+      categoryPercentage: 0.8, 
+    }
+  }
 });
 
 // Mocked left selectlist
-const timePeriods = ['week', 'month', 'quarter'] as const
-const selectedPeriod = ref<typeof timePeriods[number]>('week')
+const timePeriods = ['Manolito', 'Fatec'] as const
+const selectedPeriod = ref<typeof timePeriods[number]>('Manolito')
 
 //Mocked right selectlist
 const numberOptions = PriorityEnum as const
@@ -102,8 +109,8 @@ const selectedNumber = ref<typeof numberOptions[number]>('ALL')
   }
   
   .chart-select {
-    background-color: #0a1144;
-    border: 1px solid #3a3a5e;
+    background-color: #0C1635;
+    border-color: #0C1635 ;
     color: #e0e0e0;
     padding: 8px 40px;
     border-radius: 4px;
@@ -121,5 +128,4 @@ const selectedNumber = ref<typeof numberOptions[number]>('ALL')
     box-shadow: 0 0 0 2px rgba(61, 126, 255, 0.3);
   }
 
-/* Add height constraints if needed */
 </style>
