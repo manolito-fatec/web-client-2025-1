@@ -14,16 +14,7 @@ import KpiCard from '@/components/KpiCard.vue';
 
       <section class="kpi-grid">
         <KpiCard title="Total cards assigned to me" value="0" />
-      </section>
-
-      <section class="charts-grid-top">
-        <StatusChart />
-        <CreatedCompletedChart />
-      </section>
-
-      <section class="charts-grid-bottom">
-        <IssueChart />
-        <TagsChart />
+        <KpiCard title="Average completion time of finished cards" value="0" />
       </section>
 
     </main>
@@ -38,7 +29,6 @@ import KpiCard from '@/components/KpiCard.vue';
 
 .dashboard-layout {
   display: flex;
-  background-color: var(--color-secondary);
   min-height: 100vh;
 }
 
@@ -46,6 +36,13 @@ import KpiCard from '@/components/KpiCard.vue';
   flex-grow: 1;
   padding: 20px 40px;
   overflow-y: auto;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
 }
 
 @media (max-width: 768px) {
@@ -60,13 +57,6 @@ import KpiCard from '@/components/KpiCard.vue';
 
   .main-content {
     padding: 20px;
-  }
-
-  .kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
   }
 }
 </style>
