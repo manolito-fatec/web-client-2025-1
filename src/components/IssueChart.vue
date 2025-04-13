@@ -11,7 +11,7 @@ const chartData = ref({
       label: 'Issues', 
       backgroundColor: ['#FF6384', '#4BC0C0', '#FFCE56'],
       borderColor: ['#FF6384', '#4BC0C0', '#FFCE56'],
-      //Mocked data, todo: replace with real data from API when André makes the endpoint
+      //Mocked data, todo: replace with real data from API when someone makes the endpoint
       data: [8, 13, 5], 
     },
   ],
@@ -54,12 +54,12 @@ const chartOptions = ref({
 });
 
 // Mocked left selectlist
-const timePeriods = ['Manolito', 'Fatec'] as const
-const selectedPeriod = ref<typeof timePeriods[number]>('Manolito')
+const timePeriods = ['Manolito', 'Fatec'];
+const selectedPeriod = ref<string>(timePeriods[0]);
 
 //Mocked right selectlist
-const numberOptions = PriorityEnum as const
-const selectedNumber = ref<typeof numberOptions[number]>('ALL')
+const priorityOptions = ref<string[]>(Object.values(PriorityEnum).filter(value => typeof value === 'string') as string[]);
+const selectedNumber = ref<string>(priorityOptions.value[0]);
 
 </script>
 
@@ -75,7 +75,7 @@ const selectedNumber = ref<typeof numberOptions[number]>('ALL')
         
         <div class="select-wrapper">
           <ChartSelectlist
-            :options="numberOptions"
+            :options="priorityOptions"
             v-model="selectedNumber"/>
         </div>
       </div>
