@@ -15,17 +15,15 @@ import IssueChart from '@/components/IssueChart.vue';
 
       <section class="kpi-grid">
         <KpiCard title="Total cards assigned to me" value="0" />
+        <KpiCard title="Average completion time of finished cards" value="0" />
+        <KpiCard title="Rework cards" value="0" />
       </section>
-
-      <section class="charts-grid-top">
-        <StatusChart />
-        <CreatedCompletedChart />
-      </section>
-
+      
       <section class="charts-grid-bottom">
         <IssueChart />
         <TagsChart />
       </section>
+
 
     </main>
   </div>
@@ -39,7 +37,6 @@ import IssueChart from '@/components/IssueChart.vue';
 
 .dashboard-layout {
   display: flex;
-  background-color: var(--color-secondary);
   min-height: 100vh;
 }
 
@@ -49,11 +46,18 @@ import IssueChart from '@/components/IssueChart.vue';
   overflow-y: auto;
 }
 
+
 .charts-grid-bottom {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
   margin-top: 30px;
+}
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
 }
 
 @media (max-width: 768px) {
@@ -68,13 +72,6 @@ import IssueChart from '@/components/IssueChart.vue';
 
   .main-content {
     padding: 20px;
-  }
-
-  .kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
   }
 }
 </style>
