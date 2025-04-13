@@ -15,6 +15,7 @@ import KpiCard from '@/components/KpiCard.vue';
       <section class="kpi-grid">
         <KpiCard title="Total cards assigned to me" value="0" />
         <KpiCard title="Average completion time of finished cards" value="0" />
+        <KpiCard title="Rework cards" value="0" />
       </section>
 
     </main>
