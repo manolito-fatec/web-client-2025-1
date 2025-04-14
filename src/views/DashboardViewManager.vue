@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import KpiCard from '@/components/KpiCard.vue';
+import IssueChart from '@/components/IssueChart.vue';
 
 </script>
 
@@ -17,6 +18,12 @@ import KpiCard from '@/components/KpiCard.vue';
         <KpiCard title="Average completion time of finished cards" value="0" />
         <KpiCard title="Rework cards" value="0" />
       </section>
+      
+      <section class="charts-grid-bottom">
+        <IssueChart />
+        <TagsChart />
+      </section>
+
 
     </main>
   </div>
@@ -39,6 +46,13 @@ import KpiCard from '@/components/KpiCard.vue';
   overflow-y: auto;
 }
 
+
+.charts-grid-bottom {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-top: 30px;
+}
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

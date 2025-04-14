@@ -142,7 +142,6 @@ onMounted(() => {
       return matchingStatus ? matchingStatus.count : 0;
     });
 
-    // Update chart data
     chartData.value = {
       labels: chartLabels,
       datasets: [{
