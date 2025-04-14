@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import KpiCard from '@/components/KpiCard.vue';
+import TagsByCardChart from '@/components/TagsByCardChart.vue';
 
 </script>
 
@@ -17,6 +18,12 @@ import KpiCard from '@/components/KpiCard.vue';
         <KpiCard title="Average completion time of finished cards" value="0" />
         <KpiCard title="Rework cards" value="0" />
       </section>
+      
+      <section class="charts-grid-bottom">
+        <IssueChart />
+        <TagsByCardChart />
+      </section>
+
 
     </main>
   </div>
