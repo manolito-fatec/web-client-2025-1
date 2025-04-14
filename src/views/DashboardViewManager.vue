@@ -1,33 +1,25 @@
 <script setup lang="ts">
 import KpiCard from '@/components/KpiCard.vue';
-
+import TotalCardsByOperator from '@/components/TotalCardsByOperator.vue';
 </script>
 
 <template>
-  <div class="dashboard">
-    <h1>Projects Dashboard</h1>
-  </div>
   <div class="dashboard-layout">
     <SidebarNav />
     <main class="main-content">
       <DashboardHeader title="Projects Dashboard" />
 
       <section class="kpi-grid">
+        <TotalCardsByOperator />
         <KpiCard title="Total cards assigned to me" value="0" />
         <KpiCard title="Average completion time of finished cards" value="0" />
         <KpiCard title="Rework cards" value="0" />
       </section>
-
     </main>
   </div>
 </template>
 
 <style scoped>
-.dashboard {
-  margin: 0%;
-  color: #fff;
-}
-
 .dashboard-layout {
   display: flex;
   min-height: 100vh;
