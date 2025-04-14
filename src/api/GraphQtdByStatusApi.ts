@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const BASE_URL_STATUS = 'http://localhost:8080/status';
+const BASE_URL_STATUS = 'http://localhost:8080/web-server/status';
+//const BASE_URL_STATUS_LOCAL = 'http://localhost:8080/status';
 
 export const fetchTaskStatus = async (userId: number, projectOriginalId: number) => {
     try{
