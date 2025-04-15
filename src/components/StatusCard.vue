@@ -13,11 +13,11 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
-const palette = ['#FF6388', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
+const palette = ['#FC8F54', '#A79277', '#61E1A1', '#8E1616', '#98D8EF'];
 
-const categorias = ['New', 'In Progress', 'Ready for Test'];
+const categorias = ['New', 'In Progress', 'Ready for Test', 'Closed', 'Needs Info'];
 
-const valores = [50, 30, 10];
+const valores = [55, 25, 20, 0, 0]; 
 
 const backgroundColor = categorias.map((_, i) => palette[i % palette.length]);
 const hoverBackgroundColor = backgroundColor.map(cor => cor);
@@ -39,9 +39,6 @@ const chartOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
-    tooltip: {
-      enabled: false, 
-    },
     legend: {
       position: 'left',
       labels: {
@@ -50,9 +47,8 @@ const chartOptions = ref({
       },
     },
     datalabels: {
-      color: '#FFFFFF',
+      color: '#000000',
       font: {
-        weight: 'bold',
         size: 14,
       },
       formatter: (value: number) => `${value}%`,
@@ -74,6 +70,7 @@ const chartOptions = ref({
   padding: 20px;
   border-radius: 8px;
   color: #3D7EFF;
+  display:grid
 }
 
 .chart-card h3 {
