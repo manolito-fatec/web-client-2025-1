@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import DashboardView from '../views/DashboardView.vue'
+import DashboardViewManager from '../views/DashboardViewManager.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import DashboardViewManager from '@/views/DashboardViewManager.vue'
 
@@ -13,7 +13,7 @@ const router = createRouter({
     {
       path: '/dashboard',
       name: 'dashboard',
-      component: DashboardView,
+      component: DashboardViewManager,
     },
     {
       path: '/dashboardManager/',
