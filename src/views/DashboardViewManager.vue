@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import KpiCard from '@/components/KpiCard.vue';
+import TagsByCardChart from '@/components/TagsByCardChart.vue';
 import IssueChart from '@/components/IssueChart.vue';
 
 </script>
@@ -21,7 +22,7 @@ import IssueChart from '@/components/IssueChart.vue';
       
       <section class="charts-grid-bottom">
         <IssueChart />
-        <TagsChart />
+        <TagsByCardChart />
       </section>
 
 
