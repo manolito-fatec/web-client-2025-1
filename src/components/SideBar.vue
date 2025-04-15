@@ -7,6 +7,9 @@ const router = useRouter();
 const goDash = () => {
   router.push('/dashboard');
 };
+const goDashManager = () => {
+  router.push('/dashboardManager');
+};
 const goProfile = () => {
   router.push('/profile');
 };
@@ -20,6 +23,7 @@ const goProfile = () => {
     </div>
     <div class="sidebar-button-grid" >
       <Button icon="pi pi-objects-column" label="Dashboard" @click="goDash" variant="text" class="sidebar-routers"></Button>
+      <Button icon="pi pi-chart-bar" label="Manager" @click="goDashManager" variant="text" class="sidebar-routers" />
       <Button icon="pi pi-user" label="Profile"  @click="goProfile" severity="contrast" variant="text" class="sidebar-routers"></Button>
     </div>
   </div>
@@ -141,4 +145,4 @@ const goProfile = () => {
   }
 }
 
-</style>
+</style>  
