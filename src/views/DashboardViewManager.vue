@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import KpiCard from '@/components/KpiCard.vue';
 import TagsByCardChart from '@/components/TagsByCardChart.vue';
+import IssueChart from '@/components/IssueChart.vue';
 
 </script>
 
@@ -46,6 +47,13 @@ import TagsByCardChart from '@/components/TagsByCardChart.vue';
   overflow-y: auto;
 }
 
+
+.charts-grid-bottom {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-top: 30px;
+}
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
