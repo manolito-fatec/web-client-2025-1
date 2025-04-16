@@ -3,6 +3,7 @@ import KpiCard from '@/components/KpiCard.vue';
 import TotalCardsByOperator from '@/components/TotalCardsByOperator.vue';
 import TagsByCardChart from '@/components/TagsByCardChart.vue';
 import IssueChart from '@/components/IssueChart.vue';
+import StatusCard from '@/components/StatusCard.vue';
 
 </script>
 
@@ -20,6 +21,7 @@ import IssueChart from '@/components/IssueChart.vue';
       </section>
 
       <section class="charts-grid-bottom">
+        <StatusCard />
         <IssueChart />
         <TagsByCardChart />
       </section>
@@ -39,7 +41,6 @@ import IssueChart from '@/components/IssueChart.vue';
   padding: 20px 40px;
   overflow-y: auto;
 }
-
 
 .charts-grid-bottom {
   display: grid;
