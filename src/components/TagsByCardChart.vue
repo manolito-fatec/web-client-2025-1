@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import Chart from 'primevue/chart';
 import { Chart as ChartJS } from 'chart.js';
 import ChartSelectlist from './ChartSelectlist.vue';
 import DataLabelsPlugin from 'chartjs-plugin-datalabels';
+import { fetchTagsbyCard } from '@/api/TagsByCardApi';
 
 ChartJS.register(DataLabelsPlugin);
+
+
 
 const chartData = ref({
   labels: ['back-end', 'front-end', 'dev-ops', 'UX'],
@@ -54,9 +57,25 @@ const chartOptions = ref({
   },
 });
 
+const projects = [
+  { name: 'Manolito', id: 1637322 },
+  { name: 'Fatec', id: 1657675 }
+];
+
 //Mocked data for selectlist
-const projectsOptions = ['Manolito', 'Fatec'];
+const projectsOptions = projects.map((project) => project.name);
 const selectedOption= ref<string>(projectsOptions[0]);
+
+const selectedProjectId = computed(() => {
+  const project = projects.find(p => p.name === selectedOption.value);
+  return project ? project.id : null;
+});
+
+onMounted(() => {
+    if (selectedProjectId.value) {
+    fetchTagsbyCard(1, selectedProjectId.value);
+  }
+});
 
 </script>
 
