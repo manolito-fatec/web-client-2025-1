@@ -66,8 +66,8 @@ const chartOptions = ref({
     },
 });
 
-const startDate = ref<string | undefined>(undefined);
-const endDate = ref<string | undefined>(undefined);
+const startDate = ref('');
+const endDate = ref('');
 
 </script>
 
@@ -77,12 +77,12 @@ const endDate = ref<string | undefined>(undefined);
         <div class="filters">
             <div class="filter">
                 <label for="start-date">Start:</label>
-                <input id="start-date" type="date" v-model="startDate" :max="endDate || null" />
+                <input id="start-date" type="date" v-model="startDate" :max="endDate || undefined" />
             </div>
 
             <div class="filter">
                 <label for="end-date">End:</label>
-                <input id="end-date" type="date" v-model="endDate" :min="startDate || null" />
+                <input id="end-date" type="date" v-model="endDate" :min="startDate || undefined" />
             </div>
         </div>
         <Chart type="bar" :data="chartData" :options="chartOptions" />
