@@ -4,6 +4,7 @@ import TotalCardsByOperator from '@/components/TotalCardsByOperator.vue';
 import TagsByCardChart from '@/components/TagsByCardChart.vue';
 import IssueChart from '@/components/IssueChart.vue';
 import StatusCard from '@/components/StatusCard.vue';
+import CardsByPeriod from '@/components/CardsByPeriod.vue';
 
 </script>
 
@@ -22,6 +23,7 @@ import StatusCard from '@/components/StatusCard.vue';
 
       <section class="charts-grid-bottom">
         <StatusCard />
+        <CardsByPeriod />
         <IssueChart />
         <TagsByCardChart />
       </section>
