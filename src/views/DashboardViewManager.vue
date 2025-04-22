@@ -3,7 +3,23 @@ import KpiCard from '@/components/KpiCard.vue';
 import TotalCardsByOperator from '@/components/TotalCardsByOperator.vue';
 import TagsByCardChart from '@/components/TagsByCardChart.vue';
 import IssueChart from '@/components/IssueChart.vue';
+import { onMounted } from 'vue';
+import { mockedLogin } from '@/api/AxiosConfig.ts';
 
+
+onMounted(() => {
+  if (sessionStorage.getItem('token') === null) {
+    mockedLogin().then((response) => {
+    console.log('Login successful:', response);
+    });
+  } else {
+    const token = sessionStorage.getItem('token');
+    if (token) {
+      console.log('Token:', token);
+    }
+  }
+
+});
 </script>
 
 <template>
