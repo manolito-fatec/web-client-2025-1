@@ -66,8 +66,8 @@ const chartOptions = ref({
     },
 });
 
-const startDate = ref('');
-const endDate = ref('');
+const startDate = ref<string | undefined>(undefined);
+const endDate = ref<string | undefined>(undefined);
 
 </script>
 
