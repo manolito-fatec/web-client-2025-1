@@ -55,6 +55,10 @@ const chartOptions = ref({
         },
     },
 });
+
+const startDate = ref('');
+const endDate = ref('');
+
 </script>
 
 <template>
