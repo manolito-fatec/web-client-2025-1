@@ -53,6 +53,16 @@ const chartOptions = ref({
                 usePointStyle: true,
             },
         },
+        datalabels: {
+            anchor: 'end', 
+            align: 'start',
+            color: '#fff',
+            font: {
+                weight: 'bold',
+            },
+            formatter: (value: number) => value.toString(),
+            offset: -20,
+        },
     },
 });
 
@@ -81,40 +91,40 @@ const endDate = ref('');
 
 <style scoped>
 .chart-card {
-  background-color: #01081F;
-  padding: 20px;
-  border-radius: 8px;
-  color: #3D7EFF;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    background-color: #01081F;
+    padding: 20px;
+    border-radius: 8px;
+    color: #3D7EFF;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .chart-card h3 {
-  margin-top: 0;
-  margin-bottom: 15px;
-  text-align: center;
+    margin-top: 0;
+    margin-bottom: 15px;
+    text-align: center;
 }
 
 .filters {
-  display: flex;
-  justify-content: space-around;
-  gap: 15px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
+    display: flex;
+    justify-content: space-around;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
 .filter {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  color: #fff;
-  font-size: 0.9em;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    color: #fff;
+    font-size: 0.9em;
 }
 
 input[type="date"] {
-  background-color: #0A1237;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 5px;
+    background-color: #0A1237;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
 }
 </style>
