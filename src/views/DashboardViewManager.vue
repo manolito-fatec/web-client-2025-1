@@ -81,8 +81,9 @@ import CardsByPeriod from '@/components/CardsByPeriod.vue';
 
   h1 {
     margin: 0%;
-    margin-top: 0%;
+    margin-bottom: 0.3rem;
     color: #FFFFFF;
+    font-size: 2rem;
   }
 }
 </style>
