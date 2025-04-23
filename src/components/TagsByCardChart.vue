@@ -83,15 +83,13 @@ async function updateChartData(projectId: number) {
         data: counts
       }]
     };
-
-    const maxCount = Math.max(...counts, 0);
+    Math.max(...counts, 0);
     chartOptions.value = {
       ...chartOptions.value,
       scales: {
         ...chartOptions.value.scales,
         y: {
           ...chartOptions.value.scales?.y,
-          max: maxCount + (maxCount * 0.2)
         }
       }
     };
