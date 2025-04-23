@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import Sidebar from '@/components/SideBar.vue'
+import {onMounted} from "vue";
+import {mockedLogin} from "@/api/AxiosConfig.ts";
+
+onMounted(() => {
+  sessionStorage.clear();
+   mockedLogin().then(() => {
+    console.log('Login successful!');
+  });
+});
 </script>
 
 <template>

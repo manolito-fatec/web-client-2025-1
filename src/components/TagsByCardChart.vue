@@ -1,20 +1,22 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import Chart from 'primevue/chart';
 import { Chart as ChartJS } from 'chart.js';
 import ChartSelectlist from './ChartSelectlist.vue';
 import DataLabelsPlugin from 'chartjs-plugin-datalabels';
+import { fetchTagsbyCard } from '@/api/TagsByCardApi';
 
 ChartJS.register(DataLabelsPlugin);
 
+// Initialize chart data with empty structure
 const chartData = ref({
-  labels: ['back-end', 'front-end', 'dev-ops', 'UX'],
+  labels: [] as string[],
   datasets: [
     {
       label: 'Tags',
       backgroundColor: '#36A2EB',
       borderColor: '#36A2EB',
-      data: [5, 3, 3, 6],
+      data: [] as number[],
     },
   ],
 });
@@ -24,13 +26,13 @@ const chartOptions = ref({
   maintainAspectRatio: false,
   scales: {
     y: {
+      beginAtZero: true,
       ticks: {
         color: '#e0e0e0',
       },
       grid: {
         display: false,
       },
-      max: 7,
     },
     x: {
       ticks: {
@@ -54,23 +56,84 @@ const chartOptions = ref({
   },
 });
 
-//Mocked data for selectlist
-const projectsOptions = ['Manolito', 'Fatec'];
-const selectedOption= ref<string>(projectsOptions[0]);
+const projects = [
+  { name: 'Manolito', id: 1637322 },
+  { name: 'Fatec', id: 1657675 }
+];
 
+const projectsOptions = projects.map((project) => project.name);
+const selectedOption = ref<string>(projectsOptions[0]);
+
+const selectedProjectId = computed(() => {
+  const project = projects.find(p => p.name === selectedOption.value);
+  return project ? project.id : null;
+});
+
+async function updateChartData(projectId: number) {
+  try {
+    const response = await fetchTagsbyCard(projectId);
+
+    const tags = response.map((item: { tagName: string }) => item.tagName);
+    const counts = response.map((item: { count: number }) => item.count);
+
+    chartData.value = {
+      labels: tags,
+      datasets: [{
+        ...chartData.value.datasets[0],
+        data: counts
+      }]
+    };
+    Math.max(...counts, 0);
+    chartOptions.value = {
+      ...chartOptions.value,
+      scales: {
+        ...chartOptions.value.scales,
+        y: {
+          ...chartOptions.value.scales?.y,
+        }
+      }
+    };
+  } catch (error) {
+    console.error('Error fetching tags by card:', error);
+    chartData.value = {
+      labels: [],
+      datasets: [{
+        ...chartData.value.datasets[0],
+        data: []
+      }]
+    };
+  }
+}
+
+watch(selectedOption, (newValue) => {
+  const project = projects.find(p => p.name === newValue);
+  if (project) {
+    updateChartData(project.id);
+  }
+});
+
+onMounted(() => {
+  if (selectedProjectId.value && sessionStorage.getItem('token') !== null && sessionStorage.getItem('token') !== undefined) {
+    updateChartData(selectedProjectId.value);
+  }
+});
 </script>
 
 <template>
   <div class="chart-card">
     <h3>Tags by cards</h3>
     <div class="selects-container">
-      <ChartSelectlist :options="projectsOptions" :model-value="selectedOption"></ChartSelectlist>
+      <ChartSelectlist
+          :options="projectsOptions"
+          v-model="selectedOption"
+      ></ChartSelectlist>
     </div>
     <Chart type="bar" :data="chartData" :options="chartOptions" />
   </div>
 </template>
 
 <style scoped>
+/* Your existing styles remain the same */
 .chart-card {
   background-color: #01081F;
   padding: 20px;
