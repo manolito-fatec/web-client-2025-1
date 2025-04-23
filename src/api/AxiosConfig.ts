@@ -7,10 +7,7 @@ export const configHeader =ref<object>( {
 
 //Mocked login function to set the token in session storage.
 export const mockedLogin = async () => {
-    const loginResponse = await axios.post("http://localhost:8080/auth/login", {
-        "email":"admin@admin.com",
-        "password":"admin"
-    })
+    const loginResponse = await axios.post("http://localhost:8080/auth/login")
     const token = loginResponse.data.token;
     sessionStorage.setItem("token", token);
 }
