@@ -12,6 +12,9 @@ import CardsByPeriod from '@/components/CardsByPeriod.vue';
   <div class="dashboard-layout">
     <SidebarNav />
     <main class="main-content">
+      <div class="title">
+        <h1>Projects Dashboard</h1>
+      </div>
       <DashboardHeader title="Projects Dashboard" />
 
       <section class="kpi-grid">
@@ -50,6 +53,7 @@ import CardsByPeriod from '@/components/CardsByPeriod.vue';
   gap: 20px;
   margin-top: 30px;
 }
+
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -69,6 +73,17 @@ import CardsByPeriod from '@/components/CardsByPeriod.vue';
 
   .main-content {
     padding: 20px;
+  }
+}
+
+.title {
+  background-color: var(--color-secondary);
+
+  h1 {
+    margin: 0%;
+    margin-bottom: 0.3rem;
+    color: #FFFFFF;
+    font-size: 2rem;
   }
 }
 </style>
