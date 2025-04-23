@@ -11,11 +11,12 @@ import UserProfile from '@/components/UserProfile.vue';
     </div>
     <section class="charts-grid-bottom">
         <UserProfile />
-      </section>
+    </section>
 </template>
 
 <style lang="scss" scoped>
 .profile {
     color: #FFFFFF;
+    margin-left: 2rem;
 }
 </style>
