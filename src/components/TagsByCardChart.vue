@@ -8,7 +8,6 @@ import { fetchTagsbyCard } from '@/api/TagsByCardApi';
 
 ChartJS.register(DataLabelsPlugin);
 
-// Initialize chart data with empty structure
 const chartData = ref({
   labels: [] as string[],
   datasets: [
