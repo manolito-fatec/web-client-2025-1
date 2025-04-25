@@ -1,8 +1,14 @@
 <script setup lang="ts">
-import {onMounted, ref, watch} from 'vue';
+import { type Ref, ref, watch} from 'vue';
 import Chart from 'primevue/chart';
-import {fetchCardsByPeriod} from "@/api/CardsByPeriodAPI.ts";
+import { fetchCardsByPeriod } from "@/api/CardsByPeriodAPI.ts";
 
+/**
+ * Reactive chart data configuration.
+ * @property {string[]} labels - Labels for the chart axes.
+ * @property {Array<{label: string, backgroundColor: string, borderColor: string, data: number[]}>} datasets -
+ *        Chart datasets configuration including visual styling and data points.
+ */
 const chartData = ref({
   labels: ['Period'],
   datasets: [
@@ -21,6 +27,14 @@ const chartData = ref({
   ],
 });
 
+/**
+ * Reactive chart options configuration.
+ * @property {boolean} responsive - Enables responsive chart behavior.
+ * @property {boolean} maintainAspectRatio - Disables fixed aspect ratio.
+ * @property {string} indexAxis - Sets the chart orientation (y-axis for horizontal bars).
+ * @property {object} scales - Axis configuration including ticks and grid styling.
+ * @property {object} plugins - Chart plugins configuration (legend, datalabels).
+ */
 const chartOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
@@ -66,9 +80,28 @@ const chartOptions = ref({
   },
 });
 
-const startDate = ref<string>('');
-const endDate = ref<string>('');
-const isLoading = ref(false);
+/**
+ * Reactive reference for the start date filter.
+ */
+const startDate = ref<string>('') as Ref<string>
+
+/**
+ * Reactive reference for the end date filter.
+ */
+const endDate = ref<string>('') as Ref<string>
+
+/**
+ * Reactive loading state indicator.
+ */
+const isLoading = ref(false) as Ref<boolean>
+
+/**
+ * Fetches and updates chart data based on selected date range.
+ * @async
+ * @throws {Error} Logs errors to console if API request fails.
+ */
+
+// Use o tipo nas suas refs
 
 async function updateChartData() {
   if (!startDate.value || !endDate.value) return;
@@ -76,7 +109,6 @@ async function updateChartData() {
   try {
     isLoading.value = true;
     const response = await fetchCardsByPeriod(1637322, startDate.value, endDate.value);
-
 
     chartData.value = {
       labels: ['Period'],
@@ -106,15 +138,22 @@ async function updateChartData() {
   }
 }
 
-
+/**
+ * Watches for changes in date range and triggers chart updates.
+ */
 watch([startDate, endDate], () => {
   updateChartData();
 });
 
 
-onMounted(() => {
-
-});
+defineExpose({
+  startDate,
+  endDate,
+  isLoading,
+  chartData,
+  chartOptions,
+  updateChartData
+})
 </script>
 
 <template>
