@@ -100,9 +100,6 @@ const isLoading = ref(false) as Ref<boolean>
  * @async
  * @throws {Error} Logs errors to console if API request fails.
  */
-
-// Use o tipo nas suas refs
-
 async function updateChartData() {
   if (!startDate.value || !endDate.value) return;
 
