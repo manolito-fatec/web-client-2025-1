@@ -9,7 +9,7 @@ vi.mock('@/api/CardsByPeriodAPI.ts', () => ({
     })
 }))
 
-test('Deve atualizar corretamente as datas inseridas nos campos de início e fim', async() => {
+test('Should correctly update the dates entered in the start and end fields.', async() => {
     //Arrange
     const wrapper = mount(CardsByPeriod);
     const startDateInput = wrapper.find('#start-date');
@@ -24,7 +24,7 @@ test('Deve atualizar corretamente as datas inseridas nos campos de início e fim
     expect(wrapper.vm.endDate).toBe('2023-01-31');
 })
 
-test('Deve atualizar o gráfico com dados da API', async () => {
+test('Should update the chart with data from the API', async () => {
     //Arrange
     const wrapper = mount(CardsByPeriod);
     wrapper.vm.startDate = '2023-01-01'
