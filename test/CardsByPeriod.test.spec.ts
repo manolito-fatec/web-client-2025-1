@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, it, vi } from 'vitest'
+import { expect, test, vi } from 'vitest'
 import CardsByPeriod from '../src/components/CardsByPeriod.vue'
 
 vi.mock('@/api/CardsByPeriodAPI.ts', () => ({
@@ -9,26 +9,32 @@ vi.mock('@/api/CardsByPeriodAPI.ts', () => ({
     })
 }))
 
-describe('CardsByPeriod.vue', () => {
-    it('atualiza as datas corretamente', async () => {
-        const wrapper = mount(CardsByPeriod)
+test('Deve atualizar corretamente as datas inseridas nos campos de início e fim', async() => {
+    //Arrange
+    const wrapper = mount(CardsByPeriod);
+    const startDateInput = wrapper.find('#start-date');
+    const endDateInput = wrapper.find('#end-date');
 
-        await wrapper.find('#start-date').setValue('2023-01-01')
-        await wrapper.find('#end-date').setValue('2023-01-31')
+    //Act
+    await startDateInput.setValue('2023-01-01');
+    await endDateInput.setValue('2023-01-31');
 
-        expect(wrapper.vm.startDate).toBe('2023-01-01')
-        expect(wrapper.vm.endDate).toBe('2023-01-31')
-    })
+    //Assert
+    expect(wrapper.vm.startDate).toBe('2023-01-01');
+    expect(wrapper.vm.endDate).toBe('2023-01-31');
+})
 
-    it('atualiza o gráfico com dados da API', async () => {
-        const wrapper = mount(CardsByPeriod)
+test('Deve atualizar o gráfico com dados da API', async () => {
+    //Arrange
+    const wrapper = mount(CardsByPeriod);
+    wrapper.vm.startDate = '2023-01-01'
+    wrapper.vm.endDate = '2023-01-31'
 
-        wrapper.vm.startDate = '2023-01-01'
-        wrapper.vm.endDate = '2023-01-31'
+    //Act
+    await wrapper.vm.updateChartData()
 
-        await wrapper.vm.updateChartData()
+    //Assert
+    expect(wrapper.vm.chartData.datasets[0].data[0]).toBe(5)
+    expect(wrapper.vm.chartData.datasets[1].data[0]).toBe(3)
 
-        expect(wrapper.vm.chartData.datasets[0].data[0]).toBe(5)
-        expect(wrapper.vm.chartData.datasets[1].data[0]).toBe(3)
-    })
 })
