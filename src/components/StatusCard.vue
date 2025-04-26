@@ -20,9 +20,10 @@ const projects = [
   { name: 'Fatec', id: 1657675 }
 ];
 
+const selectedProject = ref<number | null>(1);
 
 const chartData = ref({
-  labels: categorias,
+  labels: defaultCategories,
   datasets: [
     {
       data: projetos.value[0].dados,
