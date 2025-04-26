@@ -8,6 +8,7 @@ import {
   Legend
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { fetchStatusCard } from '../api/StatusCardApi';
 
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
