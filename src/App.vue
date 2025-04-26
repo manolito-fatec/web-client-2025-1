@@ -2,14 +2,20 @@
 import { RouterView } from 'vue-router'
 import Sidebar from '../src/components/SideBar.vue'
 import {onBeforeMount} from "vue";
-import {mockedLogin} from "../src/api/AxiosConfig.ts";
+import {useAuthStore} from "@/api/session/stores/auth.ts";
+import {fetchUserProfile} from "@/api/ProfileApi.ts";
+import {setSessionItem} from "@/api/session/SessionManagement.ts";
+
 
 onBeforeMount(() => {
   sessionStorage.clear();
-   mockedLogin().then(() => {
-    console.log('Login successful!');
-  });
-});
+  useAuthStore().mockedLogin();
+  fetchUserProfile(1).then((responseUsr) =>{
+        setSessionItem("userId", responseUsr.id.toString())
+        console.log(sessionStorage.getItem("userId"))
+      }
+  );
+})
 </script>
 
 <template>

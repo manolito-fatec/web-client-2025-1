@@ -1,11 +1,21 @@
 <script setup lang="ts">
-import KpiCard from '@/components/KpiCard.vue';
-import TotalCardsByOperator from '@/components/TotalCardsByOperator.vue';
-import TagsByCardChart from '@/components/TagsByCardChart.vue';
-import IssueChart from '@/components/IssueChart.vue';
-import StatusCard from '@/components/StatusCard.vue';
-import CardsByPeriod from '@/components/CardsByPeriod.vue';
+import KpiCard from '../components/KpiCard.vue';
+import TotalCardsByOperator from '../components/TotalCardsByOperator.vue';
+import TagsByCardChart from '../components/TagsByCardChart.vue';
+import IssueChart from '../components/IssueChart.vue';
+import StatusCard from '../components/StatusCard.vue';
+import CardsByPeriod from '../components/CardsByPeriod.vue';
+import {fetchAverageTime} from "../api/AverageTimeApi.ts";
+import {onMounted, type Ref, ref} from "vue";
+import {getSessionItem} from "@/api/session/SessionManagement.ts";
 
+const averageCardData: Ref<number> = ref(0);
+
+onMounted(() => {
+  fetchAverageTime(parseInt(getSessionItem("userId"),10)).then((averageTime) => {
+    averageCardData.value = averageTime !== undefined ? averageTime : 0;
+  })
+})
 </script>
 
 <template>
@@ -20,7 +30,7 @@ import CardsByPeriod from '@/components/CardsByPeriod.vue';
       <section class="kpi-grid">
         <TotalCardsByOperator />
         <KpiCard title="Total cards assigned to me" value="0" />
-        <KpiCard title="Average completion time of finished cards" value="0" />
+        <KpiCard title="Average completion time of finished cards" :value=averageCardData />
         <KpiCard title="Rework cards" value="0" />
       </section>
 
