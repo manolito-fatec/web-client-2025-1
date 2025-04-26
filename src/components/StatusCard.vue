@@ -13,6 +13,7 @@ import { fetchStatusCard } from '../api/StatusCardApi';
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
 const palette = ['#70728f', '#e47c40', '#e4ce3d', '#94c440', '#56a1e1'];
+const defaultCategories = ['New', 'In Progress', 'Ready for Test', 'Closed', 'Needs Info'];
 
 const categorias = ['New', 'In Progress', 'Ready for Test', 'Closed', 'Needs Info'];
 
