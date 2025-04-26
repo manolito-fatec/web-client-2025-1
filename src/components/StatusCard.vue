@@ -102,10 +102,10 @@ onMounted(() => {
   <div class="chart-card">
     <h3>Status by Project</h3>
 
-    <select v-model="projetoSelecionado">
-      <option disabled value="">Selecione um projeto</option>
-      <option v-for="projeto in projetos" :key="projeto.id" :value="projeto.id">
-        {{ projeto.nome }}
+    <select v-model="selectedProject">
+      <option disabled value="">Select a project</option>
+      <option v-for="project in projects" :key="project.id" :value="project.id">
+        {{ project.name }}
       </option>
     </select>
 
