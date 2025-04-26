@@ -14,10 +14,7 @@ export const useAuthStore = defineStore('auth', {
     actions: {
         async mockedLogin() {
             try {
-                const response = await axios.post("http://localhost:8080/auth/login", {
-                    email: "admin@admin.com",
-                    password: "admin"
-                });
+                const response = await axios.post("http://localhost:8080/auth/login");
 
                 this.token = response.data.token;
                 setSessionItem("token", this.token!);
