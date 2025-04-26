@@ -1,5 +1,4 @@
-import axios from 'axios';
-import { configHeader } from './AxiosConfig';
+import {api} from './AxiosConfig';
 
 const BASE_URL_STATUS = 'http://localhost:8080/tasks/get-by-tag';
 
@@ -11,7 +10,7 @@ const BASE_URL_STATUS = 'http://localhost:8080/tasks/get-by-tag';
  */
 export const fetchTagsbyCard = async (projectOriginalId: number) => {
     try{
-        const response = await axios.get(BASE_URL_STATUS + '/' + projectOriginalId, configHeader.value);
+        const response = await api.get(BASE_URL_STATUS + '/' + projectOriginalId);
         return response.data;
     }  catch (error){
         console.log('Erro ao realizar a requisição: ' + error);
