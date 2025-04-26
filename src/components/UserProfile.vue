@@ -1,14 +1,54 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import InputText from 'primevue/inputtext';
+import { fetchUserProfile } from "@/api/ProfileApi.ts";
 
-// Mock data for user profile
-const user = ref({
+/**
+ * User Profile component displaying user information
+ *
+ * @component
+ * @example <UserProfile :userId="123" />
+ *
+ * @todo Implement prop handling for userId instead of hardcoding.Needs login screen.
+ * @vue-reactive user - Reactive user profile object
+ */
+interface UserProfile {
+  username: string;
+  email: string;
+  role: string;
+}
+
+/**
+ * Reactive reference holding the user profile data
+ * @type {import('vue').Ref<UserProfile>}
+ */
+const user = ref<UserProfile>({
   username: 'youtan_user',
   email: 'user@youtandash.com',
   role: 'Administrator',
 });
 
+/**
+ * Fetches and updates user profile data when component is mounted
+ * @async
+ * @function onMounted
+ * @throws {Error} When API request fails
+ *
+ * @example
+ * Fetches profile for user ID 1 (currently hardcoded)
+ */
+onMounted(() => {
+  /**
+   * Fetch user profile and update reactive state
+   * @param {number} userId - Currently hardcoded to 1
+   */
+  fetchUserProfile(1).then((res) => {
+    console.log(res);
+    user.value.username = res.username;
+    user.value.email = res.email;
+    user.value.role = res.roles[0]; // Take first role from array
+  });
+});
 </script>
 
 <template>
