@@ -56,10 +56,44 @@ const chartOptions = ref({
   },
 });
 
-watch(projetoSelecionado, (idSelecionado) => {
-  const projeto = projetos.value.find(p => p.id === idSelecionado);
-  if (projeto) {
-    chartData.value.datasets[0].data = projeto.dados;
+/**
+ * Updates the chart data based on selected project
+ * @param {number} projectId - ID of the selected project
+ * @returns {Promise<void>}
+ */
+const updateChart = async (projectId: number) => {
+  try {
+    const apiData = await fetchStatusCard(projectId);
+    
+    // Check if apiData is empty or invalid, if so, set chart data to 0
+    if (!apiData || apiData.length === 0) {
+      chartData.value.datasets[0].data = [0, 0, 0, 0, 0];
+    } else {
+      const convertedData = defaultCategories.map(category => {
+        const status = apiData.find((item: { statusName: string }) =>
+          item.statusName.toLowerCase().trim() === category.toLowerCase().trim()
+        );
+        return status ? status.count : 0;
+      });
+
+      chartData.value.datasets[0].data = convertedData;
+    }
+  } catch (error) {
+    console.error('Error updating chart:', error);
+    // In case of error, set chart data to zero
+    chartData.value.datasets[0].data = [0, 0, 0, 0, 0];
+  }
+};
+
+watch(selectedProject, (selectedId) => {
+  if (selectedId) {
+    updateChart(selectedId);
+  }
+});
+
+onMounted(() => {
+  if (selectedProject.value) {
+    updateChart(selectedProject.value);
   }
 });
 </script>
