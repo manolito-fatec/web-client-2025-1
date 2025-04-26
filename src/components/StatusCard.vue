@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import Chart from 'primevue/chart';
 import {
   Chart as ChartJS,
