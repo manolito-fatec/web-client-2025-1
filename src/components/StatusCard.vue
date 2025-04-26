@@ -100,7 +100,7 @@ onMounted(() => {
 
 <template>
   <div class="chart-card">
-    <h3>Status por Projeto</h3>
+    <h3>Status by Project</h3>
 
     <select v-model="projetoSelecionado">
       <option disabled value="">Selecione um projeto</option>
