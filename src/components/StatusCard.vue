@@ -20,14 +20,6 @@ const projects = [
   { name: 'Fatec', id: 1657675 }
 ];
 
-// Mock data for projects
-const projetos = ref([
-  { id: 1, nome: 'Projeto A', dados: [55, 25, 20, 0, 0] },
-  { id: 2, nome: 'Projeto B', dados: [30, 40, 20, 10, 0] },
-  { id: 3, nome: 'Projeto C', dados: [0, 15, 60, 25, 0] },
-]);
-
-const projetoSelecionado = ref<number | null>(1);
 
 const chartData = ref({
   labels: categorias,
