@@ -26,10 +26,10 @@ const chartData = ref({
   labels: defaultCategories,
   datasets: [
     {
-      data: projetos.value[0].dados,
-      backgroundColor: categorias.map((_, i) => palette[i % palette.length]),
-      hoverBackgroundColor: categorias.map((_, i) => palette[i % palette.length]),
-      borderColor: categorias.map((_, i) => palette[i % palette.length]),
+      data: [0, 0, 0, 0, 0],
+      backgroundColor: defaultCategories.map((_, i) => palette[i % palette.length]),
+      hoverBackgroundColor: defaultCategories.map((_, i) => palette[i % palette.length]),
+      borderColor: defaultCategories.map((_, i) => palette[i % palette.length]),
       borderWidth: 1,
     },
   ],
