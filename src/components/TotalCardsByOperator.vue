@@ -4,10 +4,9 @@ import { ref, watch } from 'vue';
 import type { Ref } from 'vue';
 
 const operadores = ref([
-  { id: 1, nome: 'André' },
-  { id: 2, nome: 'Beatriz' },
-  { id: 3, nome: 'Cauê' },
-  { id: 4, nome: 'Gabriel' },
+  { id: 2, nome: 'André' },
+  { id: 3, nome: 'Beatriz' },
+  { id: 4, nome: 'Cauê' },
 ]);
 
 const operadorSelecionado = ref<number | null>(null);
