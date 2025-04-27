@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { fetchTotalOfCards } from '@/api/TotalOfCardsApi';
-import type { Ref } from 'vue';
+import { fetchTotalOfCards } from '../api/TotalCardsOperatorApi';
 import { ref, watch } from 'vue';
+import type { Ref } from 'vue';
 
 const operadores = ref([
   { id: 1, nome: 'André' },
