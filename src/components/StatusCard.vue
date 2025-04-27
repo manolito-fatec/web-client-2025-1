@@ -16,8 +16,8 @@ const palette = ['#70728f', '#e47c40', '#e4ce3d', '#94c440', '#56a1e1'];
 const defaultCategories = ['New', 'In Progress', 'Ready for Test', 'Closed', 'Needs Info'];
 
 const projects = [
-  { name: 'Manolito', id: 1637322 },
-  { name: 'Fatec', id: 1657675 }
+  { name: 'Manolito', id: '1637322' },
+  { name: 'Fatec', id: '1657675' }
 ];
 
 const selectedProject = ref<number | null>(1);
@@ -51,9 +51,16 @@ const chartOptions = ref({
       font: {
         size: 14,
       },
-      formatter: (value: number) => value === 0 ? '' : `${value}%`,
+      formatter: (value: number, context: any) => {
+        const dataset = context.chart.data.datasets[0];
+        const total = dataset.data.reduce((sum: number, val: number) => sum + val, 0);
+        if (total === 0 || value === 0) return '';
+        const percentage = (value / total) * 100;
+        if (percentage === 0) return '';
+        return `${percentage.toFixed(2)}%`;
     },
   },
+},
 });
 
 /**
@@ -64,7 +71,7 @@ const chartOptions = ref({
 const updateChart = async (projectId: number) => {
   try {
     const apiData = await fetchStatusCard(projectId);
-    
+
     // Check if apiData is empty or invalid, if so, set chart data to 0
     if (!apiData || apiData.length === 0) {
       chartData.value.datasets[0].data = [0, 0, 0, 0, 0];
