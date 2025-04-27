@@ -16,8 +16,8 @@ const palette = ['#70728f', '#e47c40', '#e4ce3d', '#94c440', '#56a1e1'];
 const defaultCategories = ['New', 'In Progress', 'Ready for Test', 'Closed', 'Needs Info'];
 
 const projects = [
-  { name: 'Manolito', id: 1637322 },
-  { name: 'Fatec', id: 1657675 }
+  { name: 'Manolito', id: '1637322' },
+  { name: 'Fatec', id: '1657675' }
 ];
 
 const selectedProject = ref<number | null>(1);
