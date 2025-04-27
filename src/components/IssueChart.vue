@@ -6,6 +6,11 @@ import { fetchReworkCards } from '@/api/ReworkCardApi.ts';
 import { PriorityEnum } from '../enums/PriorityEnum'
 import { SeverityEnum } from '@/enums/SeverityEnum';
 
+/**
+ * The chart data reactive reference containing:
+ * - labels: Array of issue types displayed on the x-axis
+ * - datasets: Configuration for the chart including colors and initial zero values
+ */
 const chartData = ref({
   labels: ['Bug', 'Enhancement', 'Question'],
   datasets: [
@@ -18,6 +23,13 @@ const chartData = ref({
   ],
 });
 
+/**
+ * Chart configuration options including:
+ * - Responsive settings
+ * - Scale configurations for both axes
+ * - Legend visibility
+ * - Bar appearance settings
+ */
 const chartOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
@@ -54,19 +66,46 @@ const chartOptions = ref({
   }
 });
 
-
+/**
+ * Available projects with their IDs and names
+ */
 const projects = [
   { id: 1, name: 'Manolito' },
   { id: 2, name: 'Fatec' }
 ];
+
+/**
+ * Currently selected project ID (reactive)
+ */
 const selectedProject = ref<number>(projects[0].id);
 
+/**
+ * Available severity options derived from SeverityEnum
+ */
 const severityOptions = ref<string[]>(Object.values(SeverityEnum).filter(value => typeof value === 'string') as string[]);
+
+/**
+ * Currently selected severity level (reactive)
+ */
 const selectedSeverity = ref<string>(severityOptions.value[0]);
 
+/**
+ * Available priority options derived from PriorityEnum
+ */
 const priorityOptions = ref<string[]>(Object.values(PriorityEnum).filter(value => typeof value === 'string') as string[]);
+
+/**
+ * Currently selected priority level (reactive)
+ */
 const selectedPriority = ref<string>(priorityOptions.value[0]);
 
+/**
+ * Fetches issue data from API and updates the chart
+ * @async
+ * @function fetchDataAndUpdateChart
+ * @throws {Error} When API request fails
+ * @returns {Promise<void>}
+ */
 const fetchDataAndUpdateChart = async () => {
   try {
     const issuesData = await fetchReworkCards(
@@ -103,6 +142,10 @@ const fetchDataAndUpdateChart = async () => {
   }
 };
 
+/**
+ * Computed property for project name binding with the select list
+ * @type {ComputedRef<string>}
+ */
 const selectedProjectName = computed({
   get: () => projects.find(p => p.id === selectedProject.value)?.name || '',
   set: (newName: string) => {
@@ -113,8 +156,10 @@ const selectedProjectName = computed({
   }
 });
 
+// Fetch initial data when component mounts
 onMounted(fetchDataAndUpdateChart);
 
+// Watch for changes in filters and update chart
 watch([selectedProject, selectedSeverity, selectedPriority], fetchDataAndUpdateChart);
 </script>
 
@@ -151,6 +196,9 @@ watch([selectedProject, selectedSeverity, selectedPriority], fetchDataAndUpdateC
 </template>
 
 <style scoped>
+/**
+ * Card container styling
+ */
 .chart-card {
   background-color: #01081F;
   padding: 20px;
@@ -159,12 +207,18 @@ watch([selectedProject, selectedSeverity, selectedPriority], fetchDataAndUpdateC
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+/**
+ * Title styling
+ */
 .chart-card h3 {
   margin-top: 0;
   margin-bottom: 15px;
   text-align: center;
 }
 
+/**
+ * Container for filter select lists
+ */
 .selects-container {
   display: flex;
   gap: 10%;
@@ -173,12 +227,18 @@ watch([selectedProject, selectedSeverity, selectedPriority], fetchDataAndUpdateC
   flex-wrap: wrap;
 }
 
+/**
+ * Individual select list wrapper
+ */
 .select-wrapper {
   position: relative;
   min-width: 150px;
   margin-bottom: 10px;
 }
 
+/**
+ * Select list styling
+ */
 .chart-select {
   background-color: #0C1635;
   border-color: #0C1635;
