@@ -3,15 +3,34 @@ import { fetchTotalOfCards } from '../api/TotalCardsOperatorApi';
 import { ref, watch } from 'vue';
 import type { Ref } from 'vue';
 
+/**
+ * List of operators available for selection.
+ * @property {number} id - The unique identifier for the operator.
+ * @property {string} nome - The name of the operator.
+ */
 const operadores = ref([
   { id: 2, nome: 'André' },
   { id: 3, nome: 'Beatriz' },
   { id: 4, nome: 'Cauê' },
 ]);
 
+/**
+ * Reactive reference for the selected operator ID.
+ * @type {number | null}
+ */
 const operadorSelecionado = ref<number | null>(null);
+
+/**
+ * Reactive reference for the total count of cards.
+ * @type {Ref<number>}
+ */
 const totalRef: Ref<number> = ref(0);
 
+/**
+ * Fetches the total number of cards assigned to a specific operator.
+ * @param {number} userId - The ID of the selected operator.
+ * @throws {Error} If the API request fails, the total will be set to 0.
+ */
 const carregarTotal = async (userId: number) => {
   try {
     const total = await fetchTotalOfCards(userId);
@@ -22,6 +41,9 @@ const carregarTotal = async (userId: number) => {
   }
 };
 
+/**
+ * Watches for changes in the selected operator and triggers the total cards fetch.
+ */
 watch(operadorSelecionado, (novoId) => {
   if (novoId !== null) {
     carregarTotal(novoId);
@@ -33,6 +55,7 @@ watch(operadorSelecionado, (novoId) => {
   <div class="total-card operador">
     <div class="title">Total cards by Operator</div>
 
+    <!-- Dropdown to select an operator -->
     <select v-model="operadorSelecionado">
       <option disabled value="">Select an operator</option>
       <option 
@@ -44,6 +67,7 @@ watch(operadorSelecionado, (novoId) => {
       </option>
     </select>
 
+    <!-- Display the total cards for the selected operator -->
     <div class="value">{{ totalRef }}</div>
   </div>
 </template>
