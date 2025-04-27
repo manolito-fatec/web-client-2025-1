@@ -8,12 +8,17 @@ import CardsByPeriod from '../components/CardsByPeriod.vue';
 import {fetchAverageTime} from "../api/AverageTimeApi.ts";
 import {onMounted, type Ref, ref} from "vue";
 import {getSessionItem} from "@/api/session/SessionManagement.ts";
+import {fetchReworkCardsTotal} from "@/api/ReworkCardApi.ts";
 
 const averageCardData: Ref<number> = ref(0);
+const reworkCardsKpi: Ref<number> = ref(0);
 
 onMounted(() => {
   fetchAverageTime(parseInt(getSessionItem("userId"),10)).then((averageTime) => {
     averageCardData.value = averageTime !== undefined ? averageTime : 0;
+  })
+  fetchReworkCardsTotal(1).then((reworkCards) => {
+    reworkCardsKpi.value = reworkCards !== undefined ? reworkCards : 0;
   })
 })
 </script>
@@ -31,7 +36,7 @@ onMounted(() => {
         <TotalCardsByOperator />
         <KpiCard title="Total cards assigned to me" value="0" />
         <KpiCard title="Average completion time of finished cards" :value=averageCardData />
-        <KpiCard title="Rework cards" value="0" />
+        <KpiCard title="Rework cards" :value="reworkCardsKpi" />
       </section>
 
       <section class="charts-grid-bottom">
