@@ -1,5 +1,4 @@
 export type IssueChartT={
-    Bug :number;
-    Enhancement :number;
-    Question :number;
+    type :string;
+    count :number;
 }
