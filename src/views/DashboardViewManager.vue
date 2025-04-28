@@ -17,7 +17,7 @@ onMounted(() => {
   fetchAverageTime(parseInt(getSessionItem("userId"),10)).then((averageTime) => {
     averageCardData.value = averageTime !== undefined ? averageTime : 0;
   })
-  fetchReworkCardsTotal(1).then((reworkCards) => {
+  fetchReworkCardsTotal(1637322).then((reworkCards) => {
     reworkCardsKpi.value = reworkCards !== undefined ? reworkCards : 0;
   })
 })
