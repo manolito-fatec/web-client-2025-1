@@ -8,7 +8,6 @@ import {setSessionItem} from "@/api/session/SessionManagement.ts";
 
 
 onBeforeMount(() => {
-  sessionStorage.clear();
   useAuthStore().mockedLogin();
   fetchUserProfile(1).then((responseUsr) =>{
         setSessionItem("userId", responseUsr.id.toString())
