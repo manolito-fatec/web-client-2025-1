@@ -146,7 +146,6 @@ const fetchDataAndUpdateChart = async () => {
   }
 };
 
-
 /**
  * Computed property for project name binding with the select list
  * @type {ComputedRef<string>}
