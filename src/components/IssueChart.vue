@@ -70,8 +70,8 @@ const chartOptions = ref({
  * Available projects with their IDs and names
  */
 const projects = [
-  { id: 1, name: 'Manolito' },
-  { id: 2, name: 'Fatec' }
+  { id: 1637322, name: 'Manolito' },
+  { id: 1657675, name: 'Fatec' }
 ];
 
 /**
@@ -114,27 +114,31 @@ const fetchDataAndUpdateChart = async () => {
         selectedPriority.value
     );
 
+    const issueTypes = ['Bug', 'Enhancement', 'Question'];
+    const counts = { Bug: 0, Enhancement: 0, Question: 0 };
+
+    for (const issue of issuesData) {
+      if (issueTypes.includes(issue.type)) {
+        counts[issue.type as keyof typeof counts] = issue.count;
+      }
+    }
+
     chartData.value = {
-      labels: ['Bug', 'Enhancement', 'Question'],
+      labels: issueTypes,
       datasets: [
         {
           ...chartData.value.datasets[0],
           data: [
-            issuesData.Bug || 0,
-            issuesData.Enhancement || 0,
-            issuesData.Question || 0
+            counts.Bug,
+            counts.Enhancement,
+            counts.Question
           ]
         }
       ]
     };
 
-    const maxValue = Math.max(
-        issuesData.Bug || 0,
-        issuesData.Enhancement || 0,
-        issuesData.Question || 0
-    );
-
-    chartOptions.value.scales.y.max = maxValue + (5 - (maxValue % 5));
+    const maxValue = Math.max(counts.Bug, counts.Enhancement, counts.Question);
+    chartOptions.value.scales.y.max = maxValue > 0 ? maxValue + (5 - (maxValue % 5)) : 5;
 
   } catch (error) {
     console.error('Error fetching data:', error);
