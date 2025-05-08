@@ -43,7 +43,7 @@ export default {
 
     const rules = computed(() => {
       const noSpecialCharsOrNumbers = helpers.regex(/^[A-Za-z\s]*$/);
-      const basicEmailFormat = helpers.regex(/^[^@\s]+@[^@\s]+\.[^@\s]+$/);
+      const basicEmailFormat = helpers.regex(/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/);
 
       return {
         fullname: {
