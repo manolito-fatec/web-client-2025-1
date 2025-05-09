@@ -13,6 +13,9 @@ const goDashManager = () => {
 const goProfile = () => {
   router.push('/profile');
 };
+const goUserRegister = () => {
+  router.push('/userRegister');
+};
 </script>
 
 <template>
@@ -25,6 +28,7 @@ const goProfile = () => {
       <Button icon="pi pi-objects-column" label="Dashboard" @click="goDash" variant="text" class="sidebar-routers"></Button>
       <Button icon="pi pi-chart-bar" label="Manager" @click="goDashManager" variant="text" class="sidebar-routers" />
       <Button icon="pi pi-user" label="Profile"  @click="goProfile" severity="contrast" variant="text" class="sidebar-routers"></Button>
+      <Button icon="pi pi-user-plus" label="Create user"  @click="goUserRegister" severity="contrast" variant="text" class="sidebar-routers"></Button>
     </div>
   </div>
 </template>
