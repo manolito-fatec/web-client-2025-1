@@ -2,13 +2,11 @@
 import { RouterView } from 'vue-router'
 import Sidebar from '../src/components/SideBar.vue'
 import {onBeforeMount} from "vue";
-import {useAuthStore} from "@/api/session/stores/auth.ts";
 import {fetchUserProfile} from "@/api/ProfileApi.ts";
 import {setSessionItem} from "@/api/session/SessionManagement.ts";
 
 
 onBeforeMount(() => {
-  useAuthStore().mockedLogin();
   fetchUserProfile(1).then((responseUsr) =>{
         setSessionItem("userId", responseUsr.id.toString())
         console.log(sessionStorage.getItem("userId"))
