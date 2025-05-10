@@ -13,8 +13,11 @@
                 id="username"
                 v-model="username"
                 type="text"
+                @input="validateUserName"
+                :class="{ 'p-invalid': userNameError || loginError }"
                 required
             />
+            <small v-if="userNameError" class="p-error">{{ userNameError }}</small>
           </div>
           <div class="form-group">
             <label for="password">Password</label>
@@ -22,8 +25,12 @@
                 id="password"
                 v-model="password"
                 type="password"
+                @input="validatePassword"
+                :class="{ 'p-invalid': passwordError || loginError }"
                 required
             />
+            <small v-if="passwordError" class="p-error">{{ passwordError }}</small>
+            <small v-if="loginError" class="p-error">{{ loginError }}</small>
           </div>
           <button type="submit" @click="auth">Login</button>
         </form>
@@ -40,13 +47,56 @@ import router from "@/router";
 const username = ref<string>('');
 const password = ref<string>('');
 
+const userNameError = ref<string | null>(null);
+const passwordError = ref<string | null>(null);
+const loginError = ref<string | null>(null);
 
-const auth = () => {
-  useAuthStore().loginAndStore(username.value, password.value).then(() => {
-    if (sessionStorage.getItem('token')) {
+const validateUserName = () => {
+  const userName = username.value;
+
+  if (userName.length > 255) {
+    userNameError.value = 'Username must be less than 255 characters';
+    return false;
+  }
+
+  userNameError.value = null;
+  return true;
+}
+
+const validatePassword = () => {
+  const pass = password.value;
+
+  if (!pass) {
+    passwordError.value = 'Password is required';
+    return false;
+  }
+
+  passwordError.value = null;
+  return true;
+}
+
+const auth = async () => {
+  loginError.value = null;
+
+  const isUserNameValid = validateUserName();
+  const isPasswordValid = validatePassword();
+
+  if (!isUserNameValid || !isPasswordValid) {
+    return;
+  }
+
+  try {
+    const success = await useAuthStore().loginAndStore(username.value, password.value);
+
+    if (success && sessionStorage.getItem('token')) {
       router.push('/dashboard');
+    } else {
+      loginError.value = 'Invalid username or password';
     }
-  });
+  } catch (error) {
+    loginError.value = 'Login failed. Please try again.';
+    console.error('Login error:', error);
+  }
 }
 </script>
 
@@ -54,7 +104,6 @@ const auth = () => {
 .login-container {
   display: flex;
   justify-content: center;
-  align-items: center;
   width: 100vw;
   height: 100vh;
   background-color: #0C1635;
@@ -100,7 +149,7 @@ const auth = () => {
 .form-group {
   margin-bottom: 1rem;
   width: 100%;
-  text-align: left; /* Alinha o label e input à esquerda */
+  text-align: left;
 }
 
 label {
@@ -108,7 +157,7 @@ label {
   margin-bottom: 0.5rem;
   font-weight: 500;
   color: white;
-  text-align: left; /* Garante que o texto fique alinhado à esquerda */
+  text-align: left;
 }
 
 input {
@@ -117,7 +166,7 @@ input {
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 1rem;
-  box-sizing: border-box; /* Garante que padding não afete a largura total */
+  box-sizing: border-box;
 }
 
 button {
@@ -134,5 +183,34 @@ button {
 
 button:hover {
   background-color: #45a049;
+}
+
+.p-error {
+  color: #f87171;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.p-invalid {
+  border-color: #f87171 !important;
+}
+
+.p-invalid:focus {
+  box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.3) !important;
+}
+
+@media only screen and (max-width: 768px) {
+  .logo-title-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+
+    h1 {
+      font-size: 3rem;
+    }
+  }
 }
 </style>
