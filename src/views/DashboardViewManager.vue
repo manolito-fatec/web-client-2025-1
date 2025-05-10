@@ -14,7 +14,7 @@ const averageCardData: Ref<number> = ref(0);
 const reworkCardsKpi: Ref<number> = ref(0);
 
 onMounted(() => {
-  fetchAverageTime(parseInt(getSessionItem("userId"),10)).then((averageTime) => {
+  fetchAverageTime(parseInt(getSessionItem("userId")!,10)).then((averageTime) => {
     averageCardData.value = averageTime !== undefined ? averageTime : 0;
   })
   fetchReworkCardsTotal(1637322).then((reworkCards) => {

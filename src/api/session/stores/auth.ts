@@ -12,9 +12,12 @@ export const useAuthStore = defineStore('auth', {
         }
     }),
     actions: {
-        async mockedLogin() {
+        async loginAndStore(email: string, psw: string) {
             try {
-                const response = await axios.post("http://localhost:8080/auth/login");
+                const response = await axios.post("http://localhost:8080/auth/login", {
+                    email: email,
+                    password: psw
+                });
 
                 this.token = response.data.token;
                 setSessionItem("token", this.token!);
@@ -26,7 +29,12 @@ export const useAuthStore = defineStore('auth', {
                 this.configHeader.headers.Authorization = `Bearer ${this.token}`;
 
                 console.log("Login successful");
+                return true;
             } catch (error) {
+                if (axios.isAxiosError(error) && error.response?.status === 403) {
+                    console.error("Access forbidden - invalid credentials");
+                    return false;
+                }
                 console.error("Login failed:", error);
                 throw error;
             }
