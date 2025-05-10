@@ -17,15 +17,15 @@ onBeforeMount(() => {
 
 <template>
   <div class="app">
-    <Sidebar class="sidebar" v-if="getSessionItem('token')"/>
-    <main>
+    <Sidebar v-if="showSidebar" class="sidebar"/>
+    <main :class="{ 'with-sidebar': showSidebar }">
       <RouterView/>
     </main>
   </div>
 </template>
 
 <style lang="scss" scoped>
-:root{
+:root {
   --color-primary: #01081F;
   --color-secondary: #0C1635;
   --color-contrast: #fff;
@@ -45,20 +45,7 @@ button {
   outline: none;
 }
 
-.login {
-  .chart-wrapper, main {
-    transition: all 0.3s ease-in-out;
-  }
-  display: flex;
-  background-color: #0C1635;
-  height: 100vh;
-
-}
-
 .app {
-  .chart-wrapper, .comp-grid, main {
-  transition: all 0.3s ease-in-out;
-}
   display: flex;
   background-color: #0C1635;
   height: 100vh;
@@ -67,42 +54,24 @@ button {
     flex: 1 1 0;
     padding: 2rem;
     width: 100%;
-    display: fixed;
     overflow: hidden;
-  }
-  @media only screen and (min-width: 768px) {
-    main {
+    transition: all 0.3s ease-in-out;
+
+    &.with-sidebar {
       margin-left: 300px;
     }
-    
   }
 
-  
-
-  @media only screen and (orientation: landscape) and (min-width: 720px) {
+  @media only screen and (max-width: 768px) {
     main {
-    flex: 1 1 0;
-    padding: 2rem;
-    margin-left: 300px;
+      padding: 1rem;
 
-    @media (max-width: 768px) {
-      padding: 6rem;
-      min-height: 100vh;
+      &.with-sidebar {
+        margin-left: 0;
+        padding-bottom: 80px;
+      }
     }
-  }
-  }
 
-  @media only screen and (orientation: portrait) and (max-width: 768px) {
-    main {
-      min-height: calc(100vh - 60px);
-      height: 100%;
-      width: 100vw;
-      padding-top: 10px;
-      padding-left: 8px;
-      margin-left: none;
-      overflow: scroll;
-    }
-    
     .sidebar {
       width: 100vw;
       height: 60px;
