@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import KpiCard from '../components/KpiCard.vue';
 </script>
 
 <template>
@@ -9,6 +10,10 @@
         <h1>Projects Dashboard</h1>
       </div>
       <DashboardHeader title="Projects Dashboard" />
+
+      <section class="kpi-grid">
+        <KpiCard title="Total projects" value="0" />
+      </section>
 
       <section class="charts-grid-bottom">
 
