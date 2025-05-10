@@ -141,6 +141,14 @@ const auth = async (): Promise<void> => {
     console.error('Login error:', error);
   }
 }
+
+defineExpose({
+  userNameError,
+  passwordError,
+  loginError,
+  username,
+  password
+})
 </script>
 
 <style scoped lang="scss">
