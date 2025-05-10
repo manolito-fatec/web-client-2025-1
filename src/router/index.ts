@@ -3,6 +3,7 @@ import DashboardView from '../views/DashboardView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import DashboardViewManager from '@/views/DashboardViewManager.vue'
 import UserManagement from "@/components/UserManagement.vue";
+import DashboardViewAdmin from '../views/DashboardViewAdmin.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
