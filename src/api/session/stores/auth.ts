@@ -29,7 +29,12 @@ export const useAuthStore = defineStore('auth', {
                 this.configHeader.headers.Authorization = `Bearer ${this.token}`;
 
                 console.log("Login successful");
+                return true;
             } catch (error) {
+                if (axios.isAxiosError(error) && error.response?.status === 403) {
+                    console.error("Access forbidden - invalid credentials");
+                    return false;
+                }
                 console.error("Login failed:", error);
                 throw error;
             }
