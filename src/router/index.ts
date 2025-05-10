@@ -10,6 +10,10 @@ const router = createRouter({
   routes: [
     {
       path: '/',
+      redirect: '/login',
+    },
+    {
+      path: '/login',
       name:'login',
       component: LoginView,
       meta: { requiresAuth: false }
@@ -48,12 +52,12 @@ router.beforeEach((to, from, next) => {
   } else if (to.name === 'login' && isAuthenticated) {
     next({ name: 'dashboard' });
   } else {
-    next(); 
+    next();
   }
 })
 
 function checkAuth() {
-  return localStorage.getItem('token') !== null;
+  return sessionStorage.getItem('token') !== null;
 }
 
 export default router
