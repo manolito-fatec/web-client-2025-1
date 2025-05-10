@@ -44,14 +44,43 @@ import { ref } from 'vue';
 import {useAuthStore} from "@/api/session/stores/auth.ts";
 import router from "@/router";
 
+/**
+ * The username input value
+ * @type {import('vue').Ref<string>}
+ */
 const username = ref<string>('');
+
+/**
+ * The password input value
+ * @type {import('vue').Ref<string>}
+ */
 const password = ref<string>('');
 
+/**
+ * Error message for username validation
+ * @type {import('vue').Ref<string|null>}
+ */
 const userNameError = ref<string | null>(null);
+
+/**
+ * Error message for password validation
+ * @type {import('vue').Ref<string|null>}
+ */
 const passwordError = ref<string | null>(null);
+
+/**
+ * General login error message
+ * @type {import('vue').Ref<string|null>}
+ */
 const loginError = ref<string | null>(null);
 
-const validateUserName = () => {
+/**
+ * Validates the username input
+ * @function
+ * @returns {boolean} True if validation passes, false otherwise
+ * @description Checks if username length exceeds 255 characters
+ */
+const validateUserName = (): boolean => {
   const userName = username.value;
 
   if (userName.length > 255) {
@@ -63,7 +92,13 @@ const validateUserName = () => {
   return true;
 }
 
-const validatePassword = () => {
+/**
+ * Validates the password input
+ * @function
+ * @returns {boolean} True if validation passes, false otherwise
+ * @description Checks if password is not empty
+ */
+const validatePassword = (): boolean => {
   const pass = password.value;
 
   if (!pass) {
@@ -75,7 +110,15 @@ const validatePassword = () => {
   return true;
 }
 
-const auth = async () => {
+/**
+ * Handles the login authentication process
+ * @async
+ * @function
+ * @returns {Promise<void>}
+ * @description Validates inputs, attempts login, and handles errors
+ * @throws {Error} When authentication fails
+ */
+const auth = async (): Promise<void> => {
   loginError.value = null;
 
   const isUserNameValid = validateUserName();
