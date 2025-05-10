@@ -4,6 +4,8 @@ import ProfileView from '../views/ProfileView.vue'
 import DashboardViewManager from '../views/DashboardViewManager.vue'
 import UserManagement from "../components/UserManagement.vue";
 import LoginView from "../views/LoginView.vue";
+import DashboardViewAdmin from '../views/DashboardViewAdmin.vue'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,6 +30,12 @@ const router = createRouter({
       path: '/dashboardManager',
       name: 'dashboardManager',
       component: DashboardViewManager,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/dashboardAdmin/',
+      name: 'dashboardAdmin',
+      component: DashboardViewAdmin,
       meta: { requiresAuth: true }
     },
     {
