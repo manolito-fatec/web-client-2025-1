@@ -3,7 +3,7 @@ import { RouterView } from 'vue-router'
 import Sidebar from '../src/components/SideBar.vue'
 import {onBeforeMount} from "vue";
 import {fetchUserProfile} from "@/api/ProfileApi.ts";
-import {setSessionItem} from "@/api/session/SessionManagement.ts";
+import {getSessionItem, setSessionItem} from "@/api/session/SessionManagement.ts";
 
 
 onBeforeMount(() => {
@@ -17,7 +17,7 @@ onBeforeMount(() => {
 
 <template>
   <div class="app">
-    <Sidebar class="sidebar"/>
+    <Sidebar class="sidebar" v-if="getSessionItem('token')"/>
     <main>
       <RouterView/>
     </main>
@@ -43,6 +43,16 @@ button {
   border: none;
   background: none;
   outline: none;
+}
+
+.login {
+  .chart-wrapper, main {
+    transition: all 0.3s ease-in-out;
+  }
+  display: flex;
+  background-color: #0C1635;
+  height: 100vh;
+
 }
 
 .app {
