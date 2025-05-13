@@ -5,7 +5,7 @@ export type User = {
     id?: number,
     fullname?: string,
     username: string,
-    role: Roles,
+    roles: Roles,
     tool: Tools,
     idTool: string,
     projectTool: string,

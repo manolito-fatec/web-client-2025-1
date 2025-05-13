@@ -221,32 +221,6 @@ const clearForm = () => {
   };
 };
 
-/**
- * Initiates user editing
- * @function
- * @param {User} user - User to be edited
- * @emits alert Shows editing confirmation
- */
-const editUser = (user: User) => {
-  alert(`Editing user: ${user.fullname} (ID: ${user.id})`);
-  console.log("Editing user:", user);
-};
-
-/**
- * Deletes a user after confirmation
- * @function
- * @param {number} userId - ID of user to delete
- * @emits confirm Shows deletion confirmation dialog
- * @emits alert Shows deletion confirmation
- */
-const deleteUser = (userId: number) => {
-  if (confirm(`Are you sure you want to delete user ID: ${userId}?`)) {
-    users.value = users.value.filter((user) => user.id !== userId);
-    alert(`Deleted user ID: ${userId}`);
-    console.log("Deleted user ID:", userId);
-  }
-};
-
 onMounted(() => {
   fetchAllUsers().then(usersApi => {
     users.value = usersApi;
@@ -389,8 +363,6 @@ defineExpose({
 
       <UserManagementTable
           :users="users"
-          @edit="editUser"
-          @delete="deleteUser"
       />
     </div>
   </div>

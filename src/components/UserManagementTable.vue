@@ -8,14 +8,13 @@ defineProps<{
   users: User[];
 }>();
 
-const emit = defineEmits(['edit', 'delete']);
 
 const editUser = (user: User) => {
-  emit('edit', user);
+  console.log(user);
 };
 
 const deleteUser = (userId: number) => {
-  emit('delete', userId);
+  console.log(userId);
 };
 </script>
 
@@ -35,10 +34,10 @@ const deleteUser = (userId: number) => {
       <Column field="id" header="ID"></Column>
       <Column field="fullname" header="Fullname" :sortable="true"></Column>
       <Column field="username" header="Username" :sortable="true"></Column>
-      <Column field="role" header="Role" :sortable="true"></Column>
       <Column field="tool" header="Tool" :sortable="true"></Column>
       <Column field="idTool" header="ID Tool"></Column>
       <Column field="projectTool" header="Project Tool"></Column>
+      <Column field="roles" header="Role" :sortable="true"></Column>
       <Column field="created" header="Created" :sortable="true"></Column>
       <Column header="Action">
         <template #body="slotProps">
