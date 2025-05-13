@@ -247,6 +247,12 @@ const deleteUser = (userId: number) => {
   }
 };
 
+onMounted(() => {
+  fetchAllUsers().then(usersApi => {
+    users.value = usersApi;
+  })
+})
+
 defineExpose({
   fullNameError,
   userNameError,
@@ -381,6 +387,11 @@ defineExpose({
         </form>
       </div>
 
+      <UserManagementTable
+          :users="users"
+          @edit="editUser"
+          @delete="deleteUser"
+      />
     </div>
   </div>
 </template>
