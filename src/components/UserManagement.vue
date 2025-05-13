@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import DataTable from "primevue/datatable";
-import Column from "primevue/column";
+import {onMounted, type Ref, ref} from "vue";
 import InputText from "primevue/inputtext";
 import Dropdown from "primevue/dropdown";
 import Button from "primevue/button";
 import Password from "primevue/password";
+import UserManagementTable from "@/components/UserManagementTable.vue";
+import {Roles} from "@/enums/Roles.ts";
+import {Tools} from "@/enums/Tools.ts";
+import type {User} from "@/types/User.ts";
+import {fetchAllUsers} from "@/api/GetUsersApi.ts";
 
 /**
  * Represents a user in the system
@@ -21,18 +24,6 @@ import Password from "primevue/password";
  * @property {string} [password] - User password (optional)
  * @property {string} [email] - User email (optional)
  */
-interface User {
-  id: number;
-  fullname: string;
-  username: string;
-  role: "ADMIN" | "OPERATOR" | "MANAGER" | string;
-  tool: string;
-  idTool: string;
-  projectTool: string;
-  created: string;
-  password?: string;
-  email?: string;
-}
 
 /**
  * Available roles for user selection
@@ -58,41 +49,8 @@ const tools = ref([
  * List of registered users
  * @type {import("vue").Ref<User[]>}
  */
-const users = ref<User[]>([
-  {
-    id: 1,
-    fullname: "Man Olito",
-    username: "Otávio",
-    role: "ADMIN",
-    tool: "Taiga",
-    idTool: "798",
-    projectTool: "Ap1",
-    created: "12/12/2012",
-    email: "otavio@example.com",
-  },
-  {
-    id: 2,
-    fullname: "Ana Silva",
-    username: "asilva",
-    role: "OPERATOR",
-    tool: "Jira",
-    idTool: "123",
-    projectTool: "WebDev",
-    created: "10/10/2023",
-    email: "ana@example.com",
-  },
-  {
-    id: 3,
-    fullname: "Carlos Souza",
-    username: "csouza",
-    role: "MANAGER",
-    tool: "Trello",
-    idTool: "456",
-    projectTool: "MobileApp",
-    created: "05/05/2024",
-    email: "carlos@example.com",
-  }
-]);
+//TODO GET ALL USERS LIST/ARRAY
+const users:Ref<User[]> = ref<User[]>([]);
 
 /**
  * New user being registered
@@ -101,8 +59,8 @@ const users = ref<User[]>([
 const newUser = ref<Omit<User, "id" | "created">>({
   fullname: "",
   username: "",
-  role: "ADMIN",
-  tool: "Taiga",
+  role: Roles.ADMIN,
+  tool: Tools.TAIGA,
   idTool: "",
   projectTool: "",
   password: "",
@@ -126,7 +84,6 @@ const userNameError = ref<string | null>(null);
  * @type {import("vue").Ref<string|null>}
  */
 const emailError = ref<string | null>(null);
-
 
 /**
  * Validates the full name field
@@ -230,8 +187,8 @@ const handleSubmit = () => {
   const userToSubmit: User = {
     id:
         users.value.length > 0
-            ? Math.max(...users.value.map((u) => u.id)) + 1
-            : 1,
+            ? Math.max(...users.value.map((u) => u.id!)) + 1
+            : 1!,
     fullname: newUser.value.fullname,
     username: newUser.value.username,
     email: newUser.value.email,
@@ -240,7 +197,7 @@ const handleSubmit = () => {
     tool: newUser.value.tool,
     idTool: newUser.value.idTool,
     projectTool: newUser.value.projectTool,
-    created: new Date().toLocaleDateString("pt-BR"),
+    createdAt: new Date().toLocaleDateString("pt-BR"),
   };
   users.value.push(userToSubmit);
   console.log("Registered user:", userToSubmit);
@@ -255,8 +212,8 @@ const clearForm = () => {
   newUser.value = {
     fullname: "",
     username: "",
-    role: "ADMIN",
-    tool: "Taiga",
+    role: Roles.ADMIN,
+    tool: Tools.TAIGA,
     idTool: "",
     projectTool: "",
     password: "",
@@ -424,44 +381,6 @@ defineExpose({
         </form>
       </div>
 
-      <div class="table-container">
-        <DataTable
-            :value="users"
-            :paginator="true"
-            :rows="10"
-            scrollable
-            scrollHeight="flex"
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            :rowsPerPageOptions="[5, 10, 20, 50]"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-            responsiveLayout="scroll"
-        >
-          <Column field="id" header="ID"></Column>
-          <Column field="fullname" header="Fullname" :sortable="true"></Column>
-          <Column field="username" header="Username" :sortable="true"></Column>
-          <Column field="role" header="Role" :sortable="true"></Column>
-          <Column field="tool" header="Tool" :sortable="true"></Column>
-          <Column field="idTool" header="ID Tool"></Column>
-          <Column field="projectTool" header="Project Tool"></Column>
-          <Column field="created" header="Created" :sortable="true"></Column>
-          <Column header="Action">
-            <template #body="slotProps">
-              <Button
-                  icon="pi pi-pencil"
-                  severity="info"
-                  text
-                  @click="editUser(slotProps.data)"
-              />
-              <Button
-                  icon="pi pi-trash"
-                  severity="danger"
-                  text
-                  @click="deleteUser(slotProps.data.id)"
-              />
-            </template>
-          </Column>
-        </DataTable>
-      </div>
     </div>
   </div>
 </template>
@@ -540,7 +459,6 @@ label {
   border-radius: 6px;
   width: 100%;
   padding-top: 0.65rem;
-
   padding-bottom: 0.65rem;
   font-size: 0.95rem;
 }
@@ -550,7 +468,7 @@ label {
 }
 
 :deep(.p-inputtext:enabled:focus) {
-  border-color: #3d7eff !important; /* Your desired focus color */
+  border-color: #3d7eff !important;
   box-shadow: 0 0 0 2px rgba(61, 126, 255, 0.3) !important;
 }
 :deep(.p-dropdown:not(.p-disabled):hover) {
@@ -566,7 +484,6 @@ label {
 
 :deep(.p-dropdown .p-dropdown-label) {
   color: #1a202c;
-
   padding-top: 0.65rem;
   padding-bottom: 0.65rem;
   font-size: 0.95rem;
@@ -574,13 +491,11 @@ label {
 
 :deep(.p-dropdown-panel) {
   background-color: #0b1a3d;
-
   border: 1px solid #2d3748;
 }
 
 :deep(.p-dropdown-item) {
   color: #e2e8f0;
-
   padding: 0.75rem 1rem;
 }
 
@@ -630,15 +545,12 @@ label {
   display: flex;
   gap: 1rem;
   margin-top: 2rem;
-
   justify-content: flex-end;
-
   grid-column: span 2;
 }
 
 :deep(.p-button) {
   padding: 0.75rem 1.75rem;
-
   font-weight: 500;
   border-radius: 6px;
   font-size: 0.95rem;
@@ -646,7 +558,6 @@ label {
 
 :deep(.p-button.p-button-secondary) {
   background-color: #4a5568;
-
   color: #e2e8f0;
   border: 1px solid #4a5568;
 }
@@ -658,156 +569,13 @@ label {
 
 :deep(.p-button[type="submit"]) {
   background-color: #3d7eff;
-
   color: #ffffff;
   border: 1px solid #3d7eff;
 }
 
 :deep(.p-button[type="submit"]:hover) {
   background-color: #2563eb;
-
   border-color: #2563eb;
-}
-
-.table-container {
-  background: #01081f;
-
-  padding: 1.5rem;
-
-  border-radius: 12px;
-
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-
-  display: flex;
-  flex-direction: column;
-  min-height: 400px;
-}
-
-:deep(.p-datatable) {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  color: #cbd5e0;
-
-  background: transparent;
-}
-
-:deep(.p-datatable .p-datatable-wrapper) {
-  flex: 1;
-  overflow: auto;
-  border-radius: 8px;
-}
-
-:deep(.p-datatable .p-datatable-thead) {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-
-:deep(.p-datatable .p-datatable-thead > tr > th) {
-  background: #01081f;
-
-  color: #e2e8f0;
-  font-weight: 600;
-  font-size: 0.875rem;
-  letter-spacing: 0.5px;
-  padding: 1rem 1.25rem;
-
-  border: none;
-  text-align: left;
-}
-
-:deep(.p-datatable .p-datatable-tbody > tr > td) {
-  padding: 1rem 1.25rem;
-
-  border: none;
-  border-bottom: 1px solid #1e293b;
-}
-
-:deep(.p-datatable .p-datatable-tbody > tr) {
-  background: transparent;
-  color: #cbd5e0;
-}
-
-:deep(.p-datatable .p-datatable-tbody > tr:last-child > td) {
-  border-bottom: none;
-}
-
-:deep(.p-datatable .p-datatable-tbody > tr:hover) {
-  background: #1e293b !important;
-}
-
-:deep(.p-paginator) {
-  background: transparent;
-  border: none;
-  color: #cbd5e0 !important;
-  margin-top: auto;
-
-  padding-top: 1rem;
-}
-
-:deep(.p-paginator .p-paginator-element),
-:deep(.p-paginator .p-paginator-pages .p-paginator-page),
-:deep(.p-paginator .p-paginator-current),
-:deep(.p-dropdown .p-dropdown-label) {
-  color: #cbd5e0 !important;
-  background-color: transparent !important;
-
-  border-color: transparent;
-}
-
-:deep(.p-paginator .p-paginator-pages .p-paginator-page.p-highlight) {
-  background: #3d7eff !important;
-
-  color: #ffffff !important;
-  border-radius: 4px;
-}
-
-:deep(.p-paginator .p-paginator-element:enabled:hover) {
-  background: #2d3748 !important;
-
-  color: #ffffff !important;
-  border-radius: 4px;
-}
-
-:deep(.p-paginator .p-dropdown .p-dropdown-label) {
-  color: #cbd5e0 !important;
-}
-
-:deep(.p-datatable-wrapper::-webkit-scrollbar) {
-  width: 10px;
-
-  height: 10px;
-}
-
-:deep(.p-datatable-wrapper::-webkit-scrollbar-track) {
-  background: #01081f;
-
-  border-radius: 5px;
-}
-
-:deep(.p-datatable-wrapper::-webkit-scrollbar-thumb) {
-  background: #3d7eff;
-
-  border-radius: 5px;
-}
-
-:deep(.p-datatable-wrapper::-webkit-scrollbar-thumb:hover) {
-  background: #2563eb;
-}
-.p-error {
-  color: #f87171;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-  display: block;
-}
-
-.p-invalid {
-  border-color: #f87171 !important;
-}
-
-.p-invalid:focus {
-  box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.3) !important;
 }
 
 @media (max-width: 768px) {
