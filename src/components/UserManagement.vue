@@ -212,7 +212,7 @@ const clearForm = () => {
   newUser.value = {
     fullname: "",
     username: "",
-    role: Roles.ADMIN,
+    roles: ['Admin'],
     tool: Tools.TAIGA,
     idTool: "",
     projectTool: "",
@@ -221,9 +221,34 @@ const clearForm = () => {
   };
 };
 
+const rolesFix = (userList: User[]) => {
+  const userListFixed:Ref<User[]> = ref<User[]>([]);
+  for (const user of userList) {
+    for (let i = 0; i < user.roles.length; i++) {
+      switch (user.roles[i]) {
+        case 'ROLE_ADMIN':
+          user.roles[i] = 'Admin';
+          break;
+        case 'ROLE_OPERATOR':
+          user.roles[i] = 'Operator';
+          break;
+        case 'ROLE_MANAGER':
+          user.roles[i] = 'Manager';
+          break;
+      }
+      if (typeof user.roles !== "string") {
+        user.tableRoles = user.roles.join(", ")
+      }
+      userListFixed.value.push(user);
+    }
+  }
+
+  return userListFixed.value;
+}
+
 onMounted(() => {
   fetchAllUsers().then(usersApi => {
-    users.value = usersApi;
+    users.value = rolesFix(usersApi);
   })
 })
 
