@@ -7,9 +7,8 @@ import UserManagement from "../src/components/UserManagement.vue";
 ref<User[]>([
     {
         id: 1,
-        fullname: "Existing User",
         username: "existing",
-        role: "ADMIN",
+        roles: ["ADMIN"],
         tool: "Taiga",
         idTool: "123",
         projectTool: "Test",
@@ -31,22 +30,6 @@ Object.defineProperty(window, 'matchMedia', {
     })),
 })
 
-test('Return error when user is empty', async () => {
-    // Arrange
-    const wrapper = mount(UserManagement, {
-        global: {
-            plugins: [PrimeVue]
-        }
-    })
-    const fullName = wrapper.find('#fullName');
-    //Act
-    await fullName.setValue('')
-
-    //Assert
-    expect(wrapper.find('.p-error').text()).toBe('Full name is required')
-
-})
-
 window.alert = vi.fn()
 window.confirm = vi.fn(() => true)
 
@@ -54,38 +37,6 @@ const wrapper = mount(UserManagement, {
     global: {
         plugins: [PrimeVue]
     }
-})
-
-test('Return error when user is empty', async () => {
-    const fullName = wrapper.find('#fullName')
-    await fullName.setValue('')
-    await fullName.trigger('blur')
-
-    expect(wrapper.find('.p-error').text()).toBe('Full name is required')
-})
-
-test('Return error for invalid characters', async () => {
-    const fullName = wrapper.find('#fullName')
-    await fullName.setValue('Nome@Inválido')
-    await fullName.trigger('blur')
-
-    expect(wrapper.find('.p-error').text()).toBe('Cannot contain special characters')
-})
-
-test('Returns error when the name is too long', async () => {
-    const fullName = wrapper.find('#fullName')
-    await fullName.setValue('a'.repeat(256))
-    await fullName.trigger('blur')
-
-    expect(wrapper.find('.p-error').text()).toBe('Full name must be less than 255 characters')
-})
-
-test('Returns no error when valid', async () => {
-    const fullName = wrapper.find('#fullName')
-    await fullName.setValue('Nome Válido')
-    await fullName.trigger('blur')
-
-    expect(wrapper.find('.p-error').exists()).toBe(false)
 })
 
 test('Returns error for empty email', async () => {

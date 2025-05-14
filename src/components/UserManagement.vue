@@ -5,7 +5,6 @@ import Dropdown from "primevue/dropdown";
 import Button from "primevue/button";
 import Password from "primevue/password";
 import UserManagementTable from "@/components/UserManagementTable.vue";
-import {Roles} from "@/enums/Roles.ts";
 import {Tools} from "@/enums/Tools.ts";
 import type {User} from "@/types/User.ts";
 import {fetchAllUsers} from "@/api/GetUsersApi.ts";
@@ -59,19 +58,13 @@ const users:Ref<User[]> = ref<User[]>([]);
 const newUser = ref<Omit<User, "id" | "created">>({
   fullname: "",
   username: "",
-  role: Roles.ADMIN,
+  roles: ['Admin'],
   tool: Tools.TAIGA,
   idTool: "",
   projectTool: "",
   password: "",
   email: "",
 });
-
-/**
- * Full name validation error message
- * @type {import("vue").Ref<string|null>}
- */
-const fullNameError = ref<string | null>(null);
 
 /**
  * Username validation error message
@@ -85,34 +78,6 @@ const userNameError = ref<string | null>(null);
  */
 const emailError = ref<string | null>(null);
 
-/**
- * Validates the full name field
- * @function
- * @returns {boolean} True if validation passes
- * @description Checks for empty value, length > 255 chars, and special characters
- */
-const validateFullName = () => {
-  const value = newUser.value.fullname;
-
-  if (!value) {
-    fullNameError.value = 'Full name is required';
-    return false;
-  }
-
-  if (value.length > 255) {
-    fullNameError.value = 'Full name must be less than 255 characters';
-    return false;
-  }
-
-  const pattern = /^[a-zA-ZÀ-ÿ\s'-]+$/;
-  if (!pattern.test(value)) {
-    fullNameError.value = 'Cannot contain special characters';
-    return false;
-  }
-
-  fullNameError.value = null;
-  return true;
-};
 
 /**
  * Validates the email field
@@ -178,10 +143,9 @@ const validateUserName = () => {
  * @description Validates all fields and registers new user if valid
  */
 const handleSubmit = () => {
-  const isFullNameValid = validateFullName();
   const isUserNameValid = validateUserName();
   const isEmailValid = validateEmail();
-  if (!isFullNameValid || !isUserNameValid || !isEmailValid) {
+  if (!isUserNameValid || !isEmailValid) {
     return;
   }
   const userToSubmit: User = {
@@ -189,11 +153,10 @@ const handleSubmit = () => {
         users.value.length > 0
             ? Math.max(...users.value.map((u) => u.id!)) + 1
             : 1!,
-    fullname: newUser.value.fullname,
     username: newUser.value.username,
     email: newUser.value.email,
     password: newUser.value.password,
-    role: newUser.value.role,
+    roles: newUser.value.roles,
     tool: newUser.value.tool,
     idTool: newUser.value.idTool,
     projectTool: newUser.value.projectTool,
@@ -210,7 +173,6 @@ const handleSubmit = () => {
  */
 const clearForm = () => {
   newUser.value = {
-    fullname: "",
     username: "",
     roles: ['Admin'],
     tool: Tools.TAIGA,
@@ -253,12 +215,10 @@ onMounted(() => {
 })
 
 defineExpose({
-  fullNameError,
   userNameError,
   emailError,
   validateEmail,
   validateUserName,
-  validateFullName,
   handleSubmit,
   users,
   newUser
@@ -274,19 +234,6 @@ defineExpose({
         <form @submit.prevent="handleSubmit">
           <h2 class="section-title">Personal Information</h2>
           <div class="form-grid">
-            <div class="form-group full-width-field">
-              <label for="fullName">Full name</label>
-              <InputText
-                  id="fullName"
-                  v-model="newUser.fullname"
-                  placeholder="Enter full name"
-                  @input="validateFullName"
-                  :class="{ 'p-invalid': fullNameError }"
-                  required
-              />
-              <small v-if="fullNameError" class="p-error">{{ fullNameError }}</small>
-            </div>
-
             <div class="form-group">
               <label for="username">Username</label>
               <InputText
@@ -328,7 +275,7 @@ defineExpose({
               <label for="role">Role</label>
               <Dropdown
                   id="role"
-                  v-model="newUser.role"
+                  v-model="newUser.roles"
                   :options="roles"
                   optionLabel="label"
                   optionValue="value"
