@@ -28,6 +28,7 @@ import {removeUserApi} from "@/api/RemoveUserApi.ts";
 
 const isEditing = ref(false);
 const currentUserId = ref<number | null>(null);
+const successMessage = ref<string | null>(null);
 /**
  * Available roles for user selection
  * @type {Array<{label: string, value: string}>}
@@ -192,7 +193,11 @@ const handleSubmit = () => {
       if (index !== -1) {
         users.value[index] = rolesFix([responseUser])[0];
       }
-      exitEditMode();
+      successMessage.value = 'User updated successfully!';
+      setTimeout(() => {
+        successMessage.value = null;
+        exitEditMode();
+      }, 3000); // Message disappears after 3 seconds
     });
   } else {
     const userToSubmit: User = {
@@ -436,6 +441,7 @@ defineExpose({
             </div>
           </div>
           <div class="button-group full-width">
+            <small v-if="successMessage" class="p-success">{{ successMessage }}</small>
             <Button
                 id="cleanAll"
                 label="Cancel"
@@ -573,6 +579,15 @@ label {
 :deep(.p-dropdown-panel) {
   background-color: #0b1a3d;
   border: 1px solid #2d3748;
+}
+
+.p-success {
+  color: #4ade80;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  display: block;
+  text-align: center;
+  grid-column: span 2;
 }
 
 :deep(.p-dropdown-item) {
