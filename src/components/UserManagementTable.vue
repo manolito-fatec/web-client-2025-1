@@ -8,13 +8,17 @@ defineProps<{
   users: User[];
 }>();
 
+const emit = defineEmits<{
+  (e: 'user-deleted', userId: number): void
+  (e: 'user-edited', user: User): void
+}>();
 
 const editUser = (user: User) => {
-  console.log(user);
-};
+  emit('user-edited', user);
+}
 
 const deleteUser = (userId: number) => {
-  console.log(userId);
+  emit('user-deleted', userId);
 };
 </script>
 

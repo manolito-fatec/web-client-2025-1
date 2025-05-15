@@ -8,6 +8,8 @@ import UserManagementTable from "@/components/UserManagementTable.vue";
 import {Tools} from "@/enums/Tools.ts";
 import type {User} from "@/types/User.ts";
 import {fetchAllUsers} from "@/api/GetUsersApi.ts";
+import {editUserApi} from "@/api/EditUserApi.ts";
+import {removeUserApi} from "@/api/RemoveUserApi.ts";
 
 /**
  * Represents a user in the system
@@ -24,6 +26,8 @@ import {fetchAllUsers} from "@/api/GetUsersApi.ts";
  * @property {string} [email] - User email (optional)
  */
 
+const isEditing = ref(false);
+const currentUserId = ref<number | null>(null);
 /**
  * Available roles for user selection
  * @type {Array<{label: string, value: string}>}
@@ -137,6 +141,26 @@ const validateUserName = () => {
   return true;
 };
 
+const enterEditMode = (user: User) => {
+  isEditing.value = true;
+  currentUserId.value = user.id!;
+  newUser.value = {
+    username: user.username,
+    email: user.email || '',
+    password: user.password || '',
+    roles: user.roles,
+    tool: user.tool,
+    idTool: user.idTool,
+    projectTool: user.projectTool,
+  };
+};
+
+const exitEditMode = () => {
+  isEditing.value = false;
+  currentUserId.value = null;
+  clearForm();
+};
+
 /**
  * Handles form submission
  * @function
@@ -148,23 +172,46 @@ const handleSubmit = () => {
   if (!isUserNameValid || !isEmailValid) {
     return;
   }
-  const userToSubmit: User = {
-    id:
-        users.value.length > 0
-            ? Math.max(...users.value.map((u) => u.id!)) + 1
-            : 1!,
-    username: newUser.value.username,
-    email: newUser.value.email,
-    password: newUser.value.password,
-    roles: newUser.value.roles,
-    tool: newUser.value.tool,
-    idTool: newUser.value.idTool,
-    projectTool: newUser.value.projectTool,
-    createdAt: new Date().toLocaleDateString("pt-BR"),
-  };
-  users.value.push(userToSubmit);
-  console.log("Registered user:", userToSubmit);
-  clearForm();
+
+  if (isEditing.value && currentUserId.value) {
+    const userToUpdate: User = {
+      id: currentUserId.value,
+      username: newUser.value.username,
+      email: newUser.value.email,
+      password: newUser.value.password,
+      roles: newUser.value.roles,
+      tool: newUser.value.tool,
+      idTool: newUser.value.idTool,
+      projectTool: newUser.value.projectTool,
+      createdAt: users.value.find(u => u.id === currentUserId.value)?.createdAt || new Date().toLocaleDateString("pt-BR"),
+    };
+    const userRolesFixed: User = rolesReturn(userToUpdate);
+    userRolesFixed.createdAt = '';
+    editUserApi(userRolesFixed).then(responseUser => {
+      const index = users.value.findIndex(u => u.id === currentUserId.value);
+      if (index !== -1) {
+        users.value[index] = rolesFix([responseUser])[0];
+      }
+      exitEditMode();
+    });
+  } else {
+    const userToSubmit: User = {
+      id: users.value.length > 0
+          ? Math.max(...users.value.map((u) => u.id!)) + 1
+          : 1,
+      username: newUser.value.username,
+      email: newUser.value.email,
+      password: newUser.value.password,
+      roles: newUser.value.roles,
+      tool: newUser.value.tool,
+      idTool: newUser.value.idTool,
+      projectTool: newUser.value.projectTool,
+      createdAt: new Date().toLocaleDateString("pt-BR"),
+    };
+    users.value.push(userToSubmit);
+    console.log("Registered user:", userToSubmit);
+    clearForm();
+  }
 };
 
 /**
@@ -181,6 +228,7 @@ const clearForm = () => {
     password: "",
     email: "",
   };
+  exitEditMode();
 };
 
 const rolesFix = (userList: User[]) => {
@@ -198,15 +246,40 @@ const rolesFix = (userList: User[]) => {
           user.roles[i] = 'Manager';
           break;
       }
-      if (typeof user.roles !== "string") {
-        user.tableRoles = user.roles.join(", ")
-      }
+      user.tableRoles = user.roles.join(", ")
       userListFixed.value.push(user);
     }
   }
-
   return userListFixed.value;
 }
+
+const rolesReturn = (userReturn: User) => {
+  const userFixed:Ref<User> = ref<User>(userReturn);
+  for (let i = 0; i < userReturn.roles.length; i++) {
+    switch (userFixed.value.roles[i]) {
+      case 'Admin':
+        userFixed.value.roles[i] = 'ROLE_ADMIN';
+        break;
+      case 'Operator':
+        userFixed.value.roles[i] = 'ROLE_OPERATOR';
+        break;
+      case 'Manager':
+        userFixed.value.roles[i] = 'ROLE_MANAGER';
+        break;
+    }
+  }
+  return userFixed.value;
+}
+
+const handleUserEdited = (user: User) => {
+  enterEditMode(user);
+};
+
+const handleUserDeleted = (userId: number) => {
+  removeUserApi(userId).then(() => {
+        users.value = users.value.filter(user => user.id !== userId);
+  });
+};
 
 onMounted(() => {
   fetchAllUsers().then(usersApi => {
@@ -228,7 +301,7 @@ defineExpose({
 <template>
   <div class="user-management-scroll-container">
     <div class="user-management-container">
-      <h1>Register new user</h1>
+      <h1>{{ isEditing ? 'Edit User' : 'Register new user' }}</h1>
 
       <div class="form-section">
         <form @submit.prevent="handleSubmit">
@@ -319,22 +392,32 @@ defineExpose({
               />
             </div>
           </div>
-
           <div class="button-group full-width">
             <Button
-                id = "cleanAll"
+                id="cleanAll"
+                label="Cancel"
+                severity="secondary"
+                @click="exitEditMode"
+                type="button"
+                v-if="isEditing"
+            />
+            <Button
+                id="cleanAll"
                 label="Clean up"
                 severity="secondary"
                 @click="clearForm"
                 type="button"
+                v-else
             />
-            <Button label="Register" type="submit" />
+            <Button :label="isEditing ? 'Update' : 'Register'" type="submit" />
           </div>
         </form>
       </div>
 
       <UserManagementTable
           :users="users"
+          @user-deleted="handleUserDeleted"
+          @user-edited="handleUserEdited"
       />
     </div>
   </div>
