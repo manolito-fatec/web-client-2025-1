@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import KpiCard from '../components/KpiCard.vue';
+import TotalCardsOfProject from '../components/TotalCardsByProject.vue';
 </script>
 
 <template>
@@ -12,6 +13,7 @@ import KpiCard from '../components/KpiCard.vue';
       <DashboardHeader title="Projects Dashboard" />
 
       <section class="kpi-grid">
+        <TotalCardsOfProject />
         <KpiCard title="Total projects" value="0" />
       </section>
 
