@@ -232,42 +232,85 @@ const clearForm = () => {
 };
 
 const rolesFix = (userList: User[]) => {
-  const userListFixed:Ref<User[]> = ref<User[]>([]);
+  const userListFixed: Ref<User[]> = ref<User[]>([]);
   for (const user of userList) {
-    for (let i = 0; i < user.roles.length; i++) {
-      switch (user.roles[i]) {
+    const userCopy = { ...user };
+    if (typeof userCopy.roles === 'string') {
+      let role = userCopy.roles;
+      switch (role) {
         case 'ROLE_ADMIN':
-          user.roles[i] = 'Admin';
+          role = 'Admin';
           break;
         case 'ROLE_OPERATOR':
-          user.roles[i] = 'Operator';
+          role = 'Operator';
           break;
         case 'ROLE_MANAGER':
-          user.roles[i] = 'Manager';
+          role = 'Manager';
           break;
       }
-      user.tableRoles = user.roles.join(", ")
-      userListFixed.value.push(user);
+      userCopy.roles = [role];
     }
+    else {
+      const newRoles = [...userCopy.roles];
+      for (let i = 0; i < newRoles.length; i++) {
+        switch (newRoles[i]) {
+          case 'ROLE_ADMIN':
+            newRoles[i] = 'Admin';
+            break;
+          case 'ROLE_OPERATOR':
+            newRoles[i] = 'Operator';
+            break;
+          case 'ROLE_MANAGER':
+            newRoles[i] = 'Manager';
+            break;
+        }
+      }
+      userCopy.roles = newRoles;
+    }
+    userCopy.tableRoles = Array.isArray(userCopy.roles)
+        ? userCopy.roles.join(", ")
+        : userCopy.roles;
+    userListFixed.value.push(userCopy);
   }
+
   return userListFixed.value;
 }
 
 const rolesReturn = (userReturn: User) => {
-  const userFixed:Ref<User> = ref<User>(userReturn);
-  for (let i = 0; i < userReturn.roles.length; i++) {
-    switch (userFixed.value.roles[i]) {
-      case 'Admin':
-        userFixed.value.roles[i] = 'ROLE_ADMIN';
+  const userFixed: Ref<User> = ref<User>(userReturn);
+  if (typeof userReturn.roles === 'string') {
+    let role = userReturn.roles;
+    switch (role) {
+      case "ADMIN":
+        role = 'ROLE_ADMIN';
         break;
-      case 'Operator':
-        userFixed.value.roles[i] = 'ROLE_OPERATOR';
+      case "OPERATOR":
+        role = 'ROLE_OPERATOR';
         break;
-      case 'Manager':
-        userFixed.value.roles[i] = 'ROLE_MANAGER';
+      case "MANAGER":
+        role = 'ROLE_MANAGER';
         break;
     }
+    userFixed.value.roles = [role];
   }
+  else {
+    const newRoles = [...userReturn.roles];
+    for (let i = 0; i < newRoles.length; i++) {
+      switch (newRoles[i]) {
+        case 'ADMIN':
+          newRoles[i] = 'ROLE_ADMIN';
+          break;
+        case 'OPERATOR':
+          newRoles[i] = 'ROLE_OPERATOR';
+          break;
+        case 'MANAGER':
+          newRoles[i] = 'ROLE_MANAGER';
+          break;
+      }
+    }
+    userFixed.value.roles = newRoles;
+  }
+
   return userFixed.value;
 }
 

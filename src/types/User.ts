@@ -4,7 +4,7 @@ export type User = {
     id?: number,
     fullname?: string,
     username: string,
-    roles: string[],
+    roles: string[] | string,
     tableRoles?: string,
     tool: Tools,
     idTool: string,
