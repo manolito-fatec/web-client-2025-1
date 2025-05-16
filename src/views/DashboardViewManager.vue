@@ -9,9 +9,28 @@ import {fetchAverageTime} from "../api/AverageTimeApi.ts";
 import {onMounted, type Ref, ref} from "vue";
 import {getSessionItem} from "@/api/session/SessionManagement.ts";
 import {fetchReworkCardsTotal} from "@/api/ReworkCardApi.ts";
+import {  getExportManager } from '@/api/ExportCsvApi.ts';
 
 const averageCardData: Ref<number> = ref(0);
 const reworkCardsKpi: Ref<number> = ref(0);
+
+/**
+ * Downloads the manager dashboard data as a CSV file.
+ *
+ * Calls the getExportManager API, creates a CSV blob,
+ * and triggers the download of "ManagerDash.csv".
+ */
+  const getExportFile =async () => {
+  const response = await getExportManager();
+  const blob = new Blob([response.data], { type: 'text/csv' });
+  const objUrl = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', objUrl);
+  link.setAttribute('download', "ManagerDash.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link); 
+}
 
 onMounted(() => {
   fetchAverageTime(parseInt(getSessionItem("userId")!,10)).then((averageTime) => {
@@ -29,6 +48,7 @@ onMounted(() => {
     <main class="main-content">
       <div class="title">
         <h1>Projects Dashboard</h1>
+        <button class="export-btn" @click="getExportFile">Export CSV</button>
       </div>
       <DashboardHeader title="Projects Dashboard" />
 
@@ -93,12 +113,28 @@ onMounted(() => {
 
 .title {
   background-color: var(--color-secondary);
-
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 10px;
+  justify-content: space-between;
   h1 {
     margin: 0%;
     margin-bottom: 0.3rem;
     color: #FFFFFF;
     font-size: 2rem;
   }
+}
+
+.export-btn {
+  background-color: #61E1A1;
+  color: #000;
+  font-weight: 500;
+  font-family: sans-serif;
+  padding: 12px 32px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 </style>
