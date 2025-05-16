@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import KpiCard from '../components/KpiCard.vue';
 import TotalCardsOfProject from '../components/TotalCardsByProject.vue';
+import CardsByPeriod from '../components/CardsByPeriod.vue';
 </script>
 
 <template>
@@ -18,7 +19,7 @@ import TotalCardsOfProject from '../components/TotalCardsByProject.vue';
       </section>
 
       <section class="charts-grid-bottom">
-
+        <CardsByPeriod />
       </section>
 
     </main>
