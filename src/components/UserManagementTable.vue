@@ -2,18 +2,18 @@
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import Button from "primevue/button";
-import type {User} from "@/types/User.ts";
+import type {UserPag} from "@/types/PagUser.ts";
 
 defineProps<{
-  users: User[];
+  users: UserPag[];
 }>();
 
 const emit = defineEmits<{
   (e: 'user-deleted', userId: number): void
-  (e: 'user-edited', user: User): void
+  (e: 'user-edited', user: UserPag): void
 }>();
 
-const editUser = (user: User) => {
+const editUser = (user: UserPag) => {
   emit('user-edited', user);
 }
 

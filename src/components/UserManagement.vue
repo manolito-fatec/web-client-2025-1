@@ -7,9 +7,10 @@ import Password from "primevue/password";
 import UserManagementTable from "@/components/UserManagementTable.vue";
 import {Tools} from "@/enums/Tools.ts";
 import type {User} from "@/types/User.ts";
-import {fetchAllUsers} from "@/api/GetUsersApi.ts";
+import {fetchAllUsers, fetchPaginatedUsers} from "@/api/GetUsersApi.ts";
 import {editUserApi} from "@/api/EditUserApi.ts";
 import {removeUserApi} from "@/api/RemoveUserApi.ts";
+import type {UserPag} from "@/types/PagUser.ts";
 
 /**
  * Represents a user in the system
@@ -51,24 +52,23 @@ const tools = ref([
 
 /**
  * List of registered users
- * @type {import("vue").Ref<User[]>}
+ * @type {import("vue").Ref<UserPag[]>}
  */
 //TODO GET ALL USERS LIST/ARRAY
-const users:Ref<User[]> = ref<User[]>([]);
+const users:Ref<UserPag[]> = ref<UserPag[]>([]);
 
 /**
  * New user being registered
- * @type {import("vue").Ref<Omit<User, "id"|"created">>}
+ * @type {import("vue").Ref<Omit<UserPag, "userId"|"createdAt">>}
  */
-const newUser = ref<Omit<User, "id" | "created">>({
-  fullname: "",
-  username: "",
-  roles: ['Admin'],
-  tool: Tools.TAIGA,
-  idTool: "",
-  projectTool: "",
-  password: "",
-  email: "",
+const newUser = ref<Omit<UserPag, "userId" | "createdAt">>({
+  userName: "",
+  userRole: 'Admin',
+  toolName: Tools.TAIGA,
+  toolId: 0,
+  projectName: "",
+  userPassword: "",
+  userEmail: "",
 });
 
 /**
@@ -91,7 +91,7 @@ const emailError = ref<string | null>(null);
  * @description Checks for empty value, length > 255 chars, and valid email format
  */
 const validateEmail = () => {
-  const value = newUser.value.email;
+  const value = newUser.value.userEmail;
 
   if (!value) {
     emailError.value = 'Email is required';
@@ -120,7 +120,7 @@ const validateEmail = () => {
  * @description Checks for empty value, length > 255 chars, and allowed characters
  */
 const validateUserName = () => {
-  const value = newUser.value.username;
+  const value = newUser.value.userName;
 
   if (!value) {
     userNameError.value = 'Username is required';
@@ -142,17 +142,17 @@ const validateUserName = () => {
   return true;
 };
 
-const enterEditMode = (user: User) => {
+const enterEditMode = (user: UserPag) => {
   isEditing.value = true;
-  currentUserId.value = user.id!;
+  currentUserId.value = user.userId!;
   newUser.value = {
-    username: user.username,
-    email: user.email || '',
-    password: user.password || '',
-    roles: user.roles,
-    tool: user.tool,
-    idTool: user.idTool,
-    projectTool: user.projectTool,
+    userName: user.userName,
+    userEmail: user.userEmail || '',
+    userPassword: user.userPassword || '',
+    userRole: user.userRole,
+    toolName: user.toolName,
+    toolId: user.toolId,
+    projectName: user.projectName,
   };
 };
 
@@ -161,6 +161,32 @@ const exitEditMode = () => {
   currentUserId.value = null;
   clearForm();
 };
+
+const pagToUserConverter = (userPag : UserPag): User => {
+  return {
+    id: userPag.userId!,
+    username: userPag.userName,
+    roles : userPag.userRole,
+    tool: userPag.toolName,
+    idTool: userPag.toolId,
+    password: userPag.userPassword,
+    email: userPag.userEmail
+  }
+}
+
+const userToPagConverter = (user: User): UserPag => {
+  return {
+    userId: user.id,
+    userName: user.username,
+    userRole: user.roles,
+    userEmail: user.email,
+    userPassword: user.password!,
+    toolName: user.tool!,
+    toolId: Number(user.idTool) || 0,
+    projectName: user.projectTool,
+    createdAt: user.createdAt!
+  };
+}
 
 /**
  * Handles form submission
@@ -175,23 +201,23 @@ const handleSubmit = () => {
   }
 
   if (isEditing.value && currentUserId.value) {
-    const userToUpdate: User = {
-      id: currentUserId.value,
-      username: newUser.value.username,
-      email: newUser.value.email,
-      password: newUser.value.password,
-      roles: newUser.value.roles,
-      tool: newUser.value.tool,
-      idTool: newUser.value.idTool,
-      projectTool: newUser.value.projectTool,
-      createdAt: users.value.find(u => u.id === currentUserId.value)?.createdAt || new Date().toLocaleDateString("pt-BR"),
+    const userToUpdate: UserPag = {
+      userId: currentUserId.value,
+      userName: newUser.value.userName,
+      userEmail: newUser.value.userEmail,
+      userPassword: newUser.value.userPassword,
+      userRole: newUser.value.userRole,
+      toolName: newUser.value.toolName,
+      toolId: newUser.value.toolId,
+      projectName: newUser.value.projectName,
+      createdAt: users.value.find(u => u.userId === currentUserId.value)?.createdAt || new Date().toLocaleDateString("pt-BR"),
     };
-    const userRolesFixed: User = rolesReturn(userToUpdate);
+    const userRolesFixed: UserPag = rolesReturn(userToUpdate);
     userRolesFixed.createdAt = '';
-    editUserApi(userRolesFixed).then(responseUser => {
-      const index = users.value.findIndex(u => u.id === currentUserId.value);
+    editUserApi(pagToUserConverter(userRolesFixed)).then(responseUser => {
+      const index = users.value.findIndex(u => u.userId === currentUserId.value);
       if (index !== -1) {
-        users.value[index] = rolesFix([responseUser])[0];
+        users.value[index] = rolesFix([userToPagConverter(responseUser)])[0];
       }
       successMessage.value = 'User updated successfully!';
       setTimeout(() => {
@@ -200,20 +226,9 @@ const handleSubmit = () => {
       }, 3000); // Message disappears after 3 seconds
     });
   } else {
-    const userToSubmit: User = {
-      id: users.value.length > 0
-          ? Math.max(...users.value.map((u) => u.id!)) + 1
-          : 1,
-      username: newUser.value.username,
-      email: newUser.value.email,
-      password: newUser.value.password,
-      roles: newUser.value.roles,
-      tool: newUser.value.tool,
-      idTool: newUser.value.idTool,
-      projectTool: newUser.value.projectTool,
-      createdAt: new Date().toLocaleDateString("pt-BR"),
-    };
-    users.value.push(userToSubmit);
+    //TODO FAZ O CADASSSSSSSTROOOOOOOOOOOOOOOOO AUUUUUUUUUUU
+    const userToSubmit: User = pagToUserConverter(newUser.value);
+    // users.value.push(userToSubmit);
     console.log("Registered user:", userToSubmit);
     clearForm();
   }
@@ -236,101 +251,60 @@ const clearForm = () => {
   exitEditMode();
 };
 
-const rolesFix = (userList: User[]) => {
-  const userListFixed: Ref<User[]> = ref<User[]>([]);
+const rolesFix = (userList: UserPag[]) => {
+  const userListFixed: Ref<UserPag[]> = ref<UserPag[]>([]);
   for (const user of userList) {
     const userCopy = { ...user };
-    if (typeof userCopy.roles === 'string') {
-      let role = userCopy.roles;
-      switch (role) {
-        case 'ROLE_ADMIN':
-          role = 'Admin';
-          break;
-        case 'ROLE_OPERATOR':
-          role = 'Operator';
-          break;
-        case 'ROLE_MANAGER':
-          role = 'Manager';
-          break;
-      }
-      userCopy.roles = [role];
+    let role = userCopy.userRole;
+    switch (role) {
+      case 'ROLE_ADMIN':
+        role = 'Admin';
+        break;
+      case 'ROLE_OPERATOR':
+        role = 'Operator';
+        break;
+      case 'ROLE_MANAGER':
+        role = 'Manager';
+        break;
     }
-    else {
-      const newRoles = [...userCopy.roles];
-      for (let i = 0; i < newRoles.length; i++) {
-        switch (newRoles[i]) {
-          case 'ROLE_ADMIN':
-            newRoles[i] = 'Admin';
-            break;
-          case 'ROLE_OPERATOR':
-            newRoles[i] = 'Operator';
-            break;
-          case 'ROLE_MANAGER':
-            newRoles[i] = 'Manager';
-            break;
-        }
-      }
-      userCopy.roles = newRoles;
-    }
-    userCopy.tableRoles = Array.isArray(userCopy.roles)
-        ? userCopy.roles.join(", ")
-        : userCopy.roles;
+    userCopy.userRole = role;
     userListFixed.value.push(userCopy);
   }
 
   return userListFixed.value;
 }
 
-const rolesReturn = (userReturn: User) => {
-  const userFixed: Ref<User> = ref<User>(userReturn);
-  if (typeof userReturn.roles === 'string') {
-    let role = userReturn.roles;
-    switch (role) {
-      case "ADMIN":
-        role = 'ROLE_ADMIN';
-        break;
-      case "OPERATOR":
-        role = 'ROLE_OPERATOR';
-        break;
-      case "MANAGER":
-        role = 'ROLE_MANAGER';
-        break;
-    }
-    userFixed.value.roles = [role];
+const rolesReturn = (userReturn: UserPag) => {
+  const userFixed: Ref<UserPag> = ref<UserPag>(userReturn);
+  let role = userReturn.userRole;
+  switch (role) {
+    case "ADMIN":
+      role = 'ROLE_ADMIN';
+      break;
+    case "OPERATOR":
+      role = 'ROLE_OPERATOR';
+      break;
+    case "MANAGER":
+      role = 'ROLE_MANAGER';
+      break;
   }
-  else {
-    const newRoles = [...userReturn.roles];
-    for (let i = 0; i < newRoles.length; i++) {
-      switch (newRoles[i]) {
-        case 'ADMIN':
-          newRoles[i] = 'ROLE_ADMIN';
-          break;
-        case 'OPERATOR':
-          newRoles[i] = 'ROLE_OPERATOR';
-          break;
-        case 'MANAGER':
-          newRoles[i] = 'ROLE_MANAGER';
-          break;
-      }
-    }
-    userFixed.value.roles = newRoles;
-  }
+  userFixed.value.userRole = role;
 
   return userFixed.value;
 }
 
-const handleUserEdited = (user: User) => {
+const handleUserEdited = (user: UserPag) => {
   enterEditMode(user);
 };
 
 const handleUserDeleted = (userId: number) => {
   removeUserApi(userId).then(() => {
-        users.value = users.value.filter(user => user.id !== userId);
+        users.value = users.value.filter(user => user.userId !== userId);
   });
 };
 
 onMounted(() => {
-  fetchAllUsers().then(usersApi => {
+  fetchPaginatedUsers().then(usersApi => {
     users.value = rolesFix(usersApi);
   })
 })
@@ -359,7 +333,7 @@ defineExpose({
               <label for="username">Username</label>
               <InputText
                   id="username"
-                  v-model="newUser.username"
+                  v-model="newUser.userName"
                   placeholder="Enter username"
                   @input="validateUserName"
                   :class="{ 'p-invalid': userNameError }"
@@ -371,7 +345,7 @@ defineExpose({
               <label for="password">Password</label>
               <Password
                   id="password"
-                  v-model="newUser.password"
+                  v-model="newUser.userPassword"
                   :feedback="false"
                   placeholder="Enter password"
                   required
@@ -383,7 +357,7 @@ defineExpose({
               <label for="email">Email</label>
               <InputText
                   id="email"
-                  v-model="newUser.email"
+                  v-model="newUser.userEmail"
                   type="email"
                   placeholder="Enter email"
                   @input="validateEmail"
@@ -396,7 +370,7 @@ defineExpose({
               <label for="role">Role</label>
               <Dropdown
                   id="role"
-                  v-model="newUser.roles"
+                  v-model="newUser.userRole"
                   :options="roles"
                   optionLabel="label"
                   optionValue="value"
@@ -413,7 +387,7 @@ defineExpose({
               <label for="tools">Tools</label>
               <Dropdown
                   id="tools"
-                  v-model="newUser.tool"
+                  v-model="newUser.toolName"
                   :options="tools"
                   optionLabel="label"
                   optionValue="value"
@@ -427,7 +401,7 @@ defineExpose({
               <label for="projectTool">Project - Tool</label>
               <InputText
                   id="projectTool"
-                  v-model="newUser.projectTool"
+                  v-model="newUser.toolName"
                   placeholder="Enter project tool"
               />
             </div>
@@ -435,7 +409,7 @@ defineExpose({
               <label for="idTool">User Project - Tool</label>
               <InputText
                   id="idTool"
-                  v-model="newUser.idTool"
+                  v-model="newUser.toolId"
                   placeholder="Enter user project tool ID"
               />
             </div>
