@@ -2,6 +2,7 @@
 import KpiCard from '../components/KpiCard.vue';
 import TotalCardsOfProject from '../components/TotalCardsByProject.vue';
 import CardsByPeriod from '../components/CardsByPeriod.vue';
+import IssueChart from '../components/IssueChart.vue';
 </script>
 
 <template>
@@ -20,6 +21,7 @@ import CardsByPeriod from '../components/CardsByPeriod.vue';
 
       <section class="charts-grid-bottom">
         <CardsByPeriod />
+        <IssueChart />
       </section>
 
     </main>
