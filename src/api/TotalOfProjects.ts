@@ -1,6 +1,7 @@
 import {api} from "@/api/AxiosConfig.ts";
 
-const BASE_URL_TASKS = 'http://localhost:8080/projects';
+const BASE_URL_TASKS = 'http://localhost:8080/web-server/projects';
+//const BASE_URL_TASKS_LOCAL = 'http://localhost:8080/projects';
 
 export const fetchTotalOfProjects = async (userId:number) => {
     try{
