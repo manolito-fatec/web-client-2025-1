@@ -151,7 +151,7 @@ const mockUser: UserPag = {
     toolName: 'Taiga',
     toolId: '123',
     projectName: 'Test Project',
-    userPassword: 'password',
+    userPassword: '0000',
     userEmail: 'test@example.com',
     createdAt: '01/01/2023'
 }
@@ -169,7 +169,7 @@ test('should set up editing state correctly', () => {
         toolName: 'Taiga',
         toolId: '123',
         projectName: 'Test Project',
-        userPassword: 'password',
+        userPassword: '0000',
         userEmail: 'test@example.com'
     })
 })
