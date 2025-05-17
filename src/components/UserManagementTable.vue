@@ -35,13 +35,11 @@ const deleteUser = (userId: number) => {
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         responsiveLayout="scroll"
     >
-      <Column field="id" header="ID"></Column>
-      <Column field="username" header="Username" :sortable="true"></Column>
-      <Column field="tool" header="Tool" :sortable="true"></Column>
-      <Column field="idTool" header="ID Tool"></Column>
-      <Column field="projectTool" header="Project Tool"></Column>
-      <Column field="tableRoles" header="Role" :sortable="true"></Column>
-      <Column field="created" header="Created" :sortable="true"></Column>
+      <Column field="userId" header="ID"></Column>
+      <Column field="userName" header="Username" :sortable="true"></Column>
+      <Column field="userRole" header="Role" :sortable="true"></Column>
+      <Column field="userEmail" header="Email"></Column>
+      <Column field="toolName" header="Project Tool"></Column>
       <Column header="Action">
         <template #body="slotProps">
           <Button

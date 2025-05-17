@@ -7,7 +7,7 @@ import Password from "primevue/password";
 import UserManagementTable from "@/components/UserManagementTable.vue";
 import {Tools} from "@/enums/Tools.ts";
 import type {User} from "@/types/User.ts";
-import {fetchAllUsers, fetchPaginatedUsers} from "@/api/GetUsersApi.ts";
+import {fetchPaginatedUsers} from "@/api/GetUsersApi.ts";
 import {editUserApi} from "@/api/EditUserApi.ts";
 import {removeUserApi} from "@/api/RemoveUserApi.ts";
 import type {UserPag} from "@/types/PagUser.ts";
@@ -166,7 +166,7 @@ const pagToUserConverter = (userPag : UserPag): User => {
   return {
     id: userPag.userId!,
     username: userPag.userName,
-    roles : userPag.userRole,
+    roles : [userPag.userRole],
     tool: userPag.toolName,
     idTool: userPag.toolId,
     password: userPag.userPassword,
@@ -178,7 +178,7 @@ const userToPagConverter = (user: User): UserPag => {
   return {
     userId: user.id,
     userName: user.username,
-    userRole: user.roles,
+    userRole: user.roles[0],
     userEmail: user.email,
     userPassword: user.password!,
     toolName: user.tool!,
