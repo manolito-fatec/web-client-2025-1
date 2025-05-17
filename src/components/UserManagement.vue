@@ -13,22 +13,19 @@ import {removeUserApi} from "@/api/RemoveUserApi.ts";
 import type {UserPag} from "@/types/PagUser.ts";
 
 /**
- * Represents a user in the system
- * @interface
- * @property {number} id - Unique user identifier
- * @property {string} fullname - User's full name
- * @property {string} username - Login username
- * @property {"ADMIN"|"OPERATOR"|"MANAGER"|string} role - User role/privilege level
- * @property {string} tool - Associated ETL tool
- * @property {string} idTool - User ID in the ETL tool
- * @property {string} projectTool - Associated project in ETL tool
- * @property {string} created - Creation date (DD/MM/YYYY format)
- * @property {string} [password] - User password (optional)
- * @property {string} [email] - User email (optional)
+ * Represents the editing state of the form
+ * @type {ref<boolean>}
  */
-
 const isEditing = ref(false);
+/**
+ * Stores the current userId for edit methods. Will be null when edit is @isEditing is false
+ * @type {ref<number | null>>}
+ */
 const currentUserId = ref<number | null>(null);
+/**
+ * Stores the sucess message for edit. Will only have a value when the editApi returns success.
+ * @type {ref<string | null>}
+ */
 const successMessage = ref<string | null>(null);
 /**
  * Available roles for user selection
@@ -65,10 +62,10 @@ const newUser = ref<Omit<UserPag, "userId" | "createdAt">>({
   userName: "",
   userRole: 'Admin',
   toolName: Tools.TAIGA,
-  toolId: 0,
+  userEmail: "",
+  toolId: '1',
   projectName: "",
   userPassword: "",
-  userEmail: "",
 });
 
 /**
@@ -142,6 +139,11 @@ const validateUserName = () => {
   return true;
 };
 
+/**
+* @method enterEditMode
+* @description Enters edit mode for a specific user
+* @param {UserPag} user - The user to edit
+*/
 const enterEditMode = (user: UserPag) => {
   isEditing.value = true;
   currentUserId.value = user.userId!;
@@ -156,13 +158,30 @@ const enterEditMode = (user: UserPag) => {
   };
 };
 
+/**
+ * @method exitEditMode
+ * @description Exits edit mode and resets form
+ */
 const exitEditMode = () => {
   isEditing.value = false;
   currentUserId.value = null;
   clearForm();
 };
 
-const pagToUserConverter = (userPag : UserPag): User => {
+/**
+ * Convert UserPag object to User
+ * @method
+ * @param userPag
+ */
+const pagToUserConverter = (userPag : UserPag): {
+  id: number;
+  username: string;
+  roles: string[];
+  tool: string;
+  idTool: string;
+  password: string;
+  email: string
+} => {
   return {
     id: userPag.userId!,
     username: userPag.userName,
@@ -174,19 +193,35 @@ const pagToUserConverter = (userPag : UserPag): User => {
   }
 }
 
-const userToPagConverter = (user: User): UserPag => {
+/**
+ * Convert User object to UserPag
+ * @method
+ * @param user
+ */
+const userToPagConverter = (user: User): {
+  userId: number;
+  userName: string;
+  userRole: string;
+  userEmail: string;
+  userPassword: string;
+  toolName: string;
+  toolId: string;
+  projectName: string;
+  createdAt: string;
+} => {
   return {
-    userId: user.id,
+    userId: user.id!,
     userName: user.username,
     userRole: user.roles[0],
     userEmail: user.email,
     userPassword: user.password!,
     toolName: user.tool!,
-    toolId: Number(user.idTool) || 0,
-    projectName: user.projectTool,
+    toolId: user.idTool!,
+    projectName: user.projectTool!,
     createdAt: user.createdAt!
   };
 }
+
 
 /**
  * Handles form submission
@@ -215,6 +250,7 @@ const handleSubmit = () => {
     const userRolesFixed: UserPag = rolesReturn(userToUpdate);
     userRolesFixed.createdAt = '';
     editUserApi(pagToUserConverter(userRolesFixed)).then(responseUser => {
+      responseUser.tool = userRolesFixed.toolName;
       const index = users.value.findIndex(u => u.userId === currentUserId.value);
       if (index !== -1) {
         users.value[index] = rolesFix([userToPagConverter(responseUser)])[0];
@@ -223,12 +259,10 @@ const handleSubmit = () => {
       setTimeout(() => {
         successMessage.value = null;
         exitEditMode();
-      }, 3000); // Message disappears after 3 seconds
+      }, 3000);
     });
   } else {
-    //TODO FAZ O CADASSSSSSSTROOOOOOOOOOOOOOOOO AUUUUUUUUUUU
     const userToSubmit: User = pagToUserConverter(newUser.value);
-    // users.value.push(userToSubmit);
     console.log("Registered user:", userToSubmit);
     clearForm();
   }
@@ -240,13 +274,13 @@ const handleSubmit = () => {
  */
 const clearForm = () => {
   newUser.value = {
-    username: "",
-    roles: ['Admin'],
-    tool: Tools.TAIGA,
-    idTool: "",
-    projectTool: "",
-    password: "",
-    email: "",
+    userName: "",
+    userRole: 'Admin',
+    toolName: 'Taiga',
+    toolId: '1',
+    projectName: "",
+    userPassword: "",
+    userEmail: "",
   };
   exitEditMode();
 };
@@ -381,8 +415,8 @@ defineExpose({
             </div>
           </div>
 
-          <h2 class="section-title etl-title">ETL Tools</h2>
-          <div class="form-grid">
+          <h2 class="section-title etl-title" v-if="!isEditing">ETL Tools</h2>
+          <div class="form-grid" v-if="!isEditing">
             <div class="form-group full-width-field">
               <label for="tools">Tools</label>
               <Dropdown

@@ -1,10 +1,10 @@
 export type User = {
     id?: number,
     username: string,
-    roles: string | string[],
+    roles: string[],
     tableRoles?: string,
     tool?: string,
-    idTool?: number,
+    idTool?: string,
     projectTool?: string,
     password?: string,
     createdAt?: string,
