@@ -224,9 +224,11 @@ const userToPagConverter = (user: User): {
 
 
 /**
- * Handles form submission
+ * Handles form submission. If @isEditing is true, the user will be updated and not created
+ * Internally, the function creates a copy object from the edit form loaded one and sends it to @rolesReturn method and
+ * for the @pagToUserConverter method, and finally to the endpoint call.
  * @function
- * @description Validates all fields and registers new user if valid
+ * @description Validates all fields and registers new or edited user if valid
  */
 const handleSubmit = () => {
   const isUserNameValid = validateUserName();
@@ -285,6 +287,10 @@ const clearForm = () => {
   exitEditMode();
 };
 
+/**
+ * Converts the enum roles from the back-end to prettier ones
+ * @param userList
+ */
 const rolesFix = (userList: UserPag[]) => {
   const userListFixed: Ref<UserPag[]> = ref<UserPag[]>([]);
   for (const user of userList) {
@@ -308,6 +314,10 @@ const rolesFix = (userList: UserPag[]) => {
   return userListFixed.value;
 }
 
+/**
+ * Converts the prettier values to the back-end to enum required strings
+ * @param userReturn
+ */
 const rolesReturn = (userReturn: UserPag) => {
   const userFixed: Ref<UserPag> = ref<UserPag>(userReturn);
   let role = userReturn.userRole;
@@ -327,10 +337,18 @@ const rolesReturn = (userReturn: UserPag) => {
   return userFixed.value;
 }
 
+/**
+ * Handler for the user-edit emit event
+ * @param user
+ */
 const handleUserEdited = (user: UserPag) => {
   enterEditMode(user);
 };
 
+/**
+ * Handler for the user-removed emit event
+ * @param userId
+ */
 const handleUserDeleted = (userId: number) => {
   removeUserApi(userId).then(() => {
         users.value = users.value.filter(user => user.userId !== userId);
