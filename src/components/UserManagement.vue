@@ -51,7 +51,6 @@ const tools = ref([
  * List of registered users
  * @type {import("vue").Ref<UserPag[]>}
  */
-//TODO GET ALL USERS LIST/ARRAY
 const users:Ref<UserPag[]> = ref<UserPag[]>([]);
 
 /**
@@ -284,7 +283,9 @@ const clearForm = () => {
     userPassword: "",
     userEmail: "",
   };
-  exitEditMode();
+  if (isEditing.value) {
+    exitEditMode();
+  }
 };
 
 /**
