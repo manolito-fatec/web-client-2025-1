@@ -52,7 +52,7 @@ const deleteUser = (userId: number) => {
               icon="pi pi-trash"
               severity="danger"
               text
-              @click="deleteUser(slotProps.data.id)"
+              @click="deleteUser(slotProps.data.userId)"
           />
         </template>
       </Column>
