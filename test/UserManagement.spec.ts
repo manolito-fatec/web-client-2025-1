@@ -1,22 +1,23 @@
-import { expect, vi, test } from 'vitest'
-import { ref } from 'vue'
+import {expect, vi, test, beforeEach} from 'vitest'
+import {ref} from 'vue'
 import {User} from "../src/types/User";
 import {mount} from "@vue/test-utils";
 import PrimeVue from 'primevue/config'
 import UserManagement from "../src/components/UserManagement.vue";
+import {createPinia} from "pinia";
+import {UserPag} from "../src/types/PagUser";
+import {editUserApi} from "../src/api/EditUserApi";
 ref<User[]>([
     {
         id: 1,
-        fullname: "Existing User",
         username: "existing",
-        role: "ADMIN",
+        roles: ["ADMIN"],
         tool: "Taiga",
         idTool: "123",
         projectTool: "Test",
         email: "existing@example.com",
     }
 ]);
-
 Object.defineProperty(window, 'matchMedia', {
     writable: true,
     value: vi.fn().mockImplementation(query => ({
@@ -31,61 +32,37 @@ Object.defineProperty(window, 'matchMedia', {
     })),
 })
 
-test('Return error when user is empty', async () => {
-    // Arrange
-    const wrapper = mount(UserManagement, {
-        global: {
-            plugins: [PrimeVue]
-        }
-    })
-    const fullName = wrapper.find('#fullName');
-    //Act
-    await fullName.setValue('')
+vi.mock('@/api/EditUserApi.ts', () => ({
+    editUserApi: vi.fn()
+}))
+vi.mock('@/api/RemoveUserApi.ts', () => ({
+    removeUserApi: vi.fn()
+}))
 
-    //Assert
-    expect(wrapper.find('.p-error').text()).toBe('Full name is required')
-
-})
+createPinia()
+vi.mock('../src/api/session/stores/auth.ts', () => ({
+    useAuthStore: vi.fn(() => ({
+        isAuthenticated: true,
+        user: { name: 'Test User' },
+        login: vi.fn(),
+        logout: vi.fn()
+    }))
+}))
 
 window.alert = vi.fn()
 window.confirm = vi.fn(() => true)
 
-const wrapper = mount(UserManagement, {
-    global: {
-        plugins: [PrimeVue]
-    }
-})
 
-test('Return error when user is empty', async () => {
-    const fullName = wrapper.find('#fullName')
-    await fullName.setValue('')
-    await fullName.trigger('blur')
+beforeEach(() => {
+    vi.clearAllMocks()
 
-    expect(wrapper.find('.p-error').text()).toBe('Full name is required')
-})
-
-test('Return error for invalid characters', async () => {
-    const fullName = wrapper.find('#fullName')
-    await fullName.setValue('Nome@Inválido')
-    await fullName.trigger('blur')
-
-    expect(wrapper.find('.p-error').text()).toBe('Cannot contain special characters')
-})
-
-test('Returns error when the name is too long', async () => {
-    const fullName = wrapper.find('#fullName')
-    await fullName.setValue('a'.repeat(256))
-    await fullName.trigger('blur')
-
-    expect(wrapper.find('.p-error').text()).toBe('Full name must be less than 255 characters')
-})
-
-test('Returns no error when valid', async () => {
-    const fullName = wrapper.find('#fullName')
-    await fullName.setValue('Nome Válido')
-    await fullName.trigger('blur')
-
-    expect(wrapper.find('.p-error').exists()).toBe(false)
+    wrapper = mount(UserManagement, {
+        global: {
+            plugins: [PrimeVue]
+        }
+    })
+    component = wrapper.vm
+    component.users.value = [mockUser]
 })
 
 test('Returns error for empty email', async () => {
@@ -156,7 +133,6 @@ test('Returns no error for valid username', async () => {
 test('Does not submit when there are validation errors', async () => {
     const initialUserCount = wrapper.vm.users.length
 
-    await wrapper.find('#fullName').setValue('')
     await wrapper.find('#username').setValue('')
     await wrapper.find('#email').setValue('invalido')
 
@@ -165,47 +141,62 @@ test('Does not submit when there are validation errors', async () => {
     expect(wrapper.vm.users.length).toBe(initialUserCount)
 })
 
-test('Adds new user when valid', async () => {
-    const initialUserCount = wrapper.vm.users.length
+let wrapper: any
+let component: any
 
-    await wrapper.find('#fullName').setValue('Novo Usuário')
-    await wrapper.find('#username').setValue('novouser')
-    await wrapper.find('#email').setValue('novo@email.com')
-    await wrapper.find('#password input').setValue('senha123')
+const mockUser: UserPag = {
+    userId: 1,
+    userName: 'testuser',
+    userRole: 'ADMIN',
+    toolName: 'Taiga',
+    toolId: '123',
+    projectName: 'Test Project',
+    userPassword: '',
+    userEmail: 'test@example.com',
+    createdAt: '01/01/2023'
+}
 
-    await wrapper.find('form').trigger('submit.prevent')
 
-    expect(wrapper.vm.users.length).toBe(initialUserCount + 1)
-    expect(wrapper.vm.users[initialUserCount].fullname).toBe('Novo Usuário')
+
+test('should set up editing state correctly', () => {
+    component.enterEditMode(mockUser)
+
+    expect(component.isEditing).toBe(true)
+    expect(component.currentUserId).toBe(1)
+    expect(component.newUser).toEqual({
+        userName: 'testuser',
+        userRole: 'ADMIN',
+        toolName: 'Taiga',
+        toolId: '123',
+        projectName: 'Test Project',
+        userPassword: '',
+        userEmail: 'test@example.com'
+    })
 })
 
-test('Clears form after successful submission', async () => {
-    await wrapper.find('#fullName').setValue('Usuário Teste')
-    await wrapper.find('#username').setValue('testuser')
-    await wrapper.find('#email').setValue('teste@email.com')
+test('should reset editing state', () => {
+    component.isEditing = true
+    component.currentUserId = 1
+    component.newUser = { userName: 'test' }
 
-    await wrapper.find('form').trigger('submit.prevent')
+    component.exitEditMode()
 
-    expect(wrapper.vm.newUser.fullname).toBe('')
-    expect(wrapper.vm.newUser.username).toBe('')
-    expect(wrapper.vm.newUser.email).toBe('')
+    expect(component.isEditing).toBe(false)
+    expect(component.currentUserId).toBeNull()
+    expect(component.newUser.userName).toBe('')
 })
 
-test('Clears all form fields', async () => {
-    await wrapper.find('#fullName').setValue('Usuário para limpar')
-    await wrapper.find('#username').setValue('toclear')
-    await wrapper.find('#email').setValue('clear@example.com')
+test('should convert display roles to backend format', () => {
+    const testCases = [
+        { input: 'ADMIN', expected: 'ROLE_ADMIN' },
+        { input: 'OPERATOR', expected: 'ROLE_OPERATOR' },
+        { input: 'MANAGER', expected: 'ROLE_MANAGER' },
+        { input: 'UNKNOWN', expected: 'UNKNOWN' }
+    ]
 
-    await wrapper.find('#cleanAll').trigger('click')
-
-    expect(wrapper.vm.newUser).toEqual({
-        fullname: "",
-        username: "",
-        role: "ADMIN",
-        tool: "Taiga",
-        idTool: "",
-        projectTool: "",
-        password: "",
-        email: "",
+    testCases.forEach(({ input, expected }) => {
+        const user: UserPag = { ...mockUser, userRole: input }
+        const result = component.rolesReturn(user)
+        expect(result.userRole).toBe(expected)
     })
 })
