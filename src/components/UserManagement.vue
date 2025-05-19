@@ -1,39 +1,32 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import DataTable from "primevue/datatable";
-import Column from "primevue/column";
+import {onMounted, type Ref, ref} from "vue";
 import InputText from "primevue/inputtext";
 import Dropdown from "primevue/dropdown";
 import Button from "primevue/button";
 import Password from "primevue/password";
+import UserManagementTable from "@/components/UserManagementTable.vue";
+import {Tools} from "@/enums/Tools.ts";
+import type {User} from "@/types/User.ts";
+import {fetchPaginatedUsers} from "@/api/GetUsersApi.ts";
+import {editUserApi} from "@/api/EditUserApi.ts";
+import {removeUserApi} from "@/api/RemoveUserApi.ts";
+import type {UserPag} from "@/types/PagUser.ts";
 
 /**
- * Represents a user in the system
- * @interface
- * @property {number} id - Unique user identifier
- * @property {string} fullname - User's full name
- * @property {string} username - Login username
- * @property {"ADMIN"|"OPERATOR"|"MANAGER"|string} role - User role/privilege level
- * @property {string} tool - Associated ETL tool
- * @property {string} idTool - User ID in the ETL tool
- * @property {string} projectTool - Associated project in ETL tool
- * @property {string} created - Creation date (DD/MM/YYYY format)
- * @property {string} [password] - User password (optional)
- * @property {string} [email] - User email (optional)
+ * Represents the editing state of the form
+ * @type {ref<boolean>}
  */
-interface User {
-  id: number;
-  fullname: string;
-  username: string;
-  role: "ADMIN" | "OPERATOR" | "MANAGER" | string;
-  tool: string;
-  idTool: string;
-  projectTool: string;
-  created: string;
-  password?: string;
-  email?: string;
-}
-
+const isEditing = ref(false);
+/**
+ * Stores the current userId for edit methods. Will be null when edit is @isEditing is false
+ * @type {ref<number | null>>}
+ */
+const currentUserId = ref<number | null>(null);
+/**
+ * Stores the sucess message for edit. Will only have a value when the editApi returns success.
+ * @type {ref<string | null>}
+ */
+const successMessage = ref<string | null>(null);
 /**
  * Available roles for user selection
  * @type {Array<{label: string, value: string}>}
@@ -56,64 +49,23 @@ const tools = ref([
 
 /**
  * List of registered users
- * @type {import("vue").Ref<User[]>}
+ * @type {import("vue").Ref<UserPag[]>}
  */
-const users = ref<User[]>([
-  {
-    id: 1,
-    fullname: "Man Olito",
-    username: "Otávio",
-    role: "ADMIN",
-    tool: "Taiga",
-    idTool: "798",
-    projectTool: "Ap1",
-    created: "12/12/2012",
-    email: "otavio@example.com",
-  },
-  {
-    id: 2,
-    fullname: "Ana Silva",
-    username: "asilva",
-    role: "OPERATOR",
-    tool: "Jira",
-    idTool: "123",
-    projectTool: "WebDev",
-    created: "10/10/2023",
-    email: "ana@example.com",
-  },
-  {
-    id: 3,
-    fullname: "Carlos Souza",
-    username: "csouza",
-    role: "MANAGER",
-    tool: "Trello",
-    idTool: "456",
-    projectTool: "MobileApp",
-    created: "05/05/2024",
-    email: "carlos@example.com",
-  }
-]);
+const users:Ref<UserPag[]> = ref<UserPag[]>([]);
 
 /**
  * New user being registered
- * @type {import("vue").Ref<Omit<User, "id"|"created">>}
+ * @type {import("vue").Ref<Omit<UserPag, "userId"|"createdAt">>}
  */
-const newUser = ref<Omit<User, "id" | "created">>({
-  fullname: "",
-  username: "",
-  role: "ADMIN",
-  tool: "Taiga",
-  idTool: "",
-  projectTool: "",
-  password: "",
-  email: "",
+const newUser = ref<Omit<UserPag, "userId" | "createdAt">>({
+  userName: "",
+  userRole: 'Admin',
+  toolName: Tools.TAIGA,
+  userEmail: "",
+  toolId: '1',
+  projectName: "",
+  userPassword: "",
 });
-
-/**
- * Full name validation error message
- * @type {import("vue").Ref<string|null>}
- */
-const fullNameError = ref<string | null>(null);
 
 /**
  * Username validation error message
@@ -129,42 +81,13 @@ const emailError = ref<string | null>(null);
 
 
 /**
- * Validates the full name field
- * @function
- * @returns {boolean} True if validation passes
- * @description Checks for empty value, length > 255 chars, and special characters
- */
-const validateFullName = () => {
-  const value = newUser.value.fullname;
-
-  if (!value) {
-    fullNameError.value = 'Full name is required';
-    return false;
-  }
-
-  if (value.length > 255) {
-    fullNameError.value = 'Full name must be less than 255 characters';
-    return false;
-  }
-
-  const pattern = /^[a-zA-ZÀ-ÿ\s'-]+$/;
-  if (!pattern.test(value)) {
-    fullNameError.value = 'Cannot contain special characters';
-    return false;
-  }
-
-  fullNameError.value = null;
-  return true;
-};
-
-/**
  * Validates the email field
  * @function
  * @returns {boolean} True if validation passes
  * @description Checks for empty value, length > 255 chars, and valid email format
  */
 const validateEmail = () => {
-  const value = newUser.value.email;
+  const value = newUser.value.userEmail;
 
   if (!value) {
     emailError.value = 'Email is required';
@@ -193,7 +116,7 @@ const validateEmail = () => {
  * @description Checks for empty value, length > 255 chars, and allowed characters
  */
 const validateUserName = () => {
-  const value = newUser.value.username;
+  const value = newUser.value.userName;
 
   if (!value) {
     userNameError.value = 'Username is required';
@@ -216,35 +139,134 @@ const validateUserName = () => {
 };
 
 /**
- * Handles form submission
+* @method enterEditMode
+* @description Enters edit mode for a specific user
+* @param {UserPag} user - The user to edit
+*/
+const enterEditMode = (user: UserPag) => {
+  isEditing.value = true;
+  currentUserId.value = user.userId!;
+  newUser.value = {
+    userName: user.userName,
+    userEmail: user.userEmail || '',
+    userPassword: user.userPassword || '',
+    userRole: user.userRole,
+    toolName: user.toolName,
+    toolId: user.toolId,
+    projectName: user.projectName,
+  };
+};
+
+/**
+ * @method exitEditMode
+ * @description Exits edit mode and resets form
+ */
+const exitEditMode = () => {
+  isEditing.value = false;
+  currentUserId.value = null;
+  clearForm();
+};
+
+/**
+ * Convert UserPag object to User
+ * @method
+ * @param userPag
+ */
+const pagToUserConverter = (userPag : UserPag): {
+  id: number;
+  username: string;
+  roles: string[];
+  tool: string;
+  idTool: string;
+  password: string;
+  email: string
+} => {
+  return {
+    id: userPag.userId!,
+    username: userPag.userName,
+    roles : [userPag.userRole],
+    tool: userPag.toolName,
+    idTool: userPag.toolId,
+    password: userPag.userPassword,
+    email: userPag.userEmail
+  }
+}
+
+/**
+ * Convert User object to UserPag
+ * @method
+ * @param user
+ */
+const userToPagConverter = (user: User): {
+  userId: number;
+  userName: string;
+  userRole: string;
+  userEmail: string;
+  userPassword: string;
+  toolName: string;
+  toolId: string;
+  projectName: string;
+  createdAt: string;
+} => {
+  return {
+    userId: user.id!,
+    userName: user.username,
+    userRole: user.roles[0],
+    userEmail: user.email,
+    userPassword: user.password!,
+    toolName: user.tool!,
+    toolId: user.idTool!,
+    projectName: user.projectTool!,
+    createdAt: user.createdAt!
+  };
+}
+
+
+/**
+ * Handles form submission. If @isEditing is true, the user will be updated and not created
+ * Internally, the function creates a copy object from the edit form loaded one and sends it to @rolesReturn method and
+ * for the @pagToUserConverter method, and finally to the endpoint call.
  * @function
- * @description Validates all fields and registers new user if valid
+ * @description Validates all fields and registers new or edited user if valid
  */
 const handleSubmit = () => {
-  const isFullNameValid = validateFullName();
   const isUserNameValid = validateUserName();
   const isEmailValid = validateEmail();
-  if (!isFullNameValid || !isUserNameValid || !isEmailValid) {
+  if (!isUserNameValid || !isEmailValid) {
     return;
   }
-  const userToSubmit: User = {
-    id:
-        users.value.length > 0
-            ? Math.max(...users.value.map((u) => u.id)) + 1
-            : 1,
-    fullname: newUser.value.fullname,
-    username: newUser.value.username,
-    email: newUser.value.email,
-    password: newUser.value.password,
-    role: newUser.value.role,
-    tool: newUser.value.tool,
-    idTool: newUser.value.idTool,
-    projectTool: newUser.value.projectTool,
-    created: new Date().toLocaleDateString("pt-BR"),
-  };
-  users.value.push(userToSubmit);
-  console.log("Registered user:", userToSubmit);
-  clearForm();
+
+  if (isEditing.value && currentUserId.value) {
+    const userToUpdate: UserPag = {
+      userId: currentUserId.value,
+      userName: newUser.value.userName,
+      userEmail: newUser.value.userEmail,
+      userPassword: newUser.value.userPassword,
+      userRole: newUser.value.userRole,
+      toolName: newUser.value.toolName,
+      toolId: newUser.value.toolId,
+      projectName: newUser.value.projectName,
+      createdAt: users.value.find(u => u.userId === currentUserId.value)?.createdAt || new Date().toLocaleDateString("pt-BR"),
+    };
+    const userRolesFixed: UserPag = rolesReturn(userToUpdate);
+    userRolesFixed.createdAt = '';
+    editUserApi(pagToUserConverter(userRolesFixed)).then(responseUser => {
+      responseUser.tool = userRolesFixed.toolName;
+      const index = users.value.findIndex(u => u.userId === currentUserId.value);
+      if (index !== -1) {
+        users.value[index] = rolesFix([userToPagConverter(responseUser)])[0];
+      }
+      successMessage.value = 'User updated successfully!';
+      setTimeout(() => {
+        successMessage.value = null;
+        exitEditMode();
+      }, 3000);
+    });
+  } else {
+    const userToSubmit: User = pagToUserConverter(newUser.value);
+    console.log("Registered user:", userToSubmit);
+    clearForm();
+  }
 };
 
 /**
@@ -253,50 +275,98 @@ const handleSubmit = () => {
  */
 const clearForm = () => {
   newUser.value = {
-    fullname: "",
-    username: "",
-    role: "ADMIN",
-    tool: "Taiga",
-    idTool: "",
-    projectTool: "",
-    password: "",
-    email: "",
+    userName: "",
+    userRole: 'Admin',
+    toolName: 'Taiga',
+    toolId: '1',
+    projectName: "",
+    userPassword: "",
+    userEmail: "",
   };
-};
-
-/**
- * Initiates user editing
- * @function
- * @param {User} user - User to be edited
- * @emits alert Shows editing confirmation
- */
-const editUser = (user: User) => {
-  alert(`Editing user: ${user.fullname} (ID: ${user.id})`);
-  console.log("Editing user:", user);
-};
-
-/**
- * Deletes a user after confirmation
- * @function
- * @param {number} userId - ID of user to delete
- * @emits confirm Shows deletion confirmation dialog
- * @emits alert Shows deletion confirmation
- */
-const deleteUser = (userId: number) => {
-  if (confirm(`Are you sure you want to delete user ID: ${userId}?`)) {
-    users.value = users.value.filter((user) => user.id !== userId);
-    alert(`Deleted user ID: ${userId}`);
-    console.log("Deleted user ID:", userId);
+  if (isEditing.value) {
+    exitEditMode();
   }
 };
 
+/**
+ * Converts the enum roles from the back-end to prettier ones
+ * @param userList
+ */
+const rolesFix = (userList: UserPag[]) => {
+  const userListFixed: Ref<UserPag[]> = ref<UserPag[]>([]);
+  for (const user of userList) {
+    const userCopy = { ...user };
+    let role = userCopy.userRole;
+    switch (role) {
+      case 'ROLE_ADMIN':
+        role = 'Admin';
+        break;
+      case 'ROLE_OPERATOR':
+        role = 'Operator';
+        break;
+      case 'ROLE_MANAGER':
+        role = 'Manager';
+        break;
+    }
+    userCopy.userRole = role;
+    userListFixed.value.push(userCopy);
+  }
+
+  return userListFixed.value;
+}
+
+/**
+ * Converts the prettier values to the back-end to enum required strings
+ * @param userReturn
+ */
+const rolesReturn = (userReturn: UserPag) => {
+  const userFixed: Ref<UserPag> = ref<UserPag>(userReturn);
+  let role = userReturn.userRole;
+  switch (role) {
+    case "ADMIN":
+      role = 'ROLE_ADMIN';
+      break;
+    case "OPERATOR":
+      role = 'ROLE_OPERATOR';
+      break;
+    case "MANAGER":
+      role = 'ROLE_MANAGER';
+      break;
+  }
+  userFixed.value.userRole = role;
+
+  return userFixed.value;
+}
+
+/**
+ * Handler for the user-edit emit event
+ * @param user
+ */
+const handleUserEdited = (user: UserPag) => {
+  enterEditMode(user);
+};
+
+/**
+ * Handler for the user-removed emit event
+ * @param userId
+ */
+const handleUserDeleted = (userId: number) => {
+  removeUserApi(userId).then(() => {
+        users.value = users.value.filter(user => user.userId !== userId);
+  });
+};
+
+onMounted(() => {
+  fetchPaginatedUsers().then(usersApi => {
+    users.value = rolesFix(usersApi);
+  })
+})
+
 defineExpose({
-  fullNameError,
   userNameError,
   emailError,
   validateEmail,
   validateUserName,
-  validateFullName,
   handleSubmit,
   users,
   newUser
@@ -306,30 +376,17 @@ defineExpose({
 <template>
   <div class="user-management-scroll-container">
     <div class="user-management-container">
-      <h1>Register new user</h1>
+      <h1>{{ isEditing ? 'Edit User' : 'Register new user' }}</h1>
 
       <div class="form-section">
         <form @submit.prevent="handleSubmit">
           <h2 class="section-title">Personal Information</h2>
           <div class="form-grid">
-            <div class="form-group full-width-field">
-              <label for="fullName">Full name</label>
-              <InputText
-                  id="fullName"
-                  v-model="newUser.fullname"
-                  placeholder="Enter full name"
-                  @input="validateFullName"
-                  :class="{ 'p-invalid': fullNameError }"
-                  required
-              />
-              <small v-if="fullNameError" class="p-error">{{ fullNameError }}</small>
-            </div>
-
             <div class="form-group">
               <label for="username">Username</label>
               <InputText
                   id="username"
-                  v-model="newUser.username"
+                  v-model="newUser.userName"
                   placeholder="Enter username"
                   @input="validateUserName"
                   :class="{ 'p-invalid': userNameError }"
@@ -341,7 +398,7 @@ defineExpose({
               <label for="password">Password</label>
               <Password
                   id="password"
-                  v-model="newUser.password"
+                  v-model="newUser.userPassword"
                   :feedback="false"
                   placeholder="Enter password"
                   required
@@ -353,7 +410,7 @@ defineExpose({
               <label for="email">Email</label>
               <InputText
                   id="email"
-                  v-model="newUser.email"
+                  v-model="newUser.userEmail"
                   type="email"
                   placeholder="Enter email"
                   @input="validateEmail"
@@ -366,7 +423,7 @@ defineExpose({
               <label for="role">Role</label>
               <Dropdown
                   id="role"
-                  v-model="newUser.role"
+                  v-model="newUser.userRole"
                   :options="roles"
                   optionLabel="label"
                   optionValue="value"
@@ -377,13 +434,13 @@ defineExpose({
             </div>
           </div>
 
-          <h2 class="section-title etl-title">ETL Tools</h2>
-          <div class="form-grid">
+          <h2 class="section-title etl-title" v-if="!isEditing">ETL Tools</h2>
+          <div class="form-grid" v-if="!isEditing">
             <div class="form-group full-width-field">
               <label for="tools">Tools</label>
               <Dropdown
                   id="tools"
-                  v-model="newUser.tool"
+                  v-model="newUser.toolName"
                   :options="tools"
                   optionLabel="label"
                   optionValue="value"
@@ -397,7 +454,7 @@ defineExpose({
               <label for="projectTool">Project - Tool</label>
               <InputText
                   id="projectTool"
-                  v-model="newUser.projectTool"
+                  v-model="newUser.toolName"
                   placeholder="Enter project tool"
               />
             </div>
@@ -405,63 +462,39 @@ defineExpose({
               <label for="idTool">User Project - Tool</label>
               <InputText
                   id="idTool"
-                  v-model="newUser.idTool"
+                  v-model="newUser.toolId"
                   placeholder="Enter user project tool ID"
               />
             </div>
           </div>
-
           <div class="button-group full-width">
+            <small v-if="successMessage" class="p-success">{{ successMessage }}</small>
             <Button
-                id = "cleanAll"
+                id="cleanAll"
+                label="Cancel"
+                severity="secondary"
+                @click="exitEditMode"
+                type="button"
+                v-if="isEditing"
+            />
+            <Button
+                id="cleanAll"
                 label="Clean up"
                 severity="secondary"
                 @click="clearForm"
                 type="button"
+                v-else
             />
-            <Button label="Register" type="submit" />
+            <Button :label="isEditing ? 'Update' : 'Register'" type="submit" />
           </div>
         </form>
       </div>
 
-      <div class="table-container">
-        <DataTable
-            :value="users"
-            :paginator="true"
-            :rows="10"
-            scrollable
-            scrollHeight="flex"
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            :rowsPerPageOptions="[5, 10, 20, 50]"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-            responsiveLayout="scroll"
-        >
-          <Column field="id" header="ID"></Column>
-          <Column field="fullname" header="Fullname" :sortable="true"></Column>
-          <Column field="username" header="Username" :sortable="true"></Column>
-          <Column field="role" header="Role" :sortable="true"></Column>
-          <Column field="tool" header="Tool" :sortable="true"></Column>
-          <Column field="idTool" header="ID Tool"></Column>
-          <Column field="projectTool" header="Project Tool"></Column>
-          <Column field="created" header="Created" :sortable="true"></Column>
-          <Column header="Action">
-            <template #body="slotProps">
-              <Button
-                  icon="pi pi-pencil"
-                  severity="info"
-                  text
-                  @click="editUser(slotProps.data)"
-              />
-              <Button
-                  icon="pi pi-trash"
-                  severity="danger"
-                  text
-                  @click="deleteUser(slotProps.data.id)"
-              />
-            </template>
-          </Column>
-        </DataTable>
-      </div>
+      <UserManagementTable
+          :users="users"
+          @user-deleted="handleUserDeleted"
+          @user-edited="handleUserEdited"
+      />
     </div>
   </div>
 </template>
@@ -540,7 +573,6 @@ label {
   border-radius: 6px;
   width: 100%;
   padding-top: 0.65rem;
-
   padding-bottom: 0.65rem;
   font-size: 0.95rem;
 }
@@ -550,7 +582,7 @@ label {
 }
 
 :deep(.p-inputtext:enabled:focus) {
-  border-color: #3d7eff !important; /* Your desired focus color */
+  border-color: #3d7eff !important;
   box-shadow: 0 0 0 2px rgba(61, 126, 255, 0.3) !important;
 }
 :deep(.p-dropdown:not(.p-disabled):hover) {
@@ -566,7 +598,6 @@ label {
 
 :deep(.p-dropdown .p-dropdown-label) {
   color: #1a202c;
-
   padding-top: 0.65rem;
   padding-bottom: 0.65rem;
   font-size: 0.95rem;
@@ -574,13 +605,20 @@ label {
 
 :deep(.p-dropdown-panel) {
   background-color: #0b1a3d;
-
   border: 1px solid #2d3748;
+}
+
+.p-success {
+  color: #4ade80;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  display: block;
+  text-align: center;
+  grid-column: span 2;
 }
 
 :deep(.p-dropdown-item) {
   color: #e2e8f0;
-
   padding: 0.75rem 1rem;
 }
 
@@ -630,15 +668,12 @@ label {
   display: flex;
   gap: 1rem;
   margin-top: 2rem;
-
   justify-content: flex-end;
-
   grid-column: span 2;
 }
 
 :deep(.p-button) {
   padding: 0.75rem 1.75rem;
-
   font-weight: 500;
   border-radius: 6px;
   font-size: 0.95rem;
@@ -646,7 +681,6 @@ label {
 
 :deep(.p-button.p-button-secondary) {
   background-color: #4a5568;
-
   color: #e2e8f0;
   border: 1px solid #4a5568;
 }
@@ -658,156 +692,13 @@ label {
 
 :deep(.p-button[type="submit"]) {
   background-color: #3d7eff;
-
   color: #ffffff;
   border: 1px solid #3d7eff;
 }
 
 :deep(.p-button[type="submit"]:hover) {
   background-color: #2563eb;
-
   border-color: #2563eb;
-}
-
-.table-container {
-  background: #01081f;
-
-  padding: 1.5rem;
-
-  border-radius: 12px;
-
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-
-  display: flex;
-  flex-direction: column;
-  min-height: 400px;
-}
-
-:deep(.p-datatable) {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  color: #cbd5e0;
-
-  background: transparent;
-}
-
-:deep(.p-datatable .p-datatable-wrapper) {
-  flex: 1;
-  overflow: auto;
-  border-radius: 8px;
-}
-
-:deep(.p-datatable .p-datatable-thead) {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-
-:deep(.p-datatable .p-datatable-thead > tr > th) {
-  background: #01081f;
-
-  color: #e2e8f0;
-  font-weight: 600;
-  font-size: 0.875rem;
-  letter-spacing: 0.5px;
-  padding: 1rem 1.25rem;
-
-  border: none;
-  text-align: left;
-}
-
-:deep(.p-datatable .p-datatable-tbody > tr > td) {
-  padding: 1rem 1.25rem;
-
-  border: none;
-  border-bottom: 1px solid #1e293b;
-}
-
-:deep(.p-datatable .p-datatable-tbody > tr) {
-  background: transparent;
-  color: #cbd5e0;
-}
-
-:deep(.p-datatable .p-datatable-tbody > tr:last-child > td) {
-  border-bottom: none;
-}
-
-:deep(.p-datatable .p-datatable-tbody > tr:hover) {
-  background: #1e293b !important;
-}
-
-:deep(.p-paginator) {
-  background: transparent;
-  border: none;
-  color: #cbd5e0 !important;
-  margin-top: auto;
-
-  padding-top: 1rem;
-}
-
-:deep(.p-paginator .p-paginator-element),
-:deep(.p-paginator .p-paginator-pages .p-paginator-page),
-:deep(.p-paginator .p-paginator-current),
-:deep(.p-dropdown .p-dropdown-label) {
-  color: #cbd5e0 !important;
-  background-color: transparent !important;
-
-  border-color: transparent;
-}
-
-:deep(.p-paginator .p-paginator-pages .p-paginator-page.p-highlight) {
-  background: #3d7eff !important;
-
-  color: #ffffff !important;
-  border-radius: 4px;
-}
-
-:deep(.p-paginator .p-paginator-element:enabled:hover) {
-  background: #2d3748 !important;
-
-  color: #ffffff !important;
-  border-radius: 4px;
-}
-
-:deep(.p-paginator .p-dropdown .p-dropdown-label) {
-  color: #cbd5e0 !important;
-}
-
-:deep(.p-datatable-wrapper::-webkit-scrollbar) {
-  width: 10px;
-
-  height: 10px;
-}
-
-:deep(.p-datatable-wrapper::-webkit-scrollbar-track) {
-  background: #01081f;
-
-  border-radius: 5px;
-}
-
-:deep(.p-datatable-wrapper::-webkit-scrollbar-thumb) {
-  background: #3d7eff;
-
-  border-radius: 5px;
-}
-
-:deep(.p-datatable-wrapper::-webkit-scrollbar-thumb:hover) {
-  background: #2563eb;
-}
-.p-error {
-  color: #f87171;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-  display: block;
-}
-
-.p-invalid {
-  border-color: #f87171 !important;
-}
-
-.p-invalid:focus {
-  box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.3) !important;
 }
 
 @media (max-width: 768px) {

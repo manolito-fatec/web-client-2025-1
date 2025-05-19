@@ -143,6 +143,7 @@ const auth = async (): Promise<void> => {
 }
 
 defineExpose({
+  auth,
   userNameError,
   passwordError,
   loginError,
