@@ -1,6 +1,6 @@
 import {api} from "@/api/AxiosConfig.ts";
 
-const BASE_URL_EXPORT = 'http://localhost:8080/export';
+const BASE_URL_EXPORT = 'http://web0:8080/export';
 
 export const getExportAdmin = async () => {
     try{

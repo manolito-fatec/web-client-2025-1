@@ -1,7 +1,7 @@
 import type {UserProfile} from "@/types/UserProfile.ts";
 import {api} from "@/api/AxiosConfig.ts";
 
-const BASE_URL_USER = 'http://localhost:8080/user';
+const BASE_URL_USER = 'http://web0:8080/user';
 
 export const fetchUserProfile = async (userId:number): Promise<UserProfile> => {
     try{

@@ -1,8 +1,8 @@
 import {api} from './AxiosConfig';
 import type {IssueChartT} from "@/types/IssuaChartT.ts";
 
-const BASE_URL_ISSUES = 'http://localhost:8080/issues/gestor/issue';
-const BASE_URL_TASKS = 'http://localhost:8080/tasks';
+const BASE_URL_ISSUES = 'http://web0:8080/issues/gestor/issue';
+const BASE_URL_TASKS = 'http://web0:8080/tasks';
 
 
 export const fetchReworkCards= async (projId:number, severity: string, priority:string): Promise<IssueChartT[]> => {

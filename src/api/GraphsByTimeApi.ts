@@ -1,7 +1,7 @@
 import type { fetchGraphsBody } from '@/types/GraphsBodyT';
 import {api} from "@/api/AxiosConfig.ts";
 
-const BASE_URL_STATUS = 'http://localhost:8080/tasks/get-count-between';
+const BASE_URL_STATUS = 'http://web0:8080/tasks/get-count-between';
 
 export const fetchGraphsByTime = async (paramsJson: fetchGraphsBody) => {
     try{

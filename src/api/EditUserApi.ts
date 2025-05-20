@@ -1,7 +1,7 @@
 import {api} from './AxiosConfig';
 import type {User} from "@/types/User.ts";
 
-const BASE_URL_USERS = 'http://localhost:8080/user';
+const BASE_URL_USERS = 'http://web0:8080/user';
 
 
 export const editUserApi = async (user: User): Promise<User> => {

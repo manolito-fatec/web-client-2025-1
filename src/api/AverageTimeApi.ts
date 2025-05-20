@@ -1,6 +1,6 @@
 import {api} from "@/api/AxiosConfig.ts";
 
-const BASE_URL_AVERAGE = 'http://localhost:8080/tasks';
+const BASE_URL_AVERAGE = 'http://web0:8080/tasks';
 
 export const fetchAverageTime = async (userId:number) => {
     try {

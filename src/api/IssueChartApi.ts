@@ -2,7 +2,7 @@ import { SeverityEnum } from '../enums/SeverityEnum';
 import { PriorityEnum } from '../enums/PriorityEnum';
 import {api} from "@/api/AxiosConfig.ts";
 
-const BASE_URL_ISSUE = 'http://localhost:8080/gestor/issue';
+const BASE_URL_ISSUE = 'http://web0:8080/gestor/issue';
 
 export const fetchIssuesDetailed = async (projectId : number, severity :SeverityEnum , priority: PriorityEnum) => {
     try{
