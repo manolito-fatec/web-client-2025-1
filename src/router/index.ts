@@ -5,6 +5,7 @@ import DashboardViewManager from '../views/DashboardViewManager.vue'
 import UserManagement from "../components/UserManagement.vue";
 import LoginView from "../views/LoginView.vue";
 import DashboardViewAdmin from '../views/DashboardViewAdmin.vue'
+import SystemLogsView from '@/views/SystemLogsView.vue';
 
 
 const router = createRouter({
@@ -48,6 +49,12 @@ const router = createRouter({
       path: '/userRegister',
       name: 'userRegister',
       component: UserManagement,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/systemLogs',
+      name: 'systemLogs',
+      component: SystemLogsView,
       meta: { requiresAuth: true }
     },
   ],
