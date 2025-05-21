@@ -3,10 +3,10 @@ FROM node:23-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
 
-RUN yarn install
+RUN npm install
 COPY . .
 
-RUN yarn run build
+RUN npm run build
 
 FROM nginx:alpine
 
