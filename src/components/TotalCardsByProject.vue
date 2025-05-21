@@ -1,31 +1,35 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import type { Ref } from 'vue'
+import { fetchCardsByProject } from '../api/CardsByProject'
 
-const projects = ref([
-  { id: 1, name: '5° Semestre' },
-  { id: 2, name: 'Teste_Manolito' }
-])
-
-const selectProject = ref<number | null>(null)
-
-const totalRef: Ref<number> = ref(0)
-
-const fetchTotalCardsByProject = async (projectId: number): Promise<number> => {
-  const mockData: Record<number, number> = {
-    1: 12,
-    2: 0,
-  }
-
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(mockData[projectId] ?? 0), 500)
-  })
+interface ProjectTaskCount {
+  projectName: string;
+  projectId: string;
+  count: number;
 }
 
-const totalLoad = async (projectId: number) => {
+const projects: Ref<ProjectTaskCount[]> = ref([])
+const selectProject = ref<string | null>(null)
+const totalRef: Ref<number> = ref(0)
+
+// Fetch all projects with their task counts on component mount
+onMounted(async () => {
   try {
-    const total = await fetchTotalCardsByProject(projectId)
-    totalRef.value = total
+    const data = await fetchCardsByProject()
+    projects.value = data
+    if (data.length > 0) {
+      selectProject.value = data[0].projectId
+    }
+  } catch (error) {
+    console.error("Error fetching projects:", error)
+  }
+})
+
+const totalLoad = async (projectId: string) => {
+  try {
+    const project = projects.value.find(p => p.projectId === projectId)
+    totalRef.value = project ? project.count : 0
   } catch (error) {
     console.error("Error fetching total number of cards:", error)
     totalRef.value = 0
@@ -47,10 +51,10 @@ watch(selectProject, (newId) => {
       <option disabled value="">Select a project</option>
       <option 
         v-for="project in projects" 
-        :key="project.id" 
-        :value="project.id"
+        :key="project.projectId" 
+        :value="project.projectId"
       >
-        {{ project.name }}
+        {{ project.projectName }}
       </option>
     </select>
 
