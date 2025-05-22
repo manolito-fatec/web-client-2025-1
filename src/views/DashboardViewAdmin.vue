@@ -3,12 +3,16 @@ import KpiCard from '../components/KpiCard.vue';
 import TotalCardsOfProject from '../components/TotalCardsByProject.vue';
 import CardsByPeriod from '../components/CardsByPeriod.vue';
 import IssueChart from '../components/IssueChart.vue';
+import ProjectTable from '../components/ProjectTable.vue';
 import { getExportAdmin } from '@/api/ExportCsvApi';
+import { fetchTotalOfProjectsAdmin } from '@/api/TotalOfProjectsAdmin';
+import { ref, onMounted } from 'vue';
+
+const isLoading = ref<boolean>(true);
+const totalProjects = ref<number>(0);
 
 /**
  * Downloads the admin data as a CSV file.
- *
- * Calls the getExportAdmin API and triggers the download of "AdminDash.csv".
  */
 const getExportFile = async () => {
   const response = await getExportAdmin();
@@ -19,8 +23,27 @@ const getExportFile = async () => {
   link.setAttribute('download', "AdminDash.csv");
   document.body.appendChild(link);
   link.click();
-  document.body.removeChild(link); 
+  document.body.removeChild(link);
 }
+
+// Fetch total projects count when component mounts
+onMounted(async () => {
+  try {
+    const response = await fetchTotalOfProjectsAdmin();
+    console.log('Resposta da API:', response);
+
+    if (typeof response === 'number' && response >= 0) {
+      totalProjects.value = response;
+    } else {
+      totalProjects.value = 0;
+    }
+  } catch (error) {
+    console.error("Erro ao buscar total de projetos:", error);
+    totalProjects.value = 0;
+  } finally {
+    isLoading.value = false;
+  }
+});
 </script>
 
 <template>
@@ -33,16 +56,22 @@ const getExportFile = async () => {
       </div>
       <DashboardHeader title="Projects Dashboard" />
 
-      <section class="kpi-grid">
-        <TotalCardsOfProject />
-        <KpiCard title="Total projects" value="0" />
-      </section>
-
-      <section class="charts-grid-bottom">
-        <CardsByPeriod />
-        <IssueChart />
-      </section>
-
+      <div class="two-column-grid">
+        <div class="column">
+          <TotalCardsOfProject />
+          <IssueChart />
+          <CardsByPeriod />
+        </div>
+        
+        <div class="column">
+          <KpiCard 
+            class="kpi-card"
+            title="Total projects" 
+            :value="totalProjects.toString()" 
+          />
+          <ProjectTable class="project-table" />
+        </div>
+      </div>
     </main>
   </div>
 </template>
@@ -57,35 +86,25 @@ const getExportFile = async () => {
   flex-grow: 1;
   padding: 20px 40px;
   overflow-y: auto;
+  height: 100vh;
 }
 
-.charts-grid-bottom {
+.two-column-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr 1fr;
   gap: 20px;
-  margin-top: 30px;
+  margin-top: 20px;
 }
 
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+.column {
+  display: flex;
+  flex-direction: column;
   gap: 20px;
-  margin-bottom: 30px;
 }
 
-@media (max-width: 768px) {
-  .dashboard-layout {
-    flex-direction: column;
-  }
-
-  .sidebar {
-    width: 100%;
-    height: auto;
-  }
-
-  .main-content {
-    padding: 20px;
-  }
+.project-table {
+  height: 628px;
+  overflow-y: auto;
 }
 
 .title {
@@ -94,12 +113,15 @@ const getExportFile = async () => {
   flex-direction: row;
   margin-bottom: 10px;
   justify-content: space-between;
-  h1 {
-    margin: 0%;
-    margin-bottom: 0.3rem;
-    color: #FFFFFF;
-    font-size: 2rem;
-  }
+  padding: 10px 20px;
+  border-radius: 8px;
+}
+
+.title h1 {
+  margin: 0;
+  margin-bottom: 0.3rem;
+  color: #FFFFFF;
+  font-size: 2rem;
 }
 
 .export-btn {
@@ -113,5 +135,26 @@ const getExportFile = async () => {
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s;
+}
+
+.export-btn:hover {
+  background-color: #4bc889;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .two-column-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-layout {
+    flex-direction: column;
+  }
+
+  .main-content {
+    padding: 20px;
+  }
 }
 </style>
