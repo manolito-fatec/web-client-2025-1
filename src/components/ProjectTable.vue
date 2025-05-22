@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
+/**
+ * Defines the valid columns that can be used for sorting.
+ */
 type Column = 'project' | 'manager' | 'operators';
 
 const tableData = ref([
@@ -16,9 +19,24 @@ const tableData = ref([
   { project: 'Xbox', manager: 'Leonardo', operators: 11 }
 ]);
 
+/**
+ * Reactive reference for the currently selected column to sort by.
+ */
 const sortColumn = ref<Column | null>(null);
+
+/**
+ * Reactive reference for the sorting direction.
+ */
 const sortDirection = ref<'asc' | 'desc'>('asc');
 
+/**
+* Sorts the project table data based on the selected column.
+*
+* Toggles the sort direction (ascending or descending) if the same column is clicked again.
+* Updates reactive references by column, `sortColumn`, and by direction, `sortDirection`.
+*
+* @param {Column} column - The column by which the table will be sorted ('project', 'manager', or 'operators').
+ */
 function sortBy(column: Column) {
   if (sortColumn.value === column) {
     sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
