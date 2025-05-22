@@ -14,10 +14,11 @@ export const useAuthStore = defineStore('auth', {
     actions: {
         async loginAndStore(email: string, psw: string) {
             try {
-                const response = await axios.post("http://localhost:8080/auth/login", {
+                const response = await axios.post("http://dashflow_server:8080/auth/login", {
                     email: email,
                     password: psw
                 });
+
 
                 this.token = response.data.token;
                 setSessionItem("token", this.token!);
