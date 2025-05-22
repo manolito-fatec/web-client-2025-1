@@ -3,10 +3,9 @@ import KpiCard from '../components/KpiCard.vue';
 import TotalCardsOfProject from '../components/TotalCardsByProject.vue';
 import CardsByPeriod from '../components/CardsByPeriod.vue';
 import IssueChart from '../components/IssueChart.vue';
-import { getExportAdmin } from '../api/ExportCsvApi';
-import { fetchTotalOfProjectsAdmin } from '../api/TotalOfProjectsAdmin';
 import ProjectTable from '../components/ProjectTable.vue';
-
+import { getExportAdmin } from '@/api/ExportCsvApi';
+import { fetchTotalOfProjectsAdmin } from '@/api/TotalOfProjectsAdmin';
 import { ref, onMounted } from 'vue';
 
 const isLoading = ref<boolean>(true);
@@ -14,8 +13,6 @@ const totalProjects = ref<number>(0);
 
 /**
  * Downloads the admin data as a CSV file.
- *
- * Calls the getExportAdmin API and triggers the download of "AdminDash.csv".
  */
 const getExportFile = async () => {
   const response = await getExportAdmin();
@@ -59,24 +56,21 @@ onMounted(async () => {
       </div>
       <DashboardHeader title="Projects Dashboard" />
 
-      <section class="kpi-grid">
-        <TotalCardsOfProject />
-        <KpiCard title="Total projects" :value="totalProjects.toString()" />
-      </section>
-
-      <section class="bottom-layout">
-        <div class="left">
-          <CardsByPeriod />
+      <div class="two-column-grid">
+        <div class="column">
+          <TotalCardsOfProject />
           <IssueChart />
+          <CardsByPeriod />
         </div>
-
-        <div class="right">
-          <div class="tabela-scroll">
-            <ProjectTable />
-          </div>
+        
+        <div class="column">
+          <KpiCard 
+            title="Total projects" 
+            :value="totalProjects.toString()" 
+          />
+          <ProjectTable class="project-table" />
         </div>
-
-      </section>
+      </div>
     </main>
   </div>
 </template>
@@ -91,58 +85,25 @@ onMounted(async () => {
   flex-grow: 1;
   padding: 20px 40px;
   overflow-y: auto;
+  height: 100vh;
 }
 
-.bottom-layout {
+.two-column-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  margin-top: 30px;
-  align-items: flex-start;
+  margin-top: 20px;
 }
 
-.left {
+.column {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.right {
-  display: flex;
-  flex-direction: column;
-  max-width: 100%;
-}
-
-.tabela-scroll {
-  max-height: 40rem;
+.project-table {
+  height: 628px;
   overflow-y: auto;
-  border-radius: 8px;
-}
-
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-bottom: 30px;
-}
-
-@media (max-width: 768px) {
-  .dashboard-layout {
-    flex-direction: column;
-  }
-
-  .sidebar {
-    width: 100%;
-    height: auto;
-  }
-
-  .main-content {
-    padding: 20px;
-  }
-
-  .bottom-layout {
-    grid-template-columns: 1fr;
-  }
 }
 
 .title {
@@ -151,6 +112,8 @@ onMounted(async () => {
   flex-direction: row;
   margin-bottom: 10px;
   justify-content: space-between;
+  padding: 10px 20px;
+  border-radius: 8px;
 }
 
 .title h1 {
@@ -171,5 +134,26 @@ onMounted(async () => {
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s;
+}
+
+.export-btn:hover {
+  background-color: #4bc889;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .two-column-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-layout {
+    flex-direction: column;
+  }
+
+  .main-content {
+    padding: 20px;
+  }
 }
 </style>
