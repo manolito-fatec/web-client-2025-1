@@ -65,6 +65,7 @@ onMounted(async () => {
         
         <div class="column">
           <KpiCard 
+            class="kpi-card"
             title="Total projects" 
             :value="totalProjects.toString()" 
           />
