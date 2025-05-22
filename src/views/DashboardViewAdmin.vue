@@ -3,7 +3,12 @@ import KpiCard from '../components/KpiCard.vue';
 import TotalCardsOfProject from '../components/TotalCardsByProject.vue';
 import CardsByPeriod from '../components/CardsByPeriod.vue';
 import IssueChart from '../components/IssueChart.vue';
-import { getExportAdmin } from '@/api/ExportCsvApi';
+import { getExportAdmin } from '../api/ExportCsvApi';
+import { fetchTotalOfProjectsAdmin } from '../api/TotalOfProjectsAdmin';
+import { ref, onMounted } from 'vue';
+
+const isLoading = ref<boolean>(true);
+const totalProjects = ref<number>(0);
 
 /**
  * Downloads the admin data as a CSV file.
@@ -19,8 +24,28 @@ const getExportFile = async () => {
   link.setAttribute('download', "AdminDash.csv");
   document.body.appendChild(link);
   link.click();
-  document.body.removeChild(link); 
+  document.body.removeChild(link);
 }
+
+// Fetch total projects count when component mounts
+onMounted(async () => {
+  try {
+    const response = await fetchTotalOfProjectsAdmin();
+    console.log('Resposta da API:', response);
+
+    if (typeof response === 'number' && response >= 0) {
+      totalProjects.value = response;
+    } else {
+      totalProjects.value = 0;
+    }
+  } catch (error) {
+    console.error("Erro ao buscar total de projetos:", error);
+    totalProjects.value = 0;
+  } finally {
+    isLoading.value = false;
+  }
+});
+
 </script>
 
 <template>
@@ -35,7 +60,7 @@ const getExportFile = async () => {
 
       <section class="kpi-grid">
         <TotalCardsOfProject />
-        <KpiCard title="Total projects" value="0" />
+        <KpiCard title="Total projects" :value="totalProjects.toString()" />
       </section>
 
       <section class="charts-grid-bottom">
@@ -94,6 +119,7 @@ const getExportFile = async () => {
   flex-direction: row;
   margin-bottom: 10px;
   justify-content: space-between;
+
   h1 {
     margin: 0%;
     margin-bottom: 0.3rem;
