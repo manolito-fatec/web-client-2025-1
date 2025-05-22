@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
+type Column = 'project' | 'manager' | 'operators';
+
 const tableData = ref([
   { project: 'ManoLito', manager: 'Otávio', operators: 7 },
   { project: 'APIS', manager: 'Gabriel', operators: 10 },
@@ -11,13 +13,29 @@ const tableData = ref([
   { project: 'Facebook', manager: 'Kleber', operators: 69 },
   { project: 'Youtube', manager: 'Juan', operators: 30 },
   { project: 'Twitter', manager: 'Matheus', operators: 34 },
-  { project: 'Xbox', manager: 'Leonardo', operators: 11 },
-  { project: 'ManoLito', manager: 'Otávio', operators: 7 },
-  { project: 'APIS', manager: 'Gabriel', operators: 10 },
-  { project: 'YoutanDash', manager: 'André', operators: 43 },
-  { project: 'Fatec', manager: 'Paulo', operators: 13 },
-  { project: 'Test', manager: 'Cauê', operators: 54 }
+  { project: 'Xbox', manager: 'Leonardo', operators: 11 }
 ]);
+
+const sortColumn = ref<Column | null>(null);
+const sortDirection = ref<'asc' | 'desc'>('asc');
+
+function sortBy(column: Column) {
+  if (sortColumn.value === column) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortColumn.value = column;
+    sortDirection.value = 'asc';
+  }
+
+  tableData.value.sort((a, b) => {
+    const valA = a[column];
+    const valB = b[column];
+
+    if (valA < valB) return sortDirection.value === 'asc' ? -1 : 1;
+    if (valA > valB) return sortDirection.value === 'asc' ? 1 : -1;
+    return 0;
+  });
+}
 </script>
 
 <template>
@@ -25,14 +43,23 @@ const tableData = ref([
     <table class="project-table">
       <thead>
         <tr class="header-row">
-          <th class="table-header">
-            Project <span class="sort-indicator">▾</span>
+          <th class="table-header" @click="sortBy('project')">
+            Project
+            <span class="sort-indicator" :class="{ active: sortColumn === 'project' }">
+              {{ sortColumn === 'project' ? (sortDirection === 'asc' ? '▲' : '▼') : '▲' }}
+            </span>
           </th>
-          <th class="table-header">
-            Manager <span class="sort-indicator">▾</span>
+          <th class="table-header" @click="sortBy('manager')">
+            Manager
+            <span class="sort-indicator" :class="{ active: sortColumn === 'manager' }">
+              {{ sortColumn === 'manager' ? (sortDirection === 'asc' ? '▲' : '▼') : '▲' }}
+            </span>
           </th>
-          <th class="table-header">
-            Number of operators <span class="sort-indicator">▾</span>
+          <th class="table-header" @click="sortBy('operators')">
+            Number of operators
+            <span class="sort-indicator" :class="{ active: sortColumn === 'operators' }">
+              {{ sortColumn === 'operators' ? (sortDirection === 'asc' ? '▲' : '▼') : '▲' }}
+            </span>
           </th>
         </tr>
       </thead>
@@ -57,6 +84,7 @@ const tableData = ref([
 .project-table {
   width: 100%;
   color: white;
+  border: collapse;
 }
 
 .header-row {
@@ -68,11 +96,13 @@ const tableData = ref([
   text-align: left;
   font-weight: 500;
   font-size: 0.9em;
+  cursor: pointer;
+  user-select: none;
 }
 
 .sort-indicator {
-  margin-left: 0.25rem;
-  display: inline-block;
+  margin-left: 0.5rem;
+  font-size: 0.8em;
 }
 
 .row-even {
@@ -86,5 +116,16 @@ const tableData = ref([
 .table-cell {
   padding: 1.27rem 1rem;
   font-size: 0.9em;
+}
+
+.sort-indicator {
+  margin-left: 0.5rem;
+  font-size: 0.8em;
+  opacity: 0.4;
+  transition: opacity 0.2s;
+}
+
+.sort-indicator.active {
+  opacity: 1;
 }
 </style>
