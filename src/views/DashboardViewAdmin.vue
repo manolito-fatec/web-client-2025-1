@@ -5,6 +5,8 @@ import CardsByPeriod from '../components/CardsByPeriod.vue';
 import IssueChart from '../components/IssueChart.vue';
 import { getExportAdmin } from '../api/ExportCsvApi';
 import { fetchTotalOfProjectsAdmin } from '../api/TotalOfProjectsAdmin';
+import ProjectTable from '../components/ProjectTable.vue';
+
 import { ref, onMounted } from 'vue';
 
 const isLoading = ref<boolean>(true);
@@ -45,7 +47,6 @@ onMounted(async () => {
     isLoading.value = false;
   }
 });
-
 </script>
 
 <template>
@@ -63,11 +64,19 @@ onMounted(async () => {
         <KpiCard title="Total projects" :value="totalProjects.toString()" />
       </section>
 
-      <section class="charts-grid-bottom">
-        <CardsByPeriod />
-        <IssueChart />
-      </section>
+      <section class="bottom-layout">
+        <div class="left">
+          <CardsByPeriod />
+          <IssueChart />
+        </div>
 
+        <div class="right">
+          <div class="tabela-scroll">
+            <ProjectTable />
+          </div>
+        </div>
+
+      </section>
     </main>
   </div>
 </template>
@@ -84,11 +93,30 @@ onMounted(async () => {
   overflow-y: auto;
 }
 
-.charts-grid-bottom {
+.bottom-layout {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr 1fr;
   gap: 20px;
   margin-top: 30px;
+  align-items: flex-start;
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.right {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+}
+
+.tabela-scroll {
+  max-height: 40rem;
+  overflow-y: auto;
+  border-radius: 8px;
 }
 
 .kpi-grid {
@@ -111,6 +139,10 @@ onMounted(async () => {
   .main-content {
     padding: 20px;
   }
+
+  .bottom-layout {
+    grid-template-columns: 1fr;
+  }
 }
 
 .title {
@@ -119,13 +151,13 @@ onMounted(async () => {
   flex-direction: row;
   margin-bottom: 10px;
   justify-content: space-between;
+}
 
-  h1 {
-    margin: 0%;
-    margin-bottom: 0.3rem;
-    color: #FFFFFF;
-    font-size: 2rem;
-  }
+.title h1 {
+  margin: 0;
+  margin-bottom: 0.3rem;
+  color: #FFFFFF;
+  font-size: 2rem;
 }
 
 .export-btn {
