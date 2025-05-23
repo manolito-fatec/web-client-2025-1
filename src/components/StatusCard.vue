@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, type Ref } from 'vue';
 import Chart from 'primevue/chart';
 import {
   Chart as ChartJS,
@@ -9,16 +9,18 @@ import {
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { fetchStatusCard } from '../api/StatusCardApi';
+import type { ProjectDetails} from '@/types/ProjectUser';
+
+const props = defineProps<{
+  value: ProjectDetails[];
+}>();
 
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
 const palette = ['#70728f', '#e47c40', '#e4ce3d', '#94c440', '#56a1e1'];
 const defaultCategories = ['New', 'In Progress', 'Ready for Test', 'Closed', 'Needs Info'];
 
-const projects = [
-  { name: 'Manolito', id: '1637322' },
-  { name: 'Fatec', id: '1657675' }
-];
+const projects : Ref<Array<ProjectDetails>> = ref([]);
 
 const selectedProject = ref<number | null>(1);
 
@@ -99,6 +101,7 @@ watch(selectedProject, (selectedId) => {
 });
 
 onMounted(() => {
+  projects.value = props.value;
   if (selectedProject.value) {
     updateChart(selectedProject.value);
   }
@@ -111,8 +114,8 @@ onMounted(() => {
 
     <select v-model="selectedProject">
       <option disabled value="">Select a project</option>
-      <option v-for="project in projects" :key="project.id" :value="project.id">
-        {{ project.name }}
+      <option v-for="project in projects" :key="project.projectId" :value="project.projectId">
+        {{ project.projectName }}
       </option>
     </select>
 
