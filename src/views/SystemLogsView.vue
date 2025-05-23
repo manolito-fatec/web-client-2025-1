@@ -1,11 +1,16 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+import SystemLogsTable from '../components/SystemLogsTable.vue';
+import type { SystemLog } from '../api';
+
+const logs = ref<SystemLog[]>([]);
 
 </script>
 
 <template>
   <div class="system-logs-container">
     <h1>System Log</h1>
-
+    <SystemLogsTable :logs="logs" />
   </div>
 </template>
 
