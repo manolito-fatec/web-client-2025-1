@@ -4,6 +4,7 @@ import InputText from "primevue/inputtext";
 import Dropdown from "primevue/dropdown";
 import Button from "primevue/button";
 import Password from "primevue/password";
+import MultiSelect from "primevue/multiselect"
 import UserManagementTable from "@/components/UserManagementTable.vue";
 import {Tools} from "@/enums/Tools.ts";
 import type {User} from "@/types/User.ts";
@@ -11,6 +12,8 @@ import {fetchPaginatedUsers} from "@/api/GetUsersApi.ts";
 import {editUserApi} from "@/api/EditUserApi.ts";
 import {removeUserApi} from "@/api/RemoveUserApi.ts";
 import type {UserPag} from "@/types/PagUser.ts";
+import {fetchPaginatedProjects, fetchProjectsByTollId} from "@/api/GetProjectsApi.ts";
+import type {ProjectDto} from "@/types/ProjectTable.ts";
 
 /**
  * Represents the editing state of the form
@@ -42,9 +45,9 @@ const roles = ref([
  * @type {Array<{label: string, value: string}>}
  */
 const tools = ref([
-  { label: "Taiga", value: "Taiga" },
-  { label: "Trello", value: "Trello" },
-  { label: "Jira", value: "Jira" },
+  { label: "Taiga", value: "1" },
+  { label: "Trello", value: "2" },
+  { label: "Jira", value: "3" },
 ]);
 
 /**
@@ -64,6 +67,7 @@ const newUser = ref<Omit<UserPag, "userId" | "createdAt">>({
   userEmail: "",
   toolId: '1',
   projectName: "",
+  projectId: [""],
   userPassword: "",
 });
 
@@ -186,7 +190,7 @@ const pagToUserConverter = (userPag : UserPag): {
     username: userPag.userName,
     roles : [userPag.userRole],
     tool: userPag.toolName,
-    idTool: userPag.toolId,
+    idTool: [userPag.toolId],
     password: userPag.userPassword,
     email: userPag.userEmail
   }
@@ -204,7 +208,7 @@ const userToPagConverter = (user: User): {
   userEmail: string;
   userPassword: string;
   toolName: string;
-  toolId: string;
+  toolId: string[];
   projectName: string;
   createdAt: string;
 } => {
@@ -278,7 +282,8 @@ const clearForm = () => {
     userName: "",
     userRole: 'Admin',
     toolName: 'Taiga',
-    toolId: '1',
+    toolId: ['1'],
+    projectId: ['1'],
     projectName: "",
     userPassword: "",
     userEmail: "",
@@ -356,9 +361,14 @@ const handleUserDeleted = (userId: number) => {
   });
 };
 
+const projectById = ref<ProjectDto[]>([])
+
 onMounted(() => {
   fetchPaginatedUsers().then(usersApi => {
     users.value = rolesFix(usersApi);
+  })
+  fetchProjectsByTollId().then(projectsData => {
+    console.log(projectsData);
   })
 })
 
@@ -452,9 +462,10 @@ defineExpose({
 
             <div class="form-group">
               <label for="projectTool">Project - Tool</label>
-              <InputText
+              <MultiSelect
                   id="projectTool"
                   v-model="newUser.toolName"
+                  :options="projectsById"
                   placeholder="Enter project tool"
               />
             </div>

@@ -3,7 +3,7 @@ import {ref} from 'vue'
 import {User} from "../src/types/User";
 import {mount} from "@vue/test-utils";
 import PrimeVue from 'primevue/config'
-import UserManagement from "../src/components/UserManagement.vue";
+import UserManagementView from "../src/views/UserManagementView.vue";
 import {createPinia} from "pinia";
 import {UserPag} from "../src/types/PagUser";
 import {editUserApi} from "../src/api/EditUserApi";
@@ -56,7 +56,7 @@ window.confirm = vi.fn(() => true)
 beforeEach(() => {
     vi.clearAllMocks()
 
-    wrapper = mount(UserManagement, {
+    wrapper = mount(UserManagementView, {
         global: {
             plugins: [PrimeVue]
         }
