@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import SystemLogsTable from '../components/SystemLogsTable.vue';
 
-const logs = ref<SystemLog[]>([]);
+const logs = ref<[]>([]);
 
 </script>
 

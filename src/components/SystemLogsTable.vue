@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 
-const logs = ref<SystemLog[]>([
+const logs = ref([
   { user: 'Otávio', action: 'GET- DW DATA', timestamp: '24/04/2025' },
   { user: 'Otávio', action: 'POST- EXPORT CSV', timestamp: '24/04/2025' },
   { user: 'Otávio', action: 'GET - DATA PROFILE', timestamp: '24/04/2025' },
@@ -43,10 +43,7 @@ const logs = ref<SystemLog[]>([
   { user: 'Otávio', action: 'GET- DW DATA', timestamp: '24/04/2025' },
   { user: 'Otávio', action: 'POST- EXPORT CSV', timestamp: '24/04/2025' },
   { user: 'Otávio', action: 'GET - DATA PROFILE', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'POST-REGISTER NEW USER', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'LOGOUT', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'GET-LOGIN', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'GET-DW DATA', timestamp: '24/04/2025' }
+  { user: 'Otávio', action: 'POST-REGISTER NEW USER', timestamp: '24/04/2025' }
 ]);
 
 </script>
