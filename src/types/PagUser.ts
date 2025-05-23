@@ -5,7 +5,7 @@ export type UserPag = {
     userEmail: string;
     userPassword: string;
     toolName: string;
-    toolId?: string[];
+    toolId?: string;
     projectId? : string[];
     projectName?: string;
     createdAt?: string;
