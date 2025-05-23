@@ -51,17 +51,10 @@ const logs = ref([
 <template>
   <div class="system-logs-container">
     <div class="table-container">
-      <DataTable
-        :value="logs"
-        :paginator="true"
-        :rows="10"
-        scrollable
-        scrollHeight="flex"
+      <DataTable :value="logs" :paginator="true" :rows="10" scrollable scrollHeight="flex"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-        :rowsPerPageOptions="[5,10,20,50]"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-        responsiveLayout="scroll"
-      >
+        :rowsPerPageOptions="[5, 10, 20, 50]"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" responsiveLayout="scroll">
         <Column field="user" header="User"></Column>
         <Column field="action" header="Action"></Column>
         <Column field="timestamp" header="Timestamp"></Column>
@@ -93,12 +86,11 @@ h1 {
   padding: 1rem;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-  height: 70vh; /* Fixed container height */
+  height: 70vh;
   display: flex;
   flex-direction: column;
 }
 
-/* Table scroll container */
 :deep(.p-datatable) {
   flex: 1;
   display: flex;
@@ -110,14 +102,12 @@ h1 {
   overflow: auto;
 }
 
-/* Table header fixed */
 :deep(.p-datatable .p-datatable-thead) {
   position: sticky;
   top: 0;
   z-index: 1;
 }
 
-/* Remove all cell borders */
 :deep(.p-datatable .p-datatable-thead > tr > th),
 :deep(.p-datatable .p-datatable-tbody > tr > td) {
   border: none !important;
@@ -164,7 +154,8 @@ h1 {
   background: transparent;
   border: none;
   color: #fff !important;
-  margin-top: auto; /* Push paginator to bottom */
+  margin-top: auto;
+  /* Push paginator to bottom */
   padding-top: 1rem;
 }
 
