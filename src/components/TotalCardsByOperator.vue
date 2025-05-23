@@ -1,18 +1,19 @@
 <script setup lang="ts">
+import type {ProjectUser } from '@/types/ProjectUser';
 import { fetchTotalOfCards } from '../api/TotalCardsOperatorApi';
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import type { Ref } from 'vue';
+
+const props = defineProps<{
+  value: ProjectUser[];
+}>();
 
 /**
  * List of operators available for selection.
  * @property {number} id - The unique identifier for the operator.
  * @property {string} nome - The name of the operator.
  */
-const operadores = ref([
-  { id: 2, nome: 'André' },
-  { id: 3, nome: 'Beatriz' },
-  { id: 4, nome: 'Cauê' },
-]);
+const operadores: Ref<Array<ProjectUser>> = ref([])
 
 /**
  * Reactive reference for the selected operator ID.
@@ -49,6 +50,11 @@ watch(operadorSelecionado, (novoId) => {
     carregarTotal(novoId);
   }
 });
+
+
+onMounted(()=> {
+  operadores.value = props.value
+})
 </script>
 
 <template>
@@ -60,10 +66,10 @@ watch(operadorSelecionado, (novoId) => {
       <option disabled value="">Select an operator</option>
       <option 
         v-for="operador in operadores" 
-        :key="operador.id" 
-        :value="operador.id"
+        :key="operador.userId" 
+        :value="operador.userId"
       >
-        {{ operador.nome }}
+        {{ operador.userName }}
       </option>
     </select>
 
