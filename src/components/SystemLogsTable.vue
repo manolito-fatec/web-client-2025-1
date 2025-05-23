@@ -149,13 +149,11 @@ h1 {
   background: rgba(74, 85, 104, 0.5) !important;
 }
 
-/* Paginator styling - all text white */
 :deep(.p-paginator) {
   background: transparent;
   border: none;
   color: #fff !important;
   margin-top: auto;
-  /* Push paginator to bottom */
   padding-top: 1rem;
 }
 
@@ -196,7 +194,6 @@ h1 {
   background: rgba(74, 85, 104, 0.5);
 }
 
-/* Scrollbar styling */
 :deep(.p-datatable-wrapper::-webkit-scrollbar) {
   width: 8px;
 }
