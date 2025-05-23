@@ -1,7 +1,12 @@
 <script setup lang="ts">
-import { type Ref, ref, watch} from 'vue';
+import { onMounted, type Ref, ref, watch} from 'vue';
 import Chart from 'primevue/chart';
 import { fetchCardsByPeriod } from "@/api/CardsByPeriodAPI.ts";
+import type { ProjectDetails } from '@/types/ProjectUser';
+
+const props = defineProps<{
+  value: ProjectDetails[];
+}>();
 
 /**
  * Reactive chart data configuration.
@@ -95,17 +100,19 @@ const endDate = ref<string>('') as Ref<string>
  */
 const isLoading = ref(false) as Ref<boolean>
 
+const listOfProject: Ref<Array<ProjectDetails>> = ref([])  
+
+const selectedProject: Ref<number> = ref(0);
 /**
  * Fetches and updates chart data based on selected date range.
  * @async
  * @throws {Error} Logs errors to console if API request fails.
  */
 async function updateChartData() {
-  if (!startDate.value || !endDate.value) return;
-
+  if (!startDate.value || !endDate.value || !selectedProject.value) return;
   try {
     isLoading.value = true;
-    const response = await fetchCardsByPeriod(1637322, startDate.value, endDate.value);
+    const response = await fetchCardsByPeriod(selectedProject.value, startDate.value, endDate.value);
 
     chartData.value = {
       labels: ['Period'],
@@ -138,9 +145,13 @@ async function updateChartData() {
 /**
  * Watches for changes in date range and triggers chart updates.
  */
-watch([startDate, endDate], () => {
+watch([startDate, endDate, selectedProject], () => {
   updateChartData();
 });
+
+onMounted(()=>{
+  listOfProject.value = props.value;
+})
 
 
 defineExpose({
@@ -166,6 +177,15 @@ defineExpose({
         <label for="end-date">End:</label>
         <input id="end-date" type="date" v-model="endDate" :min="startDate || undefined" />
       </div>
+      <div class="filter">
+          <label>Select Project:</label>
+          <select v-model="selectedProject">
+            <option disabled value="">Select a project</option>
+            <option v-for="project in listOfProject" :key="project.projectId" :value="project.projectId">
+              {{ project.projectName }}
+            </option>
+          </select>
+      </div>    
     </div>
 
     <div v-if="isLoading" class="loading-indicator">
@@ -219,5 +239,17 @@ input[type="date"] {
   color: #fff;
   text-align: center;
   padding: 10px;
+}
+
+select {
+  background-color: #0A1237;
+  color: white;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+  padding: 0.3rem;
+  border-radius: 5px;
+  border: none;
+  width: 147px;
+  height: 28px;
 }
 </style>
