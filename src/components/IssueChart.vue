@@ -2,10 +2,10 @@
 import {ref, watch, onMounted, computed, type Ref} from 'vue';
 import Chart from 'primevue/chart';
 import ChartSelectlist from './ChartSelectlist.vue';
-import { fetchReworkCards } from '@/api/ReworkCardApi.ts';
 import { PriorityEnum } from '../enums/PriorityEnum'
 import { SeverityEnum } from '@/enums/SeverityEnum';
 import type { ProjectDetails } from '@/types/ProjectUser';
+import {fetchIssuesDetailed} from "@/api/IssueChartApi.ts";
 
 const props = defineProps<{
   value: ProjectDetails[]
@@ -112,7 +112,7 @@ const selectedPriority = ref<string>(priorityOptions.value[0]);
  */
 const fetchDataAndUpdateChart = async () => {
   try {
-    const issuesData = await fetchReworkCards(
+    const issuesData = await fetchIssuesDetailed(
         selectedProject.value,
         selectedSeverity.value,
         selectedPriority.value
