@@ -1,7 +1,7 @@
 export enum SeverityEnum {
-    CRITICAL = 'Critical',
-    IMPORTANT = 'Important',
-    NORMAL = 'Normal',
-    MINOR = 'Minor',
-    WHISHLIST = 'Wishlist',
+    CRITICAL = 'CRITICAL',
+    IMPORTANT = 'IMPORTANT',
+    NORMAL = 'NORMAL',
+    MINOR = 'MINOR',
+    WHISHLIST = 'WHISHLIST',
 }
