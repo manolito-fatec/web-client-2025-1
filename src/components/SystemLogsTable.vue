@@ -1,73 +1,67 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
+import { fetchAuditLogs } from '../api/AuditLogs';
 
-const logs = ref([
-  { user: 'Otávio', action: 'GET- DW DATA', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'POST- EXPORT CSV', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'GET - DATA PROFILE', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'POST-REGISTER NEW USER', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'LOGOUT', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'GET-LOGIN', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'GET-DW DATA', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'POST-ETL', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'GET-DW DATA', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'GET- DW DATA', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'POST- EXPORT CSV', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'GET - DATA PROFILE', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'POST-REGISTER NEW USER', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'LOGOUT', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'GET-LOGIN', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'GET-DW DATA', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'POST-ETL', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'GET-DW DATA', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'GET- DW DATA', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'POST- EXPORT CSV', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'GET - DATA PROFILE', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'POST-REGISTER NEW USER', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'LOGOUT', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'GET-LOGIN', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'GET-DW DATA', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'POST-ETL', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'GET-DW DATA', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'GET- DW DATA', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'POST- EXPORT CSV', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'GET - DATA PROFILE', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'POST-REGISTER NEW USER', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'LOGOUT', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'GET-LOGIN', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'GET-DW DATA', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'POST-ETL', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'GET-DW DATA', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'GET- DW DATA', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'POST- EXPORT CSV', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'GET - DATA PROFILE', timestamp: '24/04/2025' },
-  { user: 'Otávio', action: 'POST-REGISTER NEW USER', timestamp: '24/04/2025' }
-]);
+interface AuditLogDto {
+  user: string;
+  action: string;
+  timestamp: string;
+}
 
+const logs = ref<AuditLogDto[]>([]);
+
+onMounted(async () => {
+  try {
+    const resultado = await fetchAuditLogs();
+
+    logs.value = resultado.content.map((log: any) => ({
+      user: log.userId,
+      action: `${log.requestMethod} ${log.requestUri}`,
+      timestamp: log.timestamp
+    }));
+  } catch (error) {
+    console.error('Erro ao buscar logs:', error);
+  }
+});
 </script>
 
 <template>
-  <div class="system-logs-container">
-    <div class="table-container">
-      <DataTable :value="logs" :paginator="true" :rows="10" scrollable scrollHeight="flex"
-        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-        :rowsPerPageOptions="[5, 10, 20, 50]"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" responsiveLayout="scroll">
-        <Column field="user" header="User"></Column>
-        <Column field="action" header="Action"></Column>
-        <Column field="timestamp" header="Timestamp"></Column>
-      </DataTable>
-    </div>
+  <div class="audit-logs-container" style="overflow-x: auto;">
+    <DataTable 
+      :value="logs" 
+      :paginator="true" 
+      :rows="10" 
+      scrollable 
+      scrollHeight="500px" 
+      paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+      :rowsPerPageOptions="[5, 10, 20, 50]"
+      currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} registros" 
+      responsiveLayout="scroll"
+      style="min-width: 700px;"
+    >
+      <Column field="user" header="Usuário" :style="{ width: '150px' }" />
+      <Column 
+        field="action" 
+        header="Ação"
+        :bodyStyle="{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }"
+        :style="{ width: '300px' }" 
+      />
+      <Column field="timestamp" header="Data/Hora" :style="{ width: '200px' }" />
+    </DataTable>
   </div>
 </template>
+
+
 
 <style scoped>
 .system-logs-container {
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
+  flex: 1;
+  min-height: 0;
   min-height: 100vh;
   color: #fff;
 }
@@ -137,12 +131,12 @@ h1 {
 }
 
 :deep(.p-datatable .p-datatable-tbody > tr) {
-  background: transparent;
+  background: #151C32;
   color: #fff;
 }
 
 :deep(.p-datatable .p-datatable-tbody > tr:nth-child(even)) {
-  background: #151C32;
+  background: #01081F;
 }
 
 :deep(.p-datatable .p-datatable-tbody > tr:hover) {
@@ -150,7 +144,7 @@ h1 {
 }
 
 :deep(.p-paginator) {
-  background: transparent;
+  background: #01081F;
   border: none;
   color: #fff !important;
   margin-top: auto;
@@ -163,7 +157,6 @@ h1 {
 :deep(.p-dropdown-label) {
   color: #fff !important;
   background-color: #01081F !important;
-  border-color: transparent;
 }
 
 :deep(.p-paginator .p-paginator-pages .p-paginator-page.p-highlight) {
