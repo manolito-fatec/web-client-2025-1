@@ -160,7 +160,8 @@ defineExpose({
   isLoading,
   chartData,
   chartOptions,
-  updateChartData
+  updateChartData,
+  selectedProject
 })
 </script>
 
@@ -178,8 +179,8 @@ defineExpose({
         <input id="end-date" type="date" v-model="endDate" :min="startDate || undefined" />
       </div>
       <div class="filter">
-          <label>Select Project:</label>
-          <select v-model="selectedProject">
+          <label for="project-id">Select Project:</label>
+          <select id="project-id" v-model="selectedProject">
             <option disabled value="">Select a project</option>
             <option v-for="project in listOfProject" :key="project.projectId" :value="project.projectId">
               {{ project.projectName }}
