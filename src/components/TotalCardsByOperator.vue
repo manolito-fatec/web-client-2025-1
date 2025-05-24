@@ -73,7 +73,6 @@ onMounted(()=> {
       </option>
     </select>
 
-    <!-- Display the total cards for the selected operator -->
     <div class="value">{{ totalRef }}</div>
   </div>
 </template>

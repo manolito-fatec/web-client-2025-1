@@ -168,7 +168,7 @@ const selectedProjectName = computed({
 onMounted(() => {
   const listOfProject = props.value
   projects.value = listOfProject;
-  selectedProject.value = Number(projects.value[0].projectId)
+  selectedProject.value = Number(projects.value[0]?.projectId)
   projectsOptions.value = listOfProject.map((e)=> e.projectName)
 });
 
