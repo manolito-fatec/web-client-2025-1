@@ -7,14 +7,14 @@ import ProjectTable from '../components/ProjectTable.vue';
 import { getExportAdmin } from '@/api/ExportCsvApi';
 import { fetchTotalOfProjectsAdmin } from '@/api/TotalOfProjectsAdmin';
 import { ref, onMounted, type Ref } from 'vue';
-import type { ProjectTaskCount, ProjectUser } from '@/types/ProjectUser';
-import { getSessionItem } from '@/api/session/SessionManagement';
+import type { ProjectAdminTable, ProjectTaskCount} from '@/types/ProjectUser';
 import { fetchCardsByProject } from '@/api/CardsByProject';
+import { fetchProjectTable } from '@/api/TableInfoAdminApi';
 
 const totalProjects = ref<number>(0);
 const listOfProjectToFilter : Ref<Array<ProjectTaskCount>> = ref([])
 const listOfProjectAndCount : Ref<Array<ProjectTaskCount>> = ref([])
-
+const tableData = ref<ProjectAdminTable[]>([]);
 /**
  * Downloads the admin data as a CSV file.
  */
@@ -47,6 +47,11 @@ onMounted(() => {
     );
     listOfProjectToFilter.value = listWithoutDuplicates;
   })
+
+  fetchProjectTable().then((data)=>{
+    console.log("datinh", data)
+      tableData.value = data  
+  })
 });
 </script>
 
@@ -69,7 +74,7 @@ onMounted(() => {
         
         <div class="column">
           <KpiCard class="kpi-card" title="Total projects":value="totalProjects"/>
-          <ProjectTable class="project-table" />
+          <ProjectTable class="project-table" v-if="tableData.length" :value="tableData"/>
         </div>
       </div>
     </main>
