@@ -62,7 +62,7 @@ const mockUsers: UserPag[] = [
         userName: 'admin1',
         userRole: 'ADMIN',
         userEmail: 'admin1@test.com',
-        userPassword: 'mock-password-placeholder',
+        userPassword: '',
         toolName: 'Taiga'
     },
     {
@@ -70,7 +70,7 @@ const mockUsers: UserPag[] = [
         userName: 'operator1',
         userRole: 'OPERATOR',
         userEmail: 'operator1@test.com',
-        userPassword: 'mock-password-placeholder',
+        userPassword: '',
         toolName: 'Trello'
     }
 ]
