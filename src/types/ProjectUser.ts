@@ -9,3 +9,9 @@ export type ProjectDetails={
     projectId:string;
     projectName:string;
 }
+
+export type ProjectTaskCount = {
+  projectName: string;
+  projectId: string;
+  count: number;
+}
