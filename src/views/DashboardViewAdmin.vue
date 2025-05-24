@@ -7,16 +7,13 @@ import ProjectTable from '../components/ProjectTable.vue';
 import { getExportAdmin } from '@/api/ExportCsvApi';
 import { fetchTotalOfProjectsAdmin } from '@/api/TotalOfProjectsAdmin';
 import { ref, onMounted, type Ref } from 'vue';
-import type { ProjectDetails, ProjectTaskCount, ProjectUser } from '@/types/ProjectUser';
-import { fetchProjectUser } from '@/api/ProjectUserApi';
+import type { ProjectTaskCount, ProjectUser } from '@/types/ProjectUser';
 import { getSessionItem } from '@/api/session/SessionManagement';
 import { fetchCardsByProject } from '@/api/CardsByProject';
 
 const totalProjects = ref<number>(0);
 const listOfProjectToFilter : Ref<Array<ProjectTaskCount>> = ref([])
-const listOfOperator: Ref<Array<ProjectUser>> = ref([])
 const listOfProjectAndCount : Ref<Array<ProjectTaskCount>> = ref([])
-
 
 /**
  * Downloads the admin data as a CSV file.
@@ -35,7 +32,6 @@ const getExportFile = async () => {
 
 // Fetch total projects count when component mounts
 onMounted(() => {
-  const userId = Number(getSessionItem("userId"))
   fetchTotalOfProjectsAdmin().then((totalOfProjects)=>{
       totalProjects.value = totalOfProjects
   });

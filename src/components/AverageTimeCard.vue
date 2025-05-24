@@ -3,7 +3,6 @@
 import { fetchAverageTimeManager } from '@/api/AverageTimeApi';
 import { ref, type Ref } from 'vue';
 import { onMounted } from 'vue';
-import { errorMessages } from 'vue/compiler-sfc';
 
 const userIdRef:Ref<number> = ref<number>(0); 
 
@@ -11,12 +10,12 @@ const props = defineProps<{
     userIdProp: number
 }>();
 
-const averageTimeDay:Ref<String> = ref<String>("");
+const averageTimeDay:Ref<string> = ref<string>("");
 
 onMounted(() => {
     userIdRef.value = props.userIdProp;
     try {
-        fetchAverageTimeManager(userIdRef.value).then((response:Number) => {
+        fetchAverageTimeManager(userIdRef.value).then((response:number) => {
             averageTimeDay.value = String(response);
     });
     } catch (error) {
