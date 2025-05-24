@@ -6,30 +6,33 @@ import {fetchPaginatedUsers} from "@/api/GetUsersApi.ts";
 import type {UserPag} from "@/types/PagUser.ts";
 import NewUserForm from "@/components/NewUserForm.vue";
 import UserEditForm from "@/components/UserEditForm.vue";
+import {removeUserApi} from "@/api/RemoveUserApi.ts";
 
 const users = ref<UserPag[]>([]);
 const isEditting = ref<boolean>(false);
 const edittedData = ref<UserPag>();
-const deletedData = ref<number>();
 
 const handleUserEdited = async (editUser: UserPag) => {
-  toggleEditting();
   edittedData.value = editUser;
+  toggleEditting();
   await refreshUsers();
 };
 
 const handleUserDeleted = async (userId: number) => {
-  deletedData.value = userId;
+  removeUserApi(userId).then(() => {
+    users.value = users.value.filter(user => user.userId !== userId);
+  });
   await refreshUsers();
 };
 
 const toggleEditting = () => {
-  isEditting.value = true;
-  if (edittedData.value) {
+  if (isEditting.value === true) {
     isEditting.value = false;
     edittedData.value = undefined;
-    deletedData.value = undefined;
+    refreshUsers();
+    return
   }
+  isEditting.value = true;
 }
 
 const refreshUsers = async () => {
@@ -45,7 +48,7 @@ onMounted(() => {
 <template>
   <div class="user-management-scroll-container">
     <NewUserForm v-if="!isEditting" @user-created="refreshUsers"/>
-    <UserEditForm v-if="isEditting" @edited="toggleEditting"/>
+    <UserEditForm v-if="isEditting" :editted-data="edittedData!"  @eddited="toggleEditting"/>
     <UserManagementTable
         :users="users"
         @user-edited="handleUserEdited"
@@ -56,6 +59,7 @@ onMounted(() => {
 
 <style scoped>
 .user-management-scroll-container {
+  transition: all 0.3s ease;
   height: 100%;
   overflow-y: auto;
 }

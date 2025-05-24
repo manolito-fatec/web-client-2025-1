@@ -2,37 +2,26 @@
 
 import {type Ref, ref} from "vue";
 import type {UserPag} from "@/types/PagUser.ts";
-import {removeUserApi} from "@/api/RemoveUserApi.ts";
 import Button from "primevue/button";
 import Password from "primevue/password";
 import InputText from "primevue/inputtext";
 import Dropdown from "primevue/dropdown";
-import {pagToUserConverter} from "@/conversors/PagToUser.ts";
-import {rolesFix, rolesReturn} from "@/conversors/RolesConverter.ts";
 import {editUserApi} from "@/api/EditUserApi.ts";
-import type {User} from "@/types/User.ts";
-import {userToPagConverter} from "@/conversors/UserToUserPag.ts";
 
-defineProps({
-  edittedData: Object,
-  deletedData: Object
-});
+const props = defineProps<{
+  edittedData: UserPag
+}>();
 
 
 const edittingUser = ref<UserPag>({
-  userId: 0,
-  userName: "",
-  userEmail: "",
-  userPassword: "",
-  userRole: "Admin",
-  toolName: "Taiga",
+  userId: props.edittedData.userId,
+  userName: props.edittedData.userName,
+  userEmail: props.edittedData.userEmail,
+  userPassword: props.edittedData.userPassword,
+  userRole: props.edittedData.userRole,
+  toolName: props.edittedData.toolName,
 });
 
-/**
- * Stores the current userId for edit methods. Will be null when edit is @isEditing is false
- * @type {ref<number | null>>}
- */
-const currentUserId = ref<number | null>(null);
 /**
  * Stores the sucess message for edit. Will only have a value when the editApi returns success.
  * @type {ref<string | null>}
@@ -43,9 +32,9 @@ const successMessage = ref<string | null>(null);
  * @type {Array<{label: string, value: string}>}
  */
 const roles = ref([
-  { label: "Admin", value: "ADMIN" },
-  { label: "Operator", value: "OPERATOR" },
-  { label: "Manager", value: "MANAGER" },
+  { label: "ADMIN", value: "ROLE_ADMIN" },
+  { label: "OPERATOR", value: "ROLE_OPERATOR" },
+  { label: "MANAGER", value: "ROLE_MANAGER" },
 ]);
 
 /**
@@ -126,31 +115,11 @@ const validateUserName = () => {
 };
 
 /**
- * @method enterEditMode
- * @description Enters edit mode for a specific user
- * @param {UserPag} user - The user to edit
- */
-const enterEditMode = (user: UserPag) => {
-  isEditing.value = true;
-  currentUserId.value = user.userId!;
-  edittingUser.value = {
-    userName: user.userName,
-    userEmail: user.userEmail || '',
-    userPassword: user.userPassword || '',
-    userRole: user.userRole,
-    toolName: user.toolName,
-    toolId: user.toolId,
-    projectName: user.projectName,
-  };
-};
-
-/**
  * @method exitEditMode
  * @description Exits edit mode and resets form
  */
 const exitEditMode = () => {
-  isEditing.value = false;
-  currentUserId.value = null;
+  emit('eddited');
   clearForm();
 };
 
@@ -166,73 +135,34 @@ const emit = defineEmits<{
  * @function
  * @description Validates all fields and registers new or edited user if valid
  */
-const handleSubmit = () => {
+const handleSubmit = async () => {
   const isUserNameValid = validateUserName();
   const isEmailValid = validateEmail();
   if (!isUserNameValid || !isEmailValid) {
     return;
   }
-  if (isEditing.value && currentUserId.value) {
-    const userToUpdate: UserPag = {
-      userId: currentUserId.value,
-      userName: edittingUser.value.userName,
-      userEmail: edittingUser.value.userEmail,
-      userPassword: edittingUser.value.userPassword,
-      userRole: edittingUser.value.userRole,
-      toolName: edittingUser.value.toolName,
-      toolId: edittingUser.value.toolId,
-      projectName: edittingUser.value.projectName,
-      createdAt: users.value.find(u => u.userId === currentUserId.value)?.createdAt || new Date().toLocaleDateString("pt-BR"),
+
+  try {
+    const userData = {
+      id: edittingUser.value.userId!,
+      username: edittingUser.value.userName,
+      email: edittingUser.value.userEmail,
+      password: edittingUser.value.userPassword || undefined,
+      roles: [edittingUser.value.userRole]
     };
-    const userRolesFixed: UserPag = rolesReturn(userToUpdate);
-    userRolesFixed.createdAt = '';
-    editUserApi(pagToUserConverter(userRolesFixed)).then(responseUser => {
-      responseUser.tool = userRolesFixed.toolName;
-      const index = users.value.findIndex(u => u.userId === currentUserId.value);
-      if (index !== -1) {
-        users.value[index] = rolesFix([userToPagConverter(responseUser)])[0];
-      }
-      successMessage.value = 'User updated successfully!';
-      setTimeout(() => {
-        successMessage.value = null;
-        exitEditMode();
-      }, 3000);
-    });
-    emit('eddited');
-  } else {
-    const userToSubmit: User = pagToUserConverter(edittingUser.value);
-    console.log("Registered user:", userToSubmit);
-    clearForm();
+
+     await editUserApi(userData);
+
+    successMessage.value = 'User updated successfully!';
+    setTimeout(() => {
+      exitEditMode();
+    }, 2000);
+
+  } catch (error) {
+    console.error('Error updating user:', error);
+    successMessage.value = 'Error updating user!';
   }
 };
-
-
-/**
- * Represents the editing state of the form
- * @type {ref<boolean>}
- */
-const isEditing = ref(false);
-
-
-
-/**
- * Handler for the user-edit emit event
- * @param user
- */
-const handleUserEdited = (user: UserPag) => {
-  enterEditMode(user);
-};
-
-/**
- * Handler for the user-removed emit event
- * @param userId
- */
-const handleUserDeleted = (userId: number) => {
-  removeUserApi(userId).then(() => {
-    users.value = users.value.filter(user => user.userId !== userId);
-  });
-};
-
 
 /**
  * Resets the registration form
@@ -241,17 +171,11 @@ const handleUserDeleted = (userId: number) => {
 const clearForm = () => {
   edittingUser.value = {
     userName: "",
-    userRole: 'Admin',
-    toolName: 'Taiga',
-    toolId: '1',
-    projectId: ['1'],
-    projectName: "",
-    userPassword: "",
     userEmail: "",
+    userPassword: "",
+    userRole: "ROLE_OPERATOR",
+    toolName: "Taiga",
   };
-  if (isEditing.value) {
-    exitEditMode();
-  }
 };
 
 defineExpose({
@@ -266,7 +190,7 @@ defineExpose({
 </script>
 
 <template>
-  <div class="user-management-scroll-container">
+  <div>
     <div class="user-management-container">
       <h1>Edit User</h1>
       <div class="form-section">
@@ -333,15 +257,6 @@ defineExpose({
                 severity="secondary"
                 @click="exitEditMode"
                 type="button"
-                v-if="isEditing"
-            />
-            <Button
-                id="cleanAll"
-                label="Clean up"
-                severity="secondary"
-                @click="clearForm"
-                type="button"
-                v-else
             />
             <Button :label="'Update'" type="submit" />
           </div>
@@ -352,11 +267,6 @@ defineExpose({
 </template>
 
 <style scoped>
-
-.user-management-scroll-container {
-  height: 100%;
-  overflow-y: auto;
-}
 
 .user-management-container {
   padding: 2rem;
@@ -388,10 +298,6 @@ h1 {
   text-align: center;
   font-weight: 500;
   padding-bottom: 0.5rem;
-}
-
-.etl-title {
-  margin-top: 2rem;
 }
 
 .form-grid {
