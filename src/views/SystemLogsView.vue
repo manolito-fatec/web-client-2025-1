@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import SystemLogsTable from '../components/SystemLogsTable.vue';
 
 </script>
@@ -23,4 +22,5 @@ h1 {
   color: #fff;
   text-align: center;
 }
+
 </style>
