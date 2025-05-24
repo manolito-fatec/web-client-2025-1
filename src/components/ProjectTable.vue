@@ -1,42 +1,23 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import type { ProjectAdminTable } from '@/types/ProjectUser';
+import { ref, onMounted } from 'vue';
 
-/**
- * Defines the valid columns that can be used for sorting.
- */
+const props = defineProps<{
+  value: ProjectAdminTable[]
+}>();
+
 type Column = 'project' | 'manager' | 'operators';
 
-const tableData = ref([
-  { project: 'ManoLito', manager: 'Otávio', operators: 7 },
-  { project: 'APIS', manager: 'Gabriel', operators: 10 },
-  { project: 'YoutanDash', manager: 'André', operators: 43 },
-  { project: 'Fatec', manager: 'Paulo', operators: 13 },
-  { project: 'Test', manager: 'Cauê', operators: 54 },
-  { project: '5Semestre', manager: 'Beatriz', operators: 24 },
-  { project: 'Facebook', manager: 'Kleber', operators: 69 },
-  { project: 'Youtube', manager: 'Juan', operators: 30 },
-  { project: 'Twitter', manager: 'Matheus', operators: 34 },
-  { project: 'Xbox', manager: 'Leonardo', operators: 11 }
-]);
+const tableData = ref<ProjectAdminTable[]>([]);
 
-/**
- * Reactive reference for the currently selected column to sort by.
- */
+onMounted(() => {
+    tableData.value = props.value
+});
+
 const sortColumn = ref<Column | null>(null);
 
-/**
- * Reactive reference for the sorting direction.
- */
 const sortDirection = ref<'asc' | 'desc'>('asc');
 
-/**
-* Sorts the project table data based on the selected column.
-*
-* Toggles the sort direction (ascending or descending) if the same column is clicked again.
-* Updates reactive references by column, `sortColumn`, and by direction, `sortDirection`.
-*
-* @param {Column} column - The column by which the table will be sorted ('project', 'manager', or 'operators').
- */
 function sortBy(column: Column) {
   if (sortColumn.value === column) {
     sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
@@ -45,7 +26,7 @@ function sortBy(column: Column) {
     sortDirection.value = 'asc';
   }
 
-  tableData.value.sort((a, b) => {
+  tableData.value.sort((a:any, b:any) => {
     const valA = a[column];
     const valB = b[column];
 
@@ -85,7 +66,7 @@ function sortBy(column: Column) {
         <tr v-for="(row, index) in tableData" :key="index" :class="index % 2 === 0 ? 'row-even' : 'row-odd'">
           <td class="table-cell">{{ row.project }}</td>
           <td class="table-cell">{{ row.manager }}</td>
-          <td class="table-cell">{{ row.operators }}</td>
+          <td class="table-cell">{{ row.quantityOfOperators}}</td>
         </tr>
       </tbody>
     </table>

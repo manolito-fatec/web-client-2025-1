@@ -15,3 +15,9 @@ export type ProjectTaskCount = {
   projectId: string;
   count: number;
 }
+
+export type ProjectAdminTable = {
+  quantityOfOperators: number;
+  project: string;
+  manager: string;
+}
