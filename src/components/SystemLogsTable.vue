@@ -34,21 +34,22 @@ onMounted(async () => {
       :paginator="true" 
       :rows="10" 
       scrollable 
-      scrollHeight="500px" 
+      scrollHeight="550px" 
       paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
       :rowsPerPageOptions="[5, 10, 20, 50]"
       currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} registros" 
       responsiveLayout="scroll"
       style="min-width: 700px;"
     >
-      <Column field="user" header="Usuário" :style="{ width: '150px' }" />
+      <Column field="user" header="Usuário" :style="{ width: '150px' }" :sortable="true"/>
       <Column 
         field="action" 
         header="Ação"
         :bodyStyle="{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }"
         :style="{ width: '300px' }" 
+        :sortable="true"
       />
-      <Column field="timestamp" header="Data/Hora" :style="{ width: '200px' }" />
+      <Column field="timestamp" header="Data/Hora" :style="{ width: '200px' }" :sortable="true"/>
     </DataTable>
   </div>
 </template>
