@@ -15,7 +15,6 @@ import { fetchTotalOfCards } from '@/api/TotalOfCardsApi.ts';
 import ReworkCard from '@/components/ReworkCard.vue';
 
 const averageCardData: Ref<number> = ref(0);
-const reworkCardsKpi: Ref<number> = ref(0);
 const listOfProjectToFilter : Ref<Array<ProjectDetails>> = ref([])
 const listOfOperator: Ref<Array<ProjectUser>> = ref([])
 const managerCards: Ref<number> = ref(0);
