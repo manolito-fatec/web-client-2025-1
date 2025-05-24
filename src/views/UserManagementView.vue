@@ -43,6 +43,16 @@ const refreshUsers = async () => {
 onMounted(() => {
   refreshUsers();
 })
+
+defineExpose({
+  refreshUsers,
+  toggleEditting,
+  handleUserEdited,
+  handleUserDeleted,
+  isEditting,
+  edittedData,
+  users
+})
 </script>
 
 <template>
