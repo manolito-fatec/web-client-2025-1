@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import {ref, watch, onMounted, computed} from 'vue';
+import {ref, watch, onMounted, computed, type Ref} from 'vue';
 import Chart from 'primevue/chart';
 import ChartSelectlist from './ChartSelectlist.vue';
 import { fetchReworkCards } from '@/api/ReworkCardApi.ts';
 import { PriorityEnum } from '../enums/PriorityEnum'
 import { SeverityEnum } from '@/enums/SeverityEnum';
+import type { ProjectDetails } from '@/types/ProjectUser';
+
+const props = defineProps<{
+  value: ProjectDetails[]
+}>()
 
 /**
  * The chart data reactive reference containing:
@@ -69,15 +74,14 @@ const chartOptions = ref({
 /**
  * Available projects with their IDs and names
  */
-const projects = [
-  { id: 1637322, name: 'Manolito' },
-  { id: 1657675, name: 'Fatec' }
-];
+const projects: Ref<Array<ProjectDetails>> = ref([])
+
+ const projectsOptions: Ref<Array<string>> = ref([]) 
 
 /**
  * Currently selected project ID (reactive)
  */
-const selectedProject = ref<number>(projects[0].id);
+const selectedProject: Ref<number> = ref(0);
 
 /**
  * Available severity options derived from SeverityEnum
@@ -151,17 +155,22 @@ const fetchDataAndUpdateChart = async () => {
  * @type {ComputedRef<string>}
  */
 const selectedProjectName = computed({
-  get: () => projects.find(p => p.id === selectedProject.value)?.name || '',
+  get: () => projects.value.find(p => Number(p.projectId) === selectedProject.value)?.projectName || '',
   set: (newName: string) => {
-    const project = projects.find(p => p.name === newName);
+    const project = projects.value.find(p => p.projectName === newName);
     if (project) {
-      selectedProject.value = project.id;
+      selectedProject.value = Number(project.projectId);
     }
   }
 });
 
 // Fetch initial data when component mounts
-onMounted(fetchDataAndUpdateChart);
+onMounted(() => {
+  const listOfProject = props.value
+  projects.value = listOfProject;
+  selectedProject.value = Number(projects.value[0]?.projectId)
+  projectsOptions.value = listOfProject.map((e)=> e.projectName)
+});
 
 // Watch for changes in filters and update chart
 watch([selectedProject, selectedSeverity, selectedPriority], fetchDataAndUpdateChart);
@@ -173,7 +182,7 @@ watch([selectedProject, selectedSeverity, selectedPriority], fetchDataAndUpdateC
     <div class="selects-container">
       <div class="select-wrapper">
         <ChartSelectlist
-            :options="projects.map(p => p.name)"
+            :options="projectsOptions"
             v-model="selectedProjectName"
             label="Project"
         />

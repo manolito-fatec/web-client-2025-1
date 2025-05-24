@@ -26,15 +26,21 @@ test('Should correctly update the dates entered in the start and end fields.', a
 
 test('Should update the chart with data from the API', async () => {
     //Arrange
-    const wrapper = mount(CardsByPeriod);
-    wrapper.vm.startDate = '2023-01-01'
-    wrapper.vm.endDate = '2023-01-31'
+    const wrapper = mount(CardsByPeriod, {
+        props: {
+            value: [ { projectId: 1, projectName: 'Test Project' } ]
+        }
+    });
 
-    //Act
-    await wrapper.vm.updateChartData()
+    wrapper.vm.startDate = '2023-01-01';
+    wrapper.vm.endDate = '2023-01-31';
+    wrapper.vm.selectedProject = 1;
 
-    //Assert
-    expect(wrapper.vm.chartData.datasets[0].data[0]).toBe(5)
-    expect(wrapper.vm.chartData.datasets[1].data[0]).toBe(3)
+    // Act
+    await wrapper.vm.updateChartData();
+
+    // Assert
+    expect(wrapper.vm.chartData.datasets[0].data[0]).toBe(5);
+    expect(wrapper.vm.chartData.datasets[1].data[0]).toBe(3);
 
 })

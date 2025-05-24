@@ -1,35 +1,21 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import type { Ref } from 'vue'
-import { fetchCardsByProject } from '../api/CardsByProject'
+import type { ProjectTaskCount } from '@/types/ProjectUser'
 
-interface ProjectTaskCount {
-  projectName: string;
-  projectId: string;
-  count: number;
-}
+const props = defineProps<{
+  value: ProjectTaskCount[]
+}>()
 
 const projects: Ref<ProjectTaskCount[]> = ref([])
 const selectProject = ref<string | null>(null)
 const totalRef: Ref<number> = ref(0)
 
-// Fetch all projects with their task counts on component mount
-onMounted(async () => {
-  try {
-    const data = await fetchCardsByProject()
-    projects.value = data
-    if (data.length > 0) {
-      selectProject.value = data[0].projectId
-    }
-  } catch (error) {
-    console.error("Error fetching projects:", error)
-  }
-})
 
-const totalLoad = async (projectId: string) => {
+const totalLoad = (projectId: string) => {
   try {
-    const project = projects.value.find(p => p.projectId === projectId)
-    totalRef.value = project ? project.count : 0
+    const projectWithValue = projects.value.find(p => p.projectId === projectId)
+    totalRef.value = projectWithValue ? projectWithValue.count : 0
   } catch (error) {
     console.error("Error fetching total number of cards:", error)
     totalRef.value = 0
@@ -40,6 +26,14 @@ watch(selectProject, (newId) => {
   if (newId !== null) {
     totalLoad(newId)
   }
+});
+
+onMounted(()=>{
+  const valueCount = props.value
+  projects.value = valueCount
+    if (valueCount.length > 0) {
+      selectProject.value = valueCount[0]?.projectId
+    }
 })
 </script>
 
