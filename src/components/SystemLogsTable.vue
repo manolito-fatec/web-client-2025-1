@@ -4,14 +4,29 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import { fetchAuditLogs } from '../api/AuditLogs';
 
+/**
+ * Represents a single audit log entry.
+ * @typedef {Object} AuditLogDto
+ * @property {string} user - ID or name of the user who performed the action.
+ * @property {string} action - Description of the action (e.g., "GET /endpoint").
+ * @property {string} timestamp - ISO timestamp of when the action occurred.
+ */
 interface AuditLogDto {
   user: string;
   action: string;
   timestamp: string;
 }
 
+/**
+ * Reactive reference to hold the list of audit logs.
+ */
 const logs = ref<AuditLogDto[]>([]);
 
+/**
+ * Fetches audit logs from the API and populates the logs array.
+ * Transforms the API response into the AuditLogDto format.
+ * Logs an error message if the request fails.
+ */
 onMounted(async () => {
   try {
     const resultado = await fetchAuditLogs();
@@ -22,7 +37,7 @@ onMounted(async () => {
       timestamp: log.timestamp
     }));
   } catch (error) {
-    console.error('Erro ao buscar logs:', error);
+    console.error('Failed to fetch audit logs:', error);
   }
 });
 </script>
