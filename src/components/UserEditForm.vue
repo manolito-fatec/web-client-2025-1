@@ -28,6 +28,11 @@ const edittingUser = ref<UserPag>({
  */
 const successMessage = ref<string | null>(null);
 /**
+ * Stores the error message for edit. Will only have a value when the editApi returns error.
+ * @type {ref<string | null>}
+ */
+const errorMessage = ref<string | null>(null);
+/**
  * Available roles for user selection
  * @type {Array<{label: string, value: string}>}
  */
@@ -160,7 +165,7 @@ const handleSubmit = async () => {
 
   } catch (error) {
     console.error('Error updating user:', error);
-    successMessage.value = 'Error updating user!';
+    errorMessage.value = 'Error updating user!';
   }
 };
 
@@ -251,6 +256,7 @@ defineExpose({
 
           <div class="button-group full-width">
             <small v-if="successMessage" class="p-success">{{ successMessage }}</small>
+            <small v-if="errorMessage" class="p-error">{{ errorMessage }}</small>
             <Button
                 id="cleanAll"
                 label="Cancel"
