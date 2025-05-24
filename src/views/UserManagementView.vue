@@ -12,13 +12,15 @@ const isEditting = ref<boolean>(false);
 const edittedData = ref<UserPag>();
 const deletedData = ref<number>();
 
-const handleUserEdited = (editUser: UserPag) => {
+const handleUserEdited = async (editUser: UserPag) => {
   toggleEditting();
   edittedData.value = editUser;
+  await refreshUsers();
 };
 
-const handleUserDeleted = (userId: number) => {
+const handleUserDeleted = async (userId: number) => {
   deletedData.value = userId;
+  await refreshUsers();
 };
 
 const toggleEditting = () => {
@@ -30,17 +32,19 @@ const toggleEditting = () => {
   }
 }
 
-onMounted(() => {
-  fetchPaginatedUsers().then(usersApi => {
-    users.value = rolesFix(usersApi);
-  })
+const refreshUsers = async () => {
+  const usersApi = await fetchPaginatedUsers();
+  users.value = rolesFix(usersApi);
+};
 
+onMounted(() => {
+  refreshUsers();
 })
 </script>
 
 <template>
   <div class="user-management-scroll-container">
-    <NewUserForm v-if="!isEditting"/>
+    <NewUserForm v-if="!isEditting" @user-created="refreshUsers"/>
     <UserEditForm v-if="isEditting" @edited="toggleEditting"/>
     <UserManagementTable
         :users="users"

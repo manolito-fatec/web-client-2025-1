@@ -10,3 +10,8 @@ export type ProjectDto ={
     originalId: string;
     projectName: string;
 }
+
+export type ProjectTableDto ={
+    label: string;
+    value: string;
+}

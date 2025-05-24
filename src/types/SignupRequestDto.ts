@@ -4,5 +4,6 @@ export type SignupRequestDto = {
      password: string;
      roles: string[];
      toolUserId: string;
+     toolProjectIdList?: string[];
      toolId: number;
 }

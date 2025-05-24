@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref } from "vue";
 import InputText from "primevue/inputtext";
 import Dropdown from "primevue/dropdown";
 import Button from "primevue/button";
 import Password from "primevue/password";
 import MultiSelect from "primevue/multiselect"
-import { fetchProjectsByTollId} from "@/api/GetProjectsApi.ts";
-import type {ProjectDto} from "@/types/ProjectTable.ts";
+import {fetchPaginatedProjects, fetchProjectsByTollId} from "@/api/GetProjectsApi.ts";
+import type {ProjectTableDto} from "@/types/ProjectTable.ts";
 import type {SignupRequestDto} from "@/types/SignupRequestDto.ts";
 import {signupUser} from "@/api/UserSignup.ts";
+import type {UserDto} from "@/types/User.ts";
+import type {UserPag} from "@/types/PagUser.ts";
 
 /**
  * New user being registered
@@ -21,6 +23,7 @@ const newUser = ref<Omit<SignupRequestDto, "userId" | "createdAt">>({
   roles: ['Admin'],
   toolUserId: '',
   toolId: 0,
+  toolProjectIdList: []
 });
 
 /**
@@ -55,7 +58,6 @@ const tools = ref([
   { label: "Jira", value: "3" },
 ]);
 
-const projectsById = ref<ProjectDto[]>([])
 
 /**
  * Validates the email field
@@ -120,19 +122,26 @@ const validateUserName = () => {
  * @function
  * @description Validates all fields and emits submit event if valid
  */
-const handleSubmit = () => {
+const handleSubmit = async () => {
   const isUserNameValid = validateUserName();
   const isEmailValid = validateEmail();
   if (!isUserNameValid || !isEmailValid) {
     return;
   }
   try{
-    signupUser(newUser.value);
+    await signupUser(newUser.value).then(() => {
+      emit('user-created');
+    });
   } catch (e) {
     throw e;
   }
+
   clearForm();
 };
+
+const emit = defineEmits<{
+  (e: 'user-created'): void
+}>();
 
 /**
  * Resets the registration form
@@ -143,19 +152,46 @@ const clearForm = () => {
     username: "",
     email: "",
     password: "",
-    roles: ['Admin'],
+    roles: [],
     toolUserId: '',
     toolId: 0,
+    toolProjectIdList: []
   };
 };
 
+const projectsById = ref<ProjectTableDto[]>([])
+
 const fetchProjects = async () => {
   await fetchProjectsByTollId((<number>(<unknown>newUser.value.toolId!))).then(projectsData => {
-    projectsById.value = projectsData;
+    projectsById.value = projectsData.map(project => ({
+      label: project.projectName,
+      value: project.originalId
+    }));
   })
 }
 
-watch([newUser.value.toolId], fetchProjects);
+const projectOriginalUsers = ref<UserDto[]>([]);
+
+const fetchProjectUsers = async () => {
+  if(newUser.value.toolProjectIdList?.length === 0){
+    projectOriginalUsers.value = [];
+    return;
+  }
+
+  try {
+    if(newUser.value.toolProjectIdList !== undefined){
+      for (let i = 0; i < newUser.value.toolProjectIdList?.length; i++) {
+        await fetchPaginatedProjects((<number>(<unknown>newUser.value.toolProjectIdList![i]))).then(userdtolist =>{
+          projectOriginalUsers.value = userdtolist
+        });
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching project users:', error);
+    projectOriginalUsers.value = [];
+  }
+}
+
 
 defineExpose({
   userNameError,
@@ -232,6 +268,7 @@ defineExpose({
               id="tools"
               v-model="newUser.toolId"
               :options="tools"
+              @change="fetchProjects"
               optionLabel="label"
               optionValue="value"
               placeholder="Select a tool"
@@ -244,8 +281,14 @@ defineExpose({
           <label for="projectTool">Project - Tool</label>
           <MultiSelect
               id="projectTool"
-              v-model="newUser"
+              v-model="newUser.toolProjectIdList"
               :options="projectsById"
+              @change="fetchProjectUsers"
+              filter
+              display="chip"
+              :maxSelectedLabels="3"
+              optionLabel="label"
+              optionValue="value"
               placeholder="Enter project tool"
           />
         </div>
@@ -254,6 +297,9 @@ defineExpose({
           <Dropdown
               id="idTool"
               v-model="newUser.toolUserId"
+              :options="projectOriginalUsers"
+              option-label="userName"
+              option-value="originalId"
               placeholder="Enter user project tool ID"
           />
         </div>

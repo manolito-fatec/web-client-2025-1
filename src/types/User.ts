@@ -13,3 +13,8 @@ export type User = {
     toolUserId?: string,
     createdAt?: string,
 }
+
+export type UserDto = {
+    originalId: string;
+    userName: string;
+}
