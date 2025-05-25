@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch, type Ref } from 'vue';
 import Chart from 'primevue/chart';
 import { Chart as ChartJS } from 'chart.js';
 import ChartSelectlist from './ChartSelectlist.vue';
 import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import { fetchTagsbyCard } from '@/api/TagsByCardApi';
+import type { ProjectDetails } from '@/types/ProjectUser';
+
+const props = defineProps<{
+  value: ProjectDetails[]
+}>()
 
 /**
  * Registers the DataLabels plugin for ChartJS.
@@ -75,28 +80,25 @@ const chartOptions = ref({
  * @property {string} name - The display name of the project.
  * @property {number} id - The unique ID of the project.
  */
-const projects = [
-  { name: 'Manolito', id: 1637322 },
-  { name: 'Fatec', id: 1657675 }
-];
+const projects: Ref<Array<ProjectDetails>> = ref([])
 
 /**
  * Mapped project names for the dropdown options.
  */
-const projectsOptions = projects.map((project) => project.name);
+const projectsOptions: Ref<Array<string>> = ref([])
 
 /**
  * Reactive reference for the currently selected project.
  */
-const selectedOption = ref<string>(projectsOptions[0]);
+const selectedOption: Ref<string> = ref("");
 
 /**
  * Computed property to get the selected project's ID.
  * @returns {number | null} The ID of the selected project, or null if not found.
  */
 const selectedProjectId = computed(() => {
-  const project = projects.find(p => p.name === selectedOption.value);
-  return project ? project.id : null;
+  const project = projects.value.find(p => p.projectName === selectedOption.value);
+  return project ? project.projectId : null;
 });
 
 /**
@@ -144,9 +146,9 @@ async function updateChartData(projectId: number) {
  * Watches for changes in the selected project and updates the chart accordingly.
  */
 watch(selectedOption, (newValue) => {
-  const project = projects.find(p => p.name === newValue);
+  const project = projects.value.find(p => p.projectName === newValue);
   if (project) {
-    updateChartData(project.id);
+    updateChartData(Number(project.projectId));
   }
 });
 
@@ -154,9 +156,9 @@ watch(selectedOption, (newValue) => {
  * Fetches initial chart data when the component is mounted. Only fetches when the jwt token is present.
  */
 onMounted(() => {
-  if (selectedProjectId.value && sessionStorage.getItem('token') !== null && sessionStorage.getItem('token') !== undefined) {
-    updateChartData(selectedProjectId.value);
-  }
+  const listOfProject = props.value
+  projects.value = listOfProject;
+  projectsOptions.value = listOfProject.map((e)=> e.projectName)
 });
 </script>
 

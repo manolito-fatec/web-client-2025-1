@@ -1,10 +1,18 @@
 <script setup lang="ts">
-import {ref, watch, onMounted, computed} from 'vue';
+import {ref, watch, onMounted, computed, type Ref} from 'vue';
 import Chart from 'primevue/chart';
 import ChartSelectlist from './ChartSelectlist.vue';
-import { fetchReworkCards } from '@/api/ReworkCardApi.ts';
 import { PriorityEnum } from '../enums/PriorityEnum'
 import { SeverityEnum } from '@/enums/SeverityEnum';
+import type { ProjectDetails } from '@/types/ProjectUser';
+import {fetchIssuesDetailed} from "@/api/IssueChartApi.ts";
+import MultiSelect from 'primevue/multiselect';
+import type {MultiOptions} from "@/types/MultiSelect.ts";
+
+
+const props = defineProps<{
+  value: ProjectDetails[]
+}>()
 
 /**
  * The chart data reactive reference containing:
@@ -69,35 +77,34 @@ const chartOptions = ref({
 /**
  * Available projects with their IDs and names
  */
-const projects = [
-  { id: 1637322, name: 'Manolito' },
-  { id: 1657675, name: 'Fatec' }
-];
+const projects: Ref<Array<ProjectDetails>> = ref([])
+
+ const projectsOptions: Ref<Array<string>> = ref([]) 
 
 /**
  * Currently selected project ID (reactive)
  */
-const selectedProject = ref<number>(projects[0].id);
+const selectedProject: Ref<number> = ref(0);
 
 /**
  * Available severity options derived from SeverityEnum
  */
-const severityOptions = ref<string[]>(Object.values(SeverityEnum).filter(value => typeof value === 'string') as string[]);
+const severityOptions = ref<MultiOptions[]>();
 
 /**
  * Currently selected severity level (reactive)
  */
-const selectedSeverity = ref<string>(severityOptions.value[0]);
+const selectedSeverity = ref<MultiOptions[]>(severityOptions.value!);
 
 /**
  * Available priority options derived from PriorityEnum
  */
-const priorityOptions = ref<string[]>(Object.values(PriorityEnum).filter(value => typeof value === 'string') as string[]);
+const priorityOptions = ref<MultiOptions[]>();
 
 /**
  * Currently selected priority level (reactive)
  */
-const selectedPriority = ref<string>(priorityOptions.value[0]);
+const selectedPriority = ref<MultiOptions[]>(priorityOptions.value!);
 
 /**
  * Fetches issue data from API and updates the chart
@@ -108,7 +115,7 @@ const selectedPriority = ref<string>(priorityOptions.value[0]);
  */
 const fetchDataAndUpdateChart = async () => {
   try {
-    const issuesData = await fetchReworkCards(
+    const issuesData = await fetchIssuesDetailed(
         selectedProject.value,
         selectedSeverity.value,
         selectedPriority.value
@@ -151,19 +158,33 @@ const fetchDataAndUpdateChart = async () => {
  * @type {ComputedRef<string>}
  */
 const selectedProjectName = computed({
-  get: () => projects.find(p => p.id === selectedProject.value)?.name || '',
+  get: () => projects.value.find(p => Number(p.projectId) === selectedProject.value)?.projectName || '',
   set: (newName: string) => {
-    const project = projects.find(p => p.name === newName);
+    const project = projects.value.find(p => p.projectName === newName);
     if (project) {
-      selectedProject.value = project.id;
+      selectedProject.value = Number(project.projectId);
     }
   }
 });
 
-// Fetch initial data when component mounts
-onMounted(fetchDataAndUpdateChart);
+onMounted(() => {
+  const listOfProject = props.value
 
-// Watch for changes in filters and update chart
+  severityOptions.value = Object.values(SeverityEnum).map(severity => ({
+    label : severity.toString(),
+    value : severity.toString()
+  }));
+
+  priorityOptions.value = Object.values(PriorityEnum).map(priority => ({
+    label : priority.toString(),
+    value : priority.toString()
+  }));
+
+  projects.value = listOfProject;
+  selectedProject.value = Number(projects.value[0]?.projectId)
+  projectsOptions.value = listOfProject.map((e)=> e.projectName)
+});
+
 watch([selectedProject, selectedSeverity, selectedPriority], fetchDataAndUpdateChart);
 </script>
 
@@ -173,25 +194,49 @@ watch([selectedProject, selectedSeverity, selectedPriority], fetchDataAndUpdateC
     <div class="selects-container">
       <div class="select-wrapper">
         <ChartSelectlist
-            :options="projects.map(p => p.name)"
+            :options="projectsOptions"
             v-model="selectedProjectName"
             label="Project"
         />
       </div>
 
       <div class="select-wrapper">
-        <ChartSelectlist
+        <MultiSelect
             :options="severityOptions"
+            option-label="label"
+            option-value="value"
             v-model="selectedSeverity"
             label="Severity"
+            filter
+            :pt="{
+              root: { class: 'multiselect-root' },
+              trigger: { class: 'multiselect-trigger' },
+              panel: { class: 'multiselect-panel' },
+              header: { class: 'multiselect-header' },
+              item: { class: 'multiselect-item' },
+              token: { class: 'multiselect-token' },
+              tokenLabel: { class: 'multiselect-token-label' }
+            }"
         />
       </div>
 
       <div class="select-wrapper">
-        <ChartSelectlist
+        <MultiSelect
             :options="priorityOptions"
             v-model="selectedPriority"
             label="Priority"
+            option-label="label"
+            option-value="value"
+            filter
+            :pt="{
+              root: { class: 'multiselect-root' },
+              trigger: { class: 'multiselect-trigger' },
+              panel: { class: 'multiselect-panel' },
+              header: { class: 'multiselect-header' },
+              item: { class: 'multiselect-item' },
+              token: { class: 'multiselect-token' },
+              tokenLabel: { class: 'multiselect-token-label' }
+            }"
         />
       </div>
     </div>
@@ -200,9 +245,6 @@ watch([selectedProject, selectedSeverity, selectedPriority], fetchDataAndUpdateC
 </template>
 
 <style scoped>
-/**
- * Card container styling
- */
 .chart-card {
   background-color: #01081F;
   padding: 20px;
@@ -211,18 +253,12 @@ watch([selectedProject, selectedSeverity, selectedPriority], fetchDataAndUpdateC
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/**
- * Title styling
- */
 .chart-card h3 {
   margin-top: 0;
   margin-bottom: 15px;
   text-align: center;
 }
 
-/**
- * Container for filter select lists
- */
 .selects-container {
   display: flex;
   gap: 10%;
@@ -231,18 +267,15 @@ watch([selectedProject, selectedSeverity, selectedPriority], fetchDataAndUpdateC
   flex-wrap: wrap;
 }
 
-/**
- * Individual select list wrapper
- */
 .select-wrapper {
+  display: flex;
+  flex-direction: column;
+
   position: relative;
   min-width: 150px;
   margin-bottom: 10px;
 }
 
-/**
- * Select list styling
- */
 .chart-select {
   background-color: #0C1635;
   border-color: #0C1635;
@@ -254,6 +287,7 @@ watch([selectedProject, selectedSeverity, selectedPriority], fetchDataAndUpdateC
   transition: all 0.3s ease;
 }
 
+
 .chart-select:hover {
   border-color: #3D7EFF;
 }
@@ -261,5 +295,85 @@ watch([selectedProject, selectedSeverity, selectedPriority], fetchDataAndUpdateC
 .chart-select:focus {
   outline: none;
   box-shadow: 0 0 0 2px rgba(61, 126, 255, 0.3);
+}
+
+:deep(.multiselect-root) {
+  background-color: #0C1635 !important;
+  border-color: #0C1635 !important;
+  color: #e0e0e0 !important;
+  border-radius: 4px !important;
+}
+/* Estilo para o texto dentro dos chips (itens selecionados) */
+:deep(.p-multiselect-token-label) {
+  color: white !important; /* Texto branco */
+}
+
+:deep(.p-multiselect-label) {
+  color: #e0e0e0 !important;
+  padding: 0.5rem !important;
+}
+
+:deep(.multiselect.dropdown.color) {
+  color: #000642 !important;
+}
+
+:deep(.p-multiselect-item:hover) {
+  color: white !important;
+}
+
+:deep(.p-multiselect-label.p-placeholder) {
+  color: #6c757d !important;
+}
+
+:deep(.p-multiselect-token) {
+  background-color: #3D7EFF !important;
+  color: white !important; /* Texto branco */
+  margin: 0.1rem !important;
+}
+
+:deep(.p-multiselect-token-icon) {
+  color: white !important;
+}
+:deep(.multiselect-trigger) {
+  background-color: #0C1635 !important;
+  color: #e0e0e0 !important;
+  padding: 8px 40px !important;
+}
+
+:deep(.multiselect-panel) {
+  background-color: #0C1635 !important;
+  border-color: #0C1635 !important;
+  color: #022a6a !important;
+}
+
+:deep(.multiselect-header) {
+  background-color: #0C1635 !important;
+  border-color: #0C1635 !important;
+}
+
+:deep(.multiselect-item) {
+  color: #3D7EFF !important;
+}
+
+:deep(.multiselect-item:hover) {
+  background-color: #3D7EFF !important;
+}
+
+:deep(.multiselect-token) {
+  background-color: #3D7EFF !important;
+  color: #e0e0e0 !important;
+}
+
+:deep(.multiselect-token-label) {
+  color: #e0e0e0 !important;
+}
+
+:deep(.multiselect-root:hover),
+:deep(.multiselect-root:focus) {
+  border-color: #3D7EFF !important;
+}
+
+:deep(.multiselect-trigger .p-multiselect-trigger-icon) {
+  color: #e0e0e0 !important;
 }
 </style>

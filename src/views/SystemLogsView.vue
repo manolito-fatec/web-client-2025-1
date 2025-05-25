@@ -1,0 +1,26 @@
+<script setup lang="ts">
+import SystemLogsTable from '../components/SystemLogsTable.vue';
+
+</script>
+
+<template>
+  <div class="system-logs-container">
+    <h1>System Log</h1>
+    <SystemLogsTable />
+  </div>
+</template>
+
+<style scoped>
+.system-logs-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+h1 {
+  margin-bottom: 2rem;
+  color: #fff;
+  text-align: center;
+}
+
+</style>
