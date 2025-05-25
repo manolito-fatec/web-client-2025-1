@@ -1,23 +1,13 @@
 import {expect, vi, test, beforeEach} from 'vitest'
-import {ref} from 'vue'
-import {User} from "../src/types/User";
+import {nextTick} from 'vue'
 import {mount} from "@vue/test-utils";
 import PrimeVue from 'primevue/config'
-import UserManagement from "../src/components/UserManagement.vue";
+import UserManagementView from "../src/views/UserManagementView.vue";
 import {createPinia} from "pinia";
 import {UserPag} from "../src/types/PagUser";
-import {editUserApi} from "../src/api/EditUserApi";
-ref<User[]>([
-    {
-        id: 1,
-        username: "existing",
-        roles: ["ADMIN"],
-        tool: "Taiga",
-        idTool: "123",
-        projectTool: "Test",
-        email: "existing@example.com",
-    }
-]);
+import {fetchPaginatedUsers} from "../src/api/GetUsersApi";
+import {removeUserApi} from "../src/api/RemoveUserApi";
+
 Object.defineProperty(window, 'matchMedia', {
     writable: true,
     value: vi.fn().mockImplementation(query => ({
@@ -32,13 +22,6 @@ Object.defineProperty(window, 'matchMedia', {
     })),
 })
 
-vi.mock('@/api/EditUserApi.ts', () => ({
-    editUserApi: vi.fn()
-}))
-vi.mock('@/api/RemoveUserApi.ts', () => ({
-    removeUserApi: vi.fn()
-}))
-
 createPinia()
 vi.mock('../src/api/session/stores/auth.ts', () => ({
     useAuthStore: vi.fn(() => ({
@@ -48,155 +31,172 @@ vi.mock('../src/api/session/stores/auth.ts', () => ({
         logout: vi.fn()
     }))
 }))
-
-window.alert = vi.fn()
-window.confirm = vi.fn(() => true)
-
-
 beforeEach(() => {
     vi.clearAllMocks()
 
-    wrapper = mount(UserManagement, {
+    const wrapper = mount(UserManagementView, {
         global: {
             plugins: [PrimeVue]
         }
     })
-    component = wrapper.vm
-    component.users.value = [mockUser]
+    const component = wrapper.vm
+    component.users.value = [mockUsers]
 })
 
-test('Returns error for empty email', async () => {
-    const email = wrapper.find('#email')
-    await email.setValue('')
-    await email.trigger('blur')
 
-    expect(wrapper.find('.p-error').text()).toBe('Email is required')
-})
+vi.mock('@/api/GetUsersApi.ts', () => ({
+    fetchPaginatedUsers: vi.fn()
+}))
 
-test('Returns error for invalid format', async () => {
-    const email = wrapper.find('#email')
-    await email.setValue('emailinvalido')
-    await email.trigger('blur')
+vi.mock('@/api/RemoveUserApi.ts', () => ({
+    removeUserApi: vi.fn()
+}))
 
-    expect(wrapper.find('.p-error')
-        .text()).toBe('Please enter a valid email address')
-})
+vi.mock('@/conversors/RolesConverter.ts', () => ({
+    rolesFix: vi.fn((users) => users)
+}))
 
-test('Returns error for too long email', async () => {
-    const email = wrapper.find('#email')
-    await email.setValue('a'.repeat(256) + '@test.com')
-    await email.trigger('blur')
-
-    expect(wrapper.find('.p-error').text()).toBe('Email must be less than 255 characters')
-})
-
-test('Returns no error for valid email', async () => {
-    const email = wrapper.find('#email')
-    await email.setValue('valido@email.com')
-    await email.trigger('blur')
-
-    expect(wrapper.find('.p-error').exists()).toBe(false)
-})
-
-test('Returns error for empty username', async () => {
-    const username = wrapper.find('#username')
-    await username.setValue('')
-    await username.trigger('blur')
-
-    expect(wrapper.findAll('.p-error').at(0).text()).toBe('Username is required')
-})
-
-test('Returns error for invalid characters', async () => {
-    const username = wrapper.find('#username')
-    await username.setValue('user@name')
-    await username.trigger('blur')
-
-    expect(wrapper.findAll('.p-error').at(0).text()).toBe('Only letters, numbers and underscores allowed')
-})
-
-test('Returns error for too long username', async () => {
-    const username = wrapper.find('#username')
-    await username.setValue('a'.repeat(256))
-    await username.trigger('blur')
-
-    expect(wrapper.findAll('.p-error').at(0).text()).toBe('Username must be less than 255 characters')
-})
-
-test('Returns no error for valid username', async () => {
-    const username = wrapper.find('#username')
-    await username.setValue('username_valido123')
-    await username.trigger('blur')
-
-    expect(wrapper.find('.p-error').exists()).toBe(false)
-})
-
-test('Does not submit when there are validation errors', async () => {
-    const initialUserCount = wrapper.vm.users.length
-
-    await wrapper.find('#username').setValue('')
-    await wrapper.find('#email').setValue('invalido')
-
-    await wrapper.find('form').trigger('submit.prevent')
-
-    expect(wrapper.vm.users.length).toBe(initialUserCount)
-})
-
-let wrapper: any
-let component: any
-
-const mockUser: UserPag = {
-    userId: 1,
-    userName: 'testuser',
-    userRole: 'ADMIN',
-    toolName: 'Taiga',
-    toolId: '123',
-    projectName: 'Test Project',
-    userPassword: '',
-    userEmail: 'test@example.com',
-    createdAt: '01/01/2023'
-}
-
-
-
-test('should set up editing state correctly', () => {
-    component.enterEditMode(mockUser)
-
-    expect(component.isEditing).toBe(true)
-    expect(component.currentUserId).toBe(1)
-    expect(component.newUser).toEqual({
-        userName: 'testuser',
+const mockUsers: UserPag[] = [
+    {
+        userId: 1,
+        userName: 'admin1',
         userRole: 'ADMIN',
-        toolName: 'Taiga',
-        toolId: '123',
-        projectName: 'Test Project',
+        userEmail: 'admin1@test.com',
         userPassword: '',
-        userEmail: 'test@example.com'
-    })
+        toolName: 'Taiga'
+    },
+    {
+        userId: 2,
+        userName: 'operator1',
+        userRole: 'OPERATOR',
+        userEmail: 'operator1@test.com',
+        userPassword: '',
+        toolName: 'Trello'
+    }
+]
+
+beforeEach(() => {
+    vi.mocked(fetchPaginatedUsers).mockResolvedValue(mockUsers)
+    vi.mocked(removeUserApi).mockResolvedValue({})
 })
 
-test('should reset editing state', () => {
-    component.isEditing = true
-    component.currentUserId = 1
-    component.newUser = { userName: 'test' }
+test('fetches users on mount', async () => {
+    const wrapper = mount(UserManagementView, {
+        global: {
+            plugins: [PrimeVue]
+        }
+    })
+    await nextTick()
 
-    component.exitEditMode()
-
-    expect(component.isEditing).toBe(false)
-    expect(component.currentUserId).toBeNull()
-    expect(component.newUser.userName).toBe('')
+    expect(fetchPaginatedUsers).toHaveBeenCalled()
+    expect(wrapper.vm.users).toEqual(mockUsers)
 })
 
-test('should convert display roles to backend format', () => {
-    const testCases = [
-        { input: 'ADMIN', expected: 'ROLE_ADMIN' },
-        { input: 'OPERATOR', expected: 'ROLE_OPERATOR' },
-        { input: 'MANAGER', expected: 'ROLE_MANAGER' },
-        { input: 'UNKNOWN', expected: 'UNKNOWN' }
-    ]
-
-    testCases.forEach(({ input, expected }) => {
-        const user: UserPag = { ...mockUser, userRole: input }
-        const result = component.rolesReturn(user)
-        expect(result.userRole).toBe(expected)
+test('toggles edit mode and sets edited data', async () => {
+    const wrapper = mount(UserManagementView, {
+        global: {
+            plugins: [PrimeVue]
+        }
     })
+    await wrapper.vm.handleUserEdited(mockUsers[0])
+
+    expect(wrapper.vm.isEditting).toBe(true)
+    expect(wrapper.vm.edittedData).toEqual(mockUsers[0])
+
+    await wrapper.vm.toggleEditting()
+    expect(wrapper.vm.isEditting).toBe(false)
+    expect(wrapper.vm.edittedData).toBeUndefined()
+})
+
+test('deletes user and refreshes list', async () => {
+    const wrapper = mount(UserManagementView, {
+        global: {
+            plugins: [PrimeVue]
+        }
+    })
+    await wrapper.vm.handleUserDeleted(1)
+
+    expect(removeUserApi).toHaveBeenCalledWith(1)
+    expect(fetchPaginatedUsers).toHaveBeenCalledTimes(3)
+})
+
+test('refreshes users list', async () => {
+    const wrapper = mount(UserManagementView, {
+        global: {
+            plugins: [PrimeVue]
+        }
+    })
+    const initialUsers = [...wrapper.vm.users]
+
+    await wrapper.vm.refreshUsers()
+    expect(fetchPaginatedUsers).toHaveBeenCalledTimes(3)
+    expect(wrapper.vm.users).not.toBe(initialUsers)
+})
+
+test('shows NewUserForm when not editing', async () => {
+    const wrapper = mount(UserManagementView, {
+        global: {
+            plugins: [PrimeVue]
+        }
+    })
+    expect(wrapper.findComponent({ name: 'NewUserForm' }).exists()).toBe(true)
+    expect(wrapper.findComponent({ name: 'UserEditForm' }).exists()).toBe(false)
+})
+
+test('shows UserEditForm when editing', async () => {
+    const wrapper = mount(UserManagementView, {
+        global: {
+            plugins: [PrimeVue]
+        }
+    })
+    await wrapper.vm.handleUserEdited(mockUsers[0])
+
+    expect(wrapper.findComponent({ name: 'NewUserForm' }).exists()).toBe(false)
+    expect(wrapper.findComponent({ name: 'UserEditForm' }).exists()).toBe(true)
+})
+
+test('handles user creation event', async () => {
+    const wrapper = mount(UserManagementView, {
+        global: {
+            plugins: [PrimeVue]
+        }
+    })
+    const newUserForm = wrapper.findComponent({ name: 'NewUserForm' })
+
+    await newUserForm.vm.$emit('user-created')
+    expect(fetchPaginatedUsers).toHaveBeenCalledTimes(3)
+})
+
+test('handles edit completion event', async () => {
+    const wrapper = mount(UserManagementView, {
+        global: {
+            plugins: [PrimeVue]
+        }
+    })
+    await wrapper.vm.handleUserEdited(mockUsers[0])
+    const editForm = wrapper.findComponent({ name: 'UserEditForm' })
+
+    await editForm.vm.$emit('eddited')
+    expect(wrapper.vm.isEditting).toBe(false)
+})
+
+test('passes correct props to UserEditForm', async () => {
+    const wrapper = mount(UserManagementView, {
+        global: {
+            plugins: [PrimeVue]
+        }
+    })
+    await wrapper.vm.handleUserEdited(mockUsers[0])
+
+    const editForm = wrapper.findComponent({ name: 'UserEditForm' })
+    expect(editForm.props('edittedData')).toEqual(mockUsers[0])
+})
+
+test('matches snapshot', () => {
+    const wrapper = mount(UserManagementView, {
+        global: {
+            plugins: [PrimeVue]
+        }
+    })
+    expect(wrapper.html()).toMatchSnapshot()
 })

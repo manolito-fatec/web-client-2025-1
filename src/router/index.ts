@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import DashboardView from '../views/DashboardView.vue'
 import ProfileView from '../views/ProfileView.vue'
 import DashboardViewManager from '../views/DashboardViewManager.vue'
-import UserManagement from "../components/UserManagement.vue";
+import UserManagementView from "../views/UserManagementView.vue";
 import LoginView from "../views/LoginView.vue";
 import DashboardViewAdmin from '../views/DashboardViewAdmin.vue'
 import SystemLogsView from '@/views/SystemLogsView.vue';
@@ -49,7 +49,7 @@ const router = createRouter({
     {
       path: '/userRegister',
       name: 'userRegister',
-      component: UserManagement,
+      component: UserManagementView,
       meta: { requiresAuth: true, roles: ["ROLE_ADMIN"] }
     },
     {
