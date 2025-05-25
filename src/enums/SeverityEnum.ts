@@ -3,5 +3,4 @@ export enum SeverityEnum {
     IMPORTANT = 'IMPORTANT',
     NORMAL = 'NORMAL',
     MINOR = 'MINOR',
-    WHISHLIST = 'WHISHLIST',
 }

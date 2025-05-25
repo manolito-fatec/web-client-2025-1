@@ -94,7 +94,7 @@ const severityOptions = ref<MultiOptions[]>();
 /**
  * Currently selected severity level (reactive)
  */
-const selectedSeverity = ref<string>(severityOptions.value);
+const selectedSeverity = ref<MultiOptions[]>(severityOptions.value!);
 
 /**
  * Available priority options derived from PriorityEnum
@@ -104,7 +104,7 @@ const priorityOptions = ref<MultiOptions[]>();
 /**
  * Currently selected priority level (reactive)
  */
-const selectedPriority = ref<string>(priorityOptions.value);
+const selectedPriority = ref<MultiOptions[]>(priorityOptions.value!);
 
 /**
  * Fetches issue data from API and updates the chart
