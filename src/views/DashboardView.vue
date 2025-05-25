@@ -1,88 +1,142 @@
 <script setup lang="ts">
-import TotalOfCards from '@/components/TotalOfCards.vue'
-import GraphsByTime from '@/components/GraphsByTime.vue';
-import TotalOfProjects from '@/components/TotalOfProjects.vue';
-import AverageTimeCard from '@/components/AverageTimeCard.vue';
-import GraphQuantityForStatus from '@/components/GraphQuantityForStatus.vue';
-import { ref, type Ref } from 'vue';
+import KpiCard from '../components/KpiCard.vue';
+import StatusCard from '../components/StatusCard.vue';
+import CardsByPeriod from '../components/CardsByPeriod.vue';
+import { onMounted, ref, type Ref } from 'vue';
+import { fetchAverageTimeOperator } from '@/api/AverageTimeApi';
+import { getSessionItem } from '@/api/session/SessionManagement';
+import { fetchTotalOfProjects } from '@/api/TotalOfProjects';
+import { fetchTotalOfCards } from '@/api/TotalCardsOperatorApi';
+import { fetchProjectUser } from '@/api/ProjectUserApi';
+import type { ProjectDetails, ProjectUser } from '@/types/ProjectUser';
 
-const currentUserId: Ref<number> = ref<number>(1);
-const averageTime = ref(0);
+const totalOfProject: Ref<number> = ref(0);
+const totalOfCards: Ref<number> = ref(0);
+const averageTime: Ref<number> = ref(0);
+const listOfProjectToFilter : Ref<ProjectDetails[]> = ref([])
+
+
+onMounted(async () => {
+
+  const userId = Number(getSessionItem("userId"));
+
+  const listOfProject = await fetchProjectUser(userId);
+
+  const projectsValue: ProjectDetails[] = listOfProject.map((project: ProjectUser) => ({
+    projectId: project.projectId,
+    projectName: project.projectName,
+  }));
+
+  const listWithoutDuplicates= Array.from(
+  new Map(projectsValue.map(item => [JSON.stringify(item), item])).values()
+  );
+
+  listOfProjectToFilter.value = listWithoutDuplicates;
+
+  fetchAverageTimeOperator(userId).then((value)=>{
+    averageTime.value = !!value ? value : 0;
+  });
+
+  fetchTotalOfProjects(userId).then((value) =>{
+    totalOfProject.value = !!value ? value : 0;
+  });
+
+  fetchTotalOfCards(userId).then((value)=>{
+    totalOfCards.value = !!value ? value : 0;
+  })
+
+})
 
 </script>
 
 <template>
-  <div class="dashboard">
-    <h1>Projects Dashboard</h1>
-  </div>
-  <div class="top-grid">
-    <TotalOfCards title="Total of Cards" :userIdProp="currentUserId" />
-    <AverageTimeCard :userIdProp="currentUserId" :averageTime="averageTime" />
-    <TotalOfProjects title="Total of Projects" :userIdProp="currentUserId"/>
-  </div>
-  
-  <div class="bottom-grid">
-    <GraphQuantityForStatus :userIdProp="currentUserId"/>
-    <GraphsByTime :userIdProp="currentUserId"/>
+  <div class="dashboard-layout">
+    <SidebarNav/>
+    <main class="main-content">
+      <div class="title">
+        <h1>Projects Dashboard</h1>
+      </div>
+      <DashboardHeader title="Projects Dashboard" />
+
+      <section class="kpi-grid">
+        <KpiCard title="Total of cards" :value="totalOfCards" />
+        <KpiCard title="Average completion time of finished cards" :value="averageTime" />
+        <KpiCard title="Total Projects" :value="totalOfProject" />
+      </section>
+
+      <section class="charts-grid-bottom" v-if="listOfProjectToFilter.length">
+        <StatusCard :value="listOfProjectToFilter"/>
+        <CardsByPeriod :value="listOfProjectToFilter" />
+      </section>
+    </main>
   </div>
 </template>
 
-<style lang="scss" scoped>
-.dashboard {
-  background-color: var(--color-secondary);
+<style scoped>
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+}
 
+.main-content {
+  flex-grow: 1;
+  padding: 20px 40px;
+  overflow-y: auto;
+}
+
+.charts-grid-bottom {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+@media (max-width: 768px) {
+  .dashboard-layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+  }
+
+  .main-content {
+    padding: 20px;
+  }
+}
+
+.title {
+  background-color: var(--color-secondary);
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 10px;
+  justify-content: space-between;
   h1 {
     margin: 0%;
-    color: #fff;
+    margin-bottom: 0.3rem;
+    color: #FFFFFF;
+    font-size: 2rem;
   }
 }
 
-.top-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 5%;
-  height: 20%;
-  padding: 1rem;
-}
-
-.bottom-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr; /* 4 ocupa 66%, 5 ocupa 33% */
-  gap: 2%;
-  margin-top: 5%;
-  height: 60%;
-  padding: 0 1rem 1rem 1rem;
-}
-
-/* Responsividade Unificada */
-@media (max-width: 1286px) {
-  .top-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .bottom-grid {
-    grid-template-columns: 1fr; /* Empilha verticalmente */
-  }
-}
-
-@media only screen and (orientation: portrait) and (max-width: 720px) {
-  h1 {
-    display: none;
-  }
-
-  .top-grid {
-    grid-template-columns: 1fr;
-    gap: 5px;
-    width: 100%;
-    height: 17rem;
-    padding: 0%;
-  }
-  
-  .bottom-grid {
-    grid-template-columns: 1fr;
-    padding: 0%;
-    gap: 5px;
-    height: 30rem;
-  }
+.export-btn {
+  background-color: #61E1A1;
+  color: #000;
+  font-weight: 500;
+  font-family: sans-serif;
+  padding: 12px 32px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 </style>

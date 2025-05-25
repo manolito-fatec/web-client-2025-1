@@ -19,12 +19,12 @@ const handleInput = (event: Event) => {
 </script>
 
 <template>
-  <select 
+  <select
     class="chart-select"
     :value="modelValue"
     @input="handleInput"
   >
-    <option 
+    <option
       v-for="option in options"
       :key="option"
       :value="option"

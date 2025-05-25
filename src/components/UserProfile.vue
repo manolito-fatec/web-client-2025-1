@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue';
 import InputText from 'primevue/inputtext';
 import { fetchUserProfile } from "@/api/ProfileApi.ts";
+import { getSessionItem } from '@/api/session/SessionManagement';
 
 /**
  * User Profile component displaying user information
@@ -23,9 +24,9 @@ interface UserProfile {
  * @type {import('vue').Ref<UserProfile>}
  */
 const user = ref<UserProfile>({
-  username: 'youtan_user',
-  email: 'user@youtandash.com',
-  role: 'Administrator',
+  username: "",
+  email: "",
+  role:"",
 });
 
 /**
@@ -38,12 +39,12 @@ const user = ref<UserProfile>({
  * Fetches profile for user ID 1 (currently hardcoded)
  */
 onMounted(() => {
+  const userId = Number(getSessionItem("userId"));
   /**
    * Fetch user profile and update reactive state
    * @param {number} userId - Currently hardcoded to 1
    */
-  fetchUserProfile(1).then((res) => {
-    console.log(res);
+  fetchUserProfile(userId).then((res) => {
     user.value.username = res.username;
     user.value.email = res.email;
     user.value.role = res.roles[0]; // Take first role from array

@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import SystemLogsTable from '../components/SystemLogsTable.vue';
 
 </script>
 
 <template>
   <div class="system-logs-container">
     <h1>System Log</h1>
-
+    <SystemLogsTable />
   </div>
 </template>
 
@@ -21,4 +22,5 @@ h1 {
   color: #fff;
   text-align: center;
 }
+
 </style>

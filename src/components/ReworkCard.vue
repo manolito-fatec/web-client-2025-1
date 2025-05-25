@@ -1,25 +1,19 @@
 <script setup lang="ts">
-import type {ProjectUser } from '@/types/ProjectUser';
-import { fetchTotalOfCards } from '../api/TotalCardsOperatorApi';
+import type {ProjectDetails} from '@/types/ProjectUser';
 import { onMounted, ref, watch } from 'vue';
 import type { Ref } from 'vue';
+import { fetchReworkCardsTotal } from '@/api/ReworkCardApi';
 
 const props = defineProps<{
-  value: ProjectUser[];
+  value: ProjectDetails[];
 }>();
 
-/**
- * List of operators available for selection.
- * @property {number} id - The unique identifier for the operator.
- * @property {string} nome - The name of the operator.
- */
-const operadores: Ref<Array<ProjectUser>> = ref([])
 
 /**
  * Reactive reference for the selected operator ID.
  * @type {number | null}
  */
-const operadorSelecionado = ref<number | null>(null);
+const selectProject = ref<number | null>(null);
 
 /**
  * Reactive reference for the total count of cards.
@@ -28,13 +22,19 @@ const operadorSelecionado = ref<number | null>(null);
 const totalRef: Ref<number> = ref(0);
 
 /**
+ * Reactive reference for the total count of cards.
+ * @type {Ref<number>}
+ */
+const projectList: Ref<Array<ProjectDetails>> = ref([]);
+
+/**
  * Fetches the total number of cards assigned to a specific operator.
  * @param {number} userId - The ID of the selected operator.
  * @throws {Error} If the API request fails, the total will be set to 0.
  */
-const carregarTotal = async (userId: number) => {
+const loadTotal = async (userId: number) => {
   try {
-    const total = await fetchTotalOfCards(userId);
+    const total = await fetchReworkCardsTotal(userId);
     totalRef.value = total !== undefined ? total : 0;
   } catch (error) {
     console.error("Erro ao buscar total de cartões:", error);
@@ -45,34 +45,32 @@ const carregarTotal = async (userId: number) => {
 /**
  * Watches for changes in the selected operator and triggers the total cards fetch.
  */
-watch(operadorSelecionado, (novoId) => {
+watch(selectProject, (novoId) => {
   if (novoId !== null) {
-    carregarTotal(novoId);
+    loadTotal(novoId);
   }
 });
 
 
 onMounted(()=> {
-  operadores.value = props.value
+  projectList.value = props.value
 })
+
 </script>
 
 <template>
   <div class="total-card operador">
-    <div class="title">Total cards by Operator</div>
-
-    <!-- Dropdown to select an operator -->
-    <select v-model="operadorSelecionado">
-      <option disabled value="">Select an operator</option>
+    <div class="title">Reworks cards</div>
+    <select v-model="selectProject">
+      <option disabled value="">Select a project</option>
       <option 
-        v-for="operador in operadores" 
-        :key="operador.userId" 
-        :value="operador.userId"
+        v-for="project in projectList" 
+        :key="project.projectId" 
+        :value="project.projectId"
       >
-        {{ operador.userName }}
+        {{ project.projectName }}
       </option>
     </select>
-
     <div class="value">{{ totalRef }}</div>
   </div>
 </template>

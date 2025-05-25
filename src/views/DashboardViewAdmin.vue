@@ -6,11 +6,15 @@ import IssueChart from '../components/IssueChart.vue';
 import ProjectTable from '../components/ProjectTable.vue';
 import { getExportAdmin } from '@/api/ExportCsvApi';
 import { fetchTotalOfProjectsAdmin } from '@/api/TotalOfProjectsAdmin';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, type Ref } from 'vue';
+import type { ProjectAdminTable, ProjectTaskCount} from '@/types/ProjectUser';
+import { fetchCardsByProject } from '@/api/CardsByProject';
+import { fetchProjectTable } from '@/api/TableInfoAdminApi';
 
-const isLoading = ref<boolean>(true);
 const totalProjects = ref<number>(0);
-
+const listOfProjectToFilter : Ref<Array<ProjectTaskCount>> = ref([])
+const listOfProjectAndCount : Ref<Array<ProjectTaskCount>> = ref([])
+const tableData = ref<ProjectAdminTable[]>([]);
 /**
  * Downloads the admin data as a CSV file.
  */
@@ -27,22 +31,27 @@ const getExportFile = async () => {
 }
 
 // Fetch total projects count when component mounts
-onMounted(async () => {
-  try {
-    const response = await fetchTotalOfProjectsAdmin();
-    console.log('Resposta da API:', response);
+onMounted(() => {
+  fetchTotalOfProjectsAdmin().then((totalOfProjects)=>{
+      totalProjects.value = totalOfProjects
+  });
 
-    if (typeof response === 'number' && response >= 0) {
-      totalProjects.value = response;
-    } else {
-      totalProjects.value = 0;
-    }
-  } catch (error) {
-    console.error("Erro ao buscar total de projetos:", error);
-    totalProjects.value = 0;
-  } finally {
-    isLoading.value = false;
-  }
+  fetchCardsByProject().then((allProjects)=>{
+    const projectsValue: ProjectTaskCount[] = allProjects.map((project: ProjectTaskCount) => ({
+      projectId: project.projectId,
+      projectName: project.projectName,
+    }));
+    listOfProjectAndCount.value = allProjects;
+    const listWithoutDuplicates= Array.from(
+    new Map(projectsValue.map(item => [JSON.stringify(item), item])).values()
+    );
+    listOfProjectToFilter.value = listWithoutDuplicates;
+  })
+
+  fetchProjectTable().then((data)=>{
+    console.log("datinh", data)
+      tableData.value = data  
+  })
 });
 </script>
 
@@ -57,19 +66,15 @@ onMounted(async () => {
       <DashboardHeader title="Projects Dashboard" />
 
       <div class="two-column-grid">
-        <div class="column">
-          <TotalCardsOfProject />
-          <IssueChart />
-          <CardsByPeriod />
+        <div class="column" >
+          <TotalCardsOfProject v-if="listOfProjectAndCount.length" :value="listOfProjectAndCount" />
+          <IssueChart v-if="listOfProjectToFilter.length" :value="listOfProjectToFilter"/>
+          <CardsByPeriod v-if="listOfProjectToFilter.length"  :value="listOfProjectToFilter"/>
         </div>
         
         <div class="column">
-          <KpiCard 
-            class="kpi-card"
-            title="Total projects" 
-            :value="totalProjects.toString()" 
-          />
-          <ProjectTable class="project-table" />
+          <KpiCard class="kpi-card" title="Total projects":value="totalProjects"/>
+          <ProjectTable class="project-table" v-if="tableData.length" :value="tableData"/>
         </div>
       </div>
     </main>
