@@ -74,12 +74,11 @@ const updateChart = async (projectId: number) => {
   try {
     const apiData = await fetchStatusCard(projectId);
 
-    // Check if apiData is empty or invalid, if so, set chart data to 0
     if (!apiData || apiData.length === 0) {
       chartData.value.datasets[0].data = [0, 0, 0, 0, 0];
     } else {
       const convertedData = defaultCategories.map(category => {
-        const status = apiData.find((item: { statusName: string }) =>
+        const status = apiData.find((item: {statusName: string }) =>
           item.statusName.toLowerCase().trim() === category.toLowerCase().trim()
         );
         return status ? status.count : 0;
@@ -103,7 +102,7 @@ watch(selectedProject, (selectedId) => {
 onMounted(() => {
   projects.value = props.value;
   if (selectedProject.value) {
-    updateChart(selectedProject.value);
+    updateChart((<number>(<unknown>props.value[0].projectId)));
   }
 });
 </script>

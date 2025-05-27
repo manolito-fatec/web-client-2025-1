@@ -12,6 +12,38 @@ const users = ref<UserPag[]>([]);
 const isEditting = ref<boolean>(false);
 const edittedData = ref<UserPag>();
 
+ const unifyUsers = (userPagList: UserPag[])=> {
+  const userMap = new Map<number, UserPag>();
+
+  for (const user of userPagList) {
+    if (user.userId === undefined) continue;
+
+    if (userMap.has(user.userId)) {
+      const existingUser = userMap.get(user.userId)!;
+
+      if (user.projectId && existingUser.projectId) {
+        existingUser.projectId = [...existingUser.projectId, ...user.projectId];
+      } else if (user.projectId) {
+        existingUser.projectId = user.projectId;
+      }
+      if (user.projectName && existingUser.projectName) {
+        if (!existingUser.projectName.includes(user.projectName)) {
+          existingUser.projectName += `, ${user.projectName}`;
+        }
+      } else if (user.projectName) {
+        existingUser.projectName = user.projectName;
+      }
+    } else {
+      const newUser = { ...user };
+      if (newUser.projectId && !Array.isArray(newUser.projectId)) {
+        newUser.projectId = [newUser.projectId];
+      }
+      userMap.set(user.userId, newUser);
+    }
+  }
+  return Array.from(userMap.values());
+}
+
 const handleUserEdited = async (editUser: UserPag) => {
   edittedData.value = editUser;
   toggleEditting();
@@ -37,7 +69,11 @@ const toggleEditting = () => {
 
 const refreshUsers = async () => {
   const usersApi = await fetchPaginatedUsers();
-  users.value = rolesFix(usersApi);
+  console.log(usersApi);
+  const userUnified = unifyUsers(usersApi);
+  console.log(userUnified);
+
+  users.value = rolesFix(userUnified);
 };
 
 onMounted(() => {
