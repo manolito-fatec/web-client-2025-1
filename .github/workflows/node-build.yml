@@ -30,3 +30,17 @@ jobs:
     
     - name: Run Test ViTest
       run: npm run test
+
+    - name: Build Docker image (Client)
+      run: |
+        docker build -t dashflow-client:latest .
+        docker save dashflow-client:latest | gzip > dashflow-client.tar.gz
+
+    - name: Transfer Docker image via SCP
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.MANOLITO_VM_IP }}
+        username: ${{ secrets.MANOLITO_VM_USR }}
+        password: ${{ secrets.MANOLITO_VM_PSW }}
+        source: "dashflow-client.tar.gz"
+        target: "/opt/dashflow-client/"
