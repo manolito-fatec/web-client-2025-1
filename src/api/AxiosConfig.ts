@@ -7,7 +7,7 @@ export const configHeader =ref<object>( {
 });
 
 export const api = axios.create({
-    baseURL: "http://localhost:8080/",
+    baseURL: "http://localhost:3439/",
 })
 
 api.interceptors.request.use(config => {
