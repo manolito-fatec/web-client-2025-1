@@ -1,50 +1,45 @@
 <script setup lang="ts">
-import {onMounted, type Ref, ref} from "vue";
-import InputText from "primevue/inputtext";
-import Dropdown from "primevue/dropdown";
+
+import {type Ref, ref} from "vue";
+import type {UserPag} from "@/types/PagUser.ts";
 import Button from "primevue/button";
 import Password from "primevue/password";
-import UserManagementTable from "@/components/UserManagementTable.vue";
-import {Tools} from "@/enums/Tools.ts";
-import type {User} from "@/types/User.ts";
-import {fetchPaginatedUsers} from "@/api/GetUsersApi.ts";
+import InputText from "primevue/inputtext";
+import Dropdown from "primevue/dropdown";
 import {editUserApi} from "@/api/EditUserApi.ts";
-import {removeUserApi} from "@/api/RemoveUserApi.ts";
-import type {UserPag} from "@/types/PagUser.ts";
 
-/**
- * Represents the editing state of the form
- * @type {ref<boolean>}
- */
-const isEditing = ref(false);
-/**
- * Stores the current userId for edit methods. Will be null when edit is @isEditing is false
- * @type {ref<number | null>>}
- */
-const currentUserId = ref<number | null>(null);
+const props = defineProps<{
+  edittedData: UserPag
+}>();
+
+
+const edittingUser = ref<UserPag>({
+  userId: props.edittedData.userId,
+  userName: props.edittedData.userName,
+  userEmail: props.edittedData.userEmail,
+  userPassword: props.edittedData.userPassword,
+  userRole: props.edittedData.userRole,
+  toolName: props.edittedData.toolName,
+});
+
 /**
  * Stores the sucess message for edit. Will only have a value when the editApi returns success.
  * @type {ref<string | null>}
  */
 const successMessage = ref<string | null>(null);
 /**
+ * Stores the error message for edit. Will only have a value when the editApi returns error.
+ * @type {ref<string | null>}
+ */
+const errorMessage = ref<string | null>(null);
+/**
  * Available roles for user selection
  * @type {Array<{label: string, value: string}>}
  */
 const roles = ref([
-  { label: "Admin", value: "ADMIN" },
-  { label: "Operator", value: "OPERATOR" },
-  { label: "Manager", value: "MANAGER" },
-]);
-
-/**
- * Available ETL tools for selection
- * @type {Array<{label: string, value: string}>}
- */
-const tools = ref([
-  { label: "Taiga", value: "Taiga" },
-  { label: "Trello", value: "Trello" },
-  { label: "Jira", value: "Jira" },
+  { label: "ADMIN", value: "ROLE_ADMIN" },
+  { label: "OPERATOR", value: "ROLE_OPERATOR" },
+  { label: "MANAGER", value: "ROLE_MANAGER" },
 ]);
 
 /**
@@ -52,20 +47,6 @@ const tools = ref([
  * @type {import("vue").Ref<UserPag[]>}
  */
 const users:Ref<UserPag[]> = ref<UserPag[]>([]);
-
-/**
- * New user being registered
- * @type {import("vue").Ref<Omit<UserPag, "userId"|"createdAt">>}
- */
-const newUser = ref<Omit<UserPag, "userId" | "createdAt">>({
-  userName: "",
-  userRole: 'Admin',
-  toolName: Tools.TAIGA,
-  userEmail: "",
-  toolId: '1',
-  projectName: "",
-  userPassword: "",
-});
 
 /**
  * Username validation error message
@@ -87,7 +68,7 @@ const emailError = ref<string | null>(null);
  * @description Checks for empty value, length > 255 chars, and valid email format
  */
 const validateEmail = () => {
-  const value = newUser.value.userEmail;
+  const value = edittingUser.value.userEmail;
 
   if (!value) {
     emailError.value = 'Email is required';
@@ -116,7 +97,7 @@ const validateEmail = () => {
  * @description Checks for empty value, length > 255 chars, and allowed characters
  */
 const validateUserName = () => {
-  const value = newUser.value.userName;
+  const value = edittingUser.value.userName;
 
   if (!value) {
     userNameError.value = 'Username is required';
@@ -139,87 +120,17 @@ const validateUserName = () => {
 };
 
 /**
-* @method enterEditMode
-* @description Enters edit mode for a specific user
-* @param {UserPag} user - The user to edit
-*/
-const enterEditMode = (user: UserPag) => {
-  isEditing.value = true;
-  currentUserId.value = user.userId!;
-  newUser.value = {
-    userName: user.userName,
-    userEmail: user.userEmail || '',
-    userPassword: user.userPassword || '',
-    userRole: user.userRole,
-    toolName: user.toolName,
-    toolId: user.toolId,
-    projectName: user.projectName,
-  };
-};
-
-/**
  * @method exitEditMode
  * @description Exits edit mode and resets form
  */
 const exitEditMode = () => {
-  isEditing.value = false;
-  currentUserId.value = null;
+  emit('eddited');
   clearForm();
 };
 
-/**
- * Convert UserPag object to User
- * @method
- * @param userPag
- */
-const pagToUserConverter = (userPag : UserPag): {
-  id: number;
-  username: string;
-  roles: string[];
-  tool: string;
-  idTool: string;
-  password: string;
-  email: string
-} => {
-  return {
-    id: userPag.userId!,
-    username: userPag.userName,
-    roles : [userPag.userRole],
-    tool: userPag.toolName,
-    idTool: userPag.toolId,
-    password: userPag.userPassword,
-    email: userPag.userEmail
-  }
-}
-
-/**
- * Convert User object to UserPag
- * @method
- * @param user
- */
-const userToPagConverter = (user: User): {
-  userId: number;
-  userName: string;
-  userRole: string;
-  userEmail: string;
-  userPassword: string;
-  toolName: string;
-  toolId: string;
-  projectName: string;
-  createdAt: string;
-} => {
-  return {
-    userId: user.id!,
-    userName: user.username,
-    userRole: user.roles[0],
-    userEmail: user.email,
-    userPassword: user.password!,
-    toolName: user.tool!,
-    toolId: user.idTool!,
-    projectName: user.projectTool!,
-    createdAt: user.createdAt!
-  };
-}
+const emit = defineEmits<{
+  (e: 'eddited'): void
+}>();
 
 
 /**
@@ -229,43 +140,32 @@ const userToPagConverter = (user: User): {
  * @function
  * @description Validates all fields and registers new or edited user if valid
  */
-const handleSubmit = () => {
+const handleSubmit = async () => {
   const isUserNameValid = validateUserName();
   const isEmailValid = validateEmail();
   if (!isUserNameValid || !isEmailValid) {
     return;
   }
 
-  if (isEditing.value && currentUserId.value) {
-    const userToUpdate: UserPag = {
-      userId: currentUserId.value,
-      userName: newUser.value.userName,
-      userEmail: newUser.value.userEmail,
-      userPassword: newUser.value.userPassword,
-      userRole: newUser.value.userRole,
-      toolName: newUser.value.toolName,
-      toolId: newUser.value.toolId,
-      projectName: newUser.value.projectName,
-      createdAt: users.value.find(u => u.userId === currentUserId.value)?.createdAt || new Date().toLocaleDateString("pt-BR"),
+  try {
+    const userData = {
+      id: edittingUser.value.userId!,
+      username: edittingUser.value.userName,
+      email: edittingUser.value.userEmail,
+      password: edittingUser.value.userPassword || undefined,
+      roles: [edittingUser.value.userRole]
     };
-    const userRolesFixed: UserPag = rolesReturn(userToUpdate);
-    userRolesFixed.createdAt = '';
-    editUserApi(pagToUserConverter(userRolesFixed)).then(responseUser => {
-      responseUser.tool = userRolesFixed.toolName;
-      const index = users.value.findIndex(u => u.userId === currentUserId.value);
-      if (index !== -1) {
-        users.value[index] = rolesFix([userToPagConverter(responseUser)])[0];
-      }
-      successMessage.value = 'User updated successfully!';
-      setTimeout(() => {
-        successMessage.value = null;
-        exitEditMode();
-      }, 3000);
-    });
-  } else {
-    const userToSubmit: User = pagToUserConverter(newUser.value);
-    console.log("Registered user:", userToSubmit);
-    clearForm();
+
+     await editUserApi(userData);
+
+    successMessage.value = 'User updated successfully!';
+    setTimeout(() => {
+      exitEditMode();
+    }, 2000);
+
+  } catch (error) {
+    console.error('Error updating user:', error);
+    errorMessage.value = 'Error updating user!';
   }
 };
 
@@ -274,93 +174,14 @@ const handleSubmit = () => {
  * @function
  */
 const clearForm = () => {
-  newUser.value = {
+  edittingUser.value = {
     userName: "",
-    userRole: 'Admin',
-    toolName: 'Taiga',
-    toolId: '1',
-    projectName: "",
-    userPassword: "",
     userEmail: "",
+    userPassword: "",
+    userRole: "ROLE_OPERATOR",
+    toolName: "Taiga",
   };
-  if (isEditing.value) {
-    exitEditMode();
-  }
 };
-
-/**
- * Converts the enum roles from the back-end to prettier ones
- * @param userList
- */
-const rolesFix = (userList: UserPag[]) => {
-  const userListFixed: Ref<UserPag[]> = ref<UserPag[]>([]);
-  for (const user of userList) {
-    const userCopy = { ...user };
-    let role = userCopy.userRole;
-    switch (role) {
-      case 'ROLE_ADMIN':
-        role = 'Admin';
-        break;
-      case 'ROLE_OPERATOR':
-        role = 'Operator';
-        break;
-      case 'ROLE_MANAGER':
-        role = 'Manager';
-        break;
-    }
-    userCopy.userRole = role;
-    userListFixed.value.push(userCopy);
-  }
-
-  return userListFixed.value;
-}
-
-/**
- * Converts the prettier values to the back-end to enum required strings
- * @param userReturn
- */
-const rolesReturn = (userReturn: UserPag) => {
-  const userFixed: Ref<UserPag> = ref<UserPag>(userReturn);
-  let role = userReturn.userRole;
-  switch (role) {
-    case "ADMIN":
-      role = 'ROLE_ADMIN';
-      break;
-    case "OPERATOR":
-      role = 'ROLE_OPERATOR';
-      break;
-    case "MANAGER":
-      role = 'ROLE_MANAGER';
-      break;
-  }
-  userFixed.value.userRole = role;
-
-  return userFixed.value;
-}
-
-/**
- * Handler for the user-edit emit event
- * @param user
- */
-const handleUserEdited = (user: UserPag) => {
-  enterEditMode(user);
-};
-
-/**
- * Handler for the user-removed emit event
- * @param userId
- */
-const handleUserDeleted = (userId: number) => {
-  removeUserApi(userId).then(() => {
-        users.value = users.value.filter(user => user.userId !== userId);
-  });
-};
-
-onMounted(() => {
-  fetchPaginatedUsers().then(usersApi => {
-    users.value = rolesFix(usersApi);
-  })
-})
 
 defineExpose({
   userNameError,
@@ -369,15 +190,14 @@ defineExpose({
   validateUserName,
   handleSubmit,
   users,
-  newUser
+  edittingUser
 })
 </script>
 
 <template>
-  <div class="user-management-scroll-container">
+  <div>
     <div class="user-management-container">
-      <h1>{{ isEditing ? 'Edit User' : 'Register new user' }}</h1>
-
+      <h1>Edit User</h1>
       <div class="form-section">
         <form @submit.prevent="handleSubmit">
           <h2 class="section-title">Personal Information</h2>
@@ -386,7 +206,7 @@ defineExpose({
               <label for="username">Username</label>
               <InputText
                   id="username"
-                  v-model="newUser.userName"
+                  v-model="edittingUser.userName"
                   placeholder="Enter username"
                   @input="validateUserName"
                   :class="{ 'p-invalid': userNameError }"
@@ -398,7 +218,7 @@ defineExpose({
               <label for="password">Password</label>
               <Password
                   id="password"
-                  v-model="newUser.userPassword"
+                  v-model="edittingUser.userPassword"
                   :feedback="false"
                   placeholder="Enter password"
                   required
@@ -410,7 +230,7 @@ defineExpose({
               <label for="email">Email</label>
               <InputText
                   id="email"
-                  v-model="newUser.userEmail"
+                  v-model="edittingUser.userEmail"
                   type="email"
                   placeholder="Enter email"
                   @input="validateEmail"
@@ -423,7 +243,7 @@ defineExpose({
               <label for="role">Role</label>
               <Dropdown
                   id="role"
-                  v-model="newUser.userRole"
+                  v-model="edittingUser.userRole"
                   :options="roles"
                   optionLabel="label"
                   optionValue="value"
@@ -434,76 +254,25 @@ defineExpose({
             </div>
           </div>
 
-          <h2 class="section-title etl-title" v-if="!isEditing">ETL Tools</h2>
-          <div class="form-grid" v-if="!isEditing">
-            <div class="form-group full-width-field">
-              <label for="tools">Tools</label>
-              <Dropdown
-                  id="tools"
-                  v-model="newUser.toolName"
-                  :options="tools"
-                  optionLabel="label"
-                  optionValue="value"
-                  placeholder="Select a tool"
-                  required
-                  class="w-full"
-              />
-            </div>
-
-            <div class="form-group">
-              <label for="projectTool">Project - Tool</label>
-              <InputText
-                  id="projectTool"
-                  v-model="newUser.toolName"
-                  placeholder="Enter project tool"
-              />
-            </div>
-            <div class="form-group">
-              <label for="idTool">User Project - Tool</label>
-              <InputText
-                  id="idTool"
-                  v-model="newUser.toolId"
-                  placeholder="Enter user project tool ID"
-              />
-            </div>
-          </div>
           <div class="button-group full-width">
             <small v-if="successMessage" class="p-success">{{ successMessage }}</small>
+            <small v-if="errorMessage" class="p-error">{{ errorMessage }}</small>
             <Button
                 id="cleanAll"
                 label="Cancel"
                 severity="secondary"
                 @click="exitEditMode"
                 type="button"
-                v-if="isEditing"
             />
-            <Button
-                id="cleanAll"
-                label="Clean up"
-                severity="secondary"
-                @click="clearForm"
-                type="button"
-                v-else
-            />
-            <Button :label="isEditing ? 'Update' : 'Register'" type="submit" />
+            <Button :label="'Update'" type="submit" />
           </div>
         </form>
       </div>
-
-      <UserManagementTable
-          :users="users"
-          @user-deleted="handleUserDeleted"
-          @user-edited="handleUserEdited"
-      />
     </div>
   </div>
 </template>
 
 <style scoped>
-.user-management-scroll-container {
-  height: 100%;
-  overflow-y: auto;
-}
 
 .user-management-container {
   padding: 2rem;
@@ -535,10 +304,6 @@ h1 {
   text-align: center;
   font-weight: 500;
   padding-bottom: 0.5rem;
-}
-
-.etl-title {
-  margin-top: 2rem;
 }
 
 .form-grid {

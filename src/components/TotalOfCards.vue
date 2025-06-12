@@ -22,7 +22,7 @@ onMounted(() => {
   titleRef.value = props.title;
   try {
     fetchTotalOfCards(props.userIdProp).then((total) => {
-      totalRef.value = total !== undefined ? total : 1;
+      totalRef.value = total !== undefined ? total : 0;
     });
   } catch (error) {
     console.error("Erro ao buscar total de cartões:", error);

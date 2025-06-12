@@ -1,31 +1,21 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import type { Ref } from 'vue'
+import type { ProjectTaskCount } from '@/types/ProjectUser'
 
-const projects = ref([
-  { id: 1, name: '5° Semestre' },
-  { id: 2, name: 'Teste_Manolito' }
-])
+const props = defineProps<{
+  value: ProjectTaskCount[]
+}>()
 
-const selectProject = ref<number | null>(null)
-
+const projects: Ref<ProjectTaskCount[]> = ref([])
+const selectProject = ref<string | null>(null)
 const totalRef: Ref<number> = ref(0)
 
-const fetchTotalCardsByProject = async (projectId: number): Promise<number> => {
-  const mockData: Record<number, number> = {
-    1: 12,
-    2: 0,
-  }
 
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(mockData[projectId] ?? 0), 500)
-  })
-}
-
-const totalLoad = async (projectId: number) => {
+const totalLoad = (projectId: string) => {
   try {
-    const total = await fetchTotalCardsByProject(projectId)
-    totalRef.value = total
+    const projectWithValue = projects.value.find(p => p.projectId === projectId)
+    totalRef.value = projectWithValue ? projectWithValue.count : 0
   } catch (error) {
     console.error("Error fetching total number of cards:", error)
     totalRef.value = 0
@@ -36,6 +26,14 @@ watch(selectProject, (newId) => {
   if (newId !== null) {
     totalLoad(newId)
   }
+});
+
+onMounted(()=>{
+  const valueCount = props.value
+  projects.value = valueCount
+    if (valueCount.length > 0) {
+      selectProject.value = valueCount[0]?.projectId
+    }
 })
 </script>
 
@@ -47,10 +45,10 @@ watch(selectProject, (newId) => {
       <option disabled value="">Select a project</option>
       <option 
         v-for="project in projects" 
-        :key="project.id" 
-        :value="project.id"
+        :key="project.projectId" 
+        :value="project.projectId"
       >
-        {{ project.name }}
+        {{ project.projectName }}
       </option>
     </select>
 

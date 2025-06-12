@@ -57,6 +57,12 @@ const username = ref<string>('');
 const password = ref<string>('');
 
 /**
+ * The Role user.
+ * @type {import('vue').Ref<string>}
+ */
+const roleUser = ref<string>('');
+
+/**
  * Error message for username validation
  * @type {import('vue').Ref<string|null>}
  */
@@ -110,6 +116,16 @@ const validatePassword = (): boolean => {
   return true;
 }
 
+function getDashboardRouteByRole(role: string): string {
+  const roleMap: Record<string, string> = {
+    'ROLE_OPERATOR': 'dashboard',
+    'ROLE_MANAGER': 'dashboardManager',
+    'ROLE_ADMIN': 'dashboardAdmin'
+  };
+
+  return roleMap[role] || 'dashboard';
+}
+
 /**
  * Handles the login authentication process
  * @async
@@ -132,7 +148,9 @@ const auth = async (): Promise<void> => {
     const success = await useAuthStore().loginAndStore(username.value, password.value);
 
     if (success && sessionStorage.getItem('token')) {
-      router.push('/dashboard');
+      roleUser.value = String(sessionStorage.getItem('role'))
+      let routeByUser = getDashboardRouteByRole(roleUser.value);
+      router.push('/'+routeByUser);
     } else {
       loginError.value = 'Invalid username or password';
     }

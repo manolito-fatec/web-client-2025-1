@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { fetchAverageTime } from '../api/AverageTimeApi';
+
+import { fetchAverageTimeManager } from '@/api/AverageTimeApi';
 import { ref, type Ref } from 'vue';
 import { onMounted } from 'vue';
 
@@ -9,16 +10,17 @@ const props = defineProps<{
     userIdProp: number
 }>();
 
-const averageTimeDay:Ref<number> = ref<number>(0);
+const averageTimeDay:Ref<string> = ref<string>("");
 
 onMounted(() => {
     userIdRef.value = props.userIdProp;
     try {
-        fetchAverageTime(userIdRef.value).then((response) => {
-            averageTimeDay.value = response;
-        });
+        fetchAverageTimeManager(userIdRef.value).then((response:number) => {
+            averageTimeDay.value = String(response);
+    });
     } catch (error) {
         console.error('Error fetching average time:', error);
+        averageTimeDay.value = String(error);
     }
 });
 

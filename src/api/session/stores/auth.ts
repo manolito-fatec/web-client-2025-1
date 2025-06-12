@@ -22,14 +22,14 @@ export const useAuthStore = defineStore('auth', {
 
                 this.token = response.data.token;
                 setSessionItem("token", this.token!);
-
-                const userProfile = await fetchUserProfile(1);
+                const decodedToken = JSON.parse(atob(response.data.token.split(".")[1]));
+                const userId = decodedToken.userId;
+                const userRole = decodedToken.role[0].roleName;
+                setSessionItem("userId", userId);
+                setSessionItem("role", userRole);
+                const userProfile = await fetchUserProfile(userId);
                 this.userId = userProfile.id.toString();
-                setSessionItem("userId", this.userId);
-
                 this.configHeader.headers.Authorization = `Bearer ${this.token}`;
-
-                console.log("Login successful");
                 return true;
             } catch (error) {
                 if (axios.isAxiosError(error) && error.response?.status === 403) {

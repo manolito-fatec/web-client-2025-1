@@ -1,21 +1,51 @@
 <script setup lang="ts">
 import Button from 'primevue/button';
+import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
+const userRole = ref("");
 
 const goDash = () => {
-  router.push('/dashboard');
+  const roleRoutes: Record<string, string> = {
+    ROLE_OPERATOR: '/dashboard',
+    ROLE_MANAGER: '/dashboardManager',
+    ROLE_ADMIN: '/dashboardAdmin',
+  };
+  const route = roleRoutes[userRole.value];
+  if (route) {
+    router.push(route);
+  } else {
+    sessionStorage.clear();
+    router.push('/login');
+  }
 };
-const goDashManager = () => {
-  router.push('/dashboardManager');
-};
+
 const goProfile = () => {
   router.push('/profile');
 };
 const goUserRegister = () => {
   router.push('/userRegister');
 };
+const goSystemLogs = () => {
+  router.push('/systemLogs');
+};
+
+/**
+ * Logs the user out by clearing session storage and redirecting to the login page.
+ */
+const logOut = () => {
+  sessionStorage.clear();
+  router.push("/login");
+}
+
+onMounted(()=>{
+  const roleValue = sessionStorage.getItem("role");
+  if(roleValue){
+    userRole.value = roleValue;
+  }
+  
+})
 </script>
 
 <template>
@@ -26,9 +56,10 @@ const goUserRegister = () => {
     </div>
     <div class="sidebar-button-grid" >
       <Button icon="pi pi-objects-column" label="Dashboard" @click="goDash" variant="text" class="sidebar-routers"></Button>
-      <Button icon="pi pi-chart-bar" label="Manager" @click="goDashManager" variant="text" class="sidebar-routers" />
       <Button icon="pi pi-user" label="Profile"  @click="goProfile" severity="contrast" variant="text" class="sidebar-routers"></Button>
-      <Button icon="pi pi-user-plus" label="Create user"  @click="goUserRegister" severity="contrast" variant="text" class="sidebar-routers"></Button>
+      <Button icon="pi pi-book" label="System Log" v-if="userRole==='ROLE_ADMIN'" @click="goSystemLogs" severity="contrast" variant="text" class="sidebar-routers"></Button>
+      <Button icon="pi pi-user-plus" v-if="userRole==='ROLE_ADMIN'" label="Create user"  @click="goUserRegister" severity="contrast" variant="text" class="sidebar-routers"></Button>
+      <Button icon="pi pi-user-plus" label="Logout"  @click="logOut" severity="contrast" variant="text" class="sidebar-routers"></Button>
     </div>
   </div>
 </template>

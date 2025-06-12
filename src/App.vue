@@ -8,6 +8,7 @@ import { setSessionItem } from "@/api/session/SessionManagement.ts";
 
 const router = useRouter()
 const showSidebar = ref(false)
+const userId = ref(1)
 
 const checkRoute = () => {
   showSidebar.value = !['/', '/login'].includes(router.currentRoute.value.path)
@@ -18,9 +19,9 @@ watch(() => router.currentRoute.value.path, checkRoute)
 
 onBeforeMount(() => {
   checkRoute()
-  fetchUserProfile(1).then((responseUsr) => {
+  userId.value = Number(sessionStorage.getItem("userId"))
+  fetchUserProfile(userId.value).then((responseUsr) => {
     setSessionItem("userId", responseUsr.id.toString())
-    console.log(sessionStorage.getItem("userId"))
   })
 })
 </script>
