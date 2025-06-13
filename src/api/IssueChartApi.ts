@@ -1,7 +1,7 @@
 import { api } from "@/api/AxiosConfig.ts";
 import type { MultiOptions } from "@/types/MultiSelect.ts";
 
-const BASE_URL_ISSUE = '/gestor/issue';
+const BASE_URL_ISSUE = '/issues/gestor/filtered';
 
 export const fetchIssuesDetailed = async (
     projectId: number,
