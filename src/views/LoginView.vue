@@ -242,7 +242,7 @@ input {
 button {
   width: 100%;
   padding: 0.75rem;
-  background-color: #3D7EFF;
+  background-color: purple;
   color: white;
   border: none;
   border-radius: 4px;
