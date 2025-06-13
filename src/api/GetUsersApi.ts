@@ -3,7 +3,6 @@ import type {UserPag} from "@/types/PagUser.ts";
 
 const BASE_URL_USERS_PAG = '/users/paginated';
 
-
 export const fetchPaginatedUsers = async (): Promise<UserPag[]> => {
     try{
         const response = await api.get(BASE_URL_USERS_PAG , {

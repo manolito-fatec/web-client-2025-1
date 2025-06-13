@@ -19,7 +19,6 @@ export const useAuthStore = defineStore('auth', {
                     password: psw
                 });
 
-
                 this.token = response.data.token;
                 setSessionItem("token", this.token!);
                 const decodedToken = JSON.parse(atob(response.data.token.split(".")[1]));
