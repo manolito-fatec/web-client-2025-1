@@ -1,6 +1,6 @@
 import {api} from "@/api/AxiosConfig.ts";
 
-const BASE_URL_CARDS = 'http://localhost:8080/tasks';
+const BASE_URL_CARDS = '/tasks';
 
 export const fetchTotalOfCards = async (userId: number) => {
   try {

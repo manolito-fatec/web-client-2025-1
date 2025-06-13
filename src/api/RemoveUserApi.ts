@@ -1,6 +1,6 @@
 import {api} from './AxiosConfig';
 
-const BASE_URL_USERS = 'http://localhost:8080/user';
+const BASE_URL_USERS = '/user';
 
 
 export const removeUserApi = async (userid: number) => {

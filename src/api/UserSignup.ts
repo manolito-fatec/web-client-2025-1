@@ -1,7 +1,7 @@
 import {api} from './AxiosConfig';
 import type {User} from "@/types/User.ts";
 
-const BASE_URL_AUTH = 'http://localhost:8080/auth';
+const BASE_URL_AUTH = 'http://localhost:3439/auth';
 
 
 export const signupUser = async (user: User): Promise<User> => {

@@ -1,7 +1,7 @@
 import {api} from './AxiosConfig';
 import type {cardsByPeriodResponse} from "@/types/CardsByPeriodResponse.ts";
 
-const BASE_URL_TASKS = 'http://localhost:8080/tasks/get-project-count-between';
+const BASE_URL_TASKS = '/tasks/get-project-count-between';
 
 
 export const fetchCardsByPeriod = async (projectOriginalId: number, startDate :string, endDate:string): Promise<cardsByPeriodResponse> => {
