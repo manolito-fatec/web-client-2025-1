@@ -1,6 +1,6 @@
 import {api} from "@/api/AxiosConfig.ts";
 
-const BASE_URL_STATUS = 'http://localhost:8080/admin/dash/table';
+const BASE_URL_STATUS = 'http://localhost:3439/admin/dash/table';
 
 export const  fetchProjectTable = async () => {
     try{

@@ -2,7 +2,7 @@
 import {api} from "@/api/AxiosConfig.ts";
 import type { ProjectUser } from "@/types/ProjectUser";
 
-const BASE_URL_USER = 'http://localhost:8080/users';
+const BASE_URL_USER = 'http://localhost:3439/users';
 
 /**
  * Fetches a list of users and their associated projects managed by a specific user.

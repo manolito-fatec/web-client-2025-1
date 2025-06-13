@@ -2,8 +2,8 @@ import {api} from './AxiosConfig';
 import type {ProjectDto, ProjectTable} from "@/types/ProjectTable.ts";
 import type {UserDto} from "@/types/User.ts";
 
-const BASE_URL_PROJECTS = 'http://localhost:8080/projects';
-const BASE_URL_USERS = 'http://localhost:8080/users';
+const BASE_URL_PROJECTS = 'http://localhost:3439/projects';
+const BASE_URL_USERS = 'http://localhost:3439/users';
 
 
 export const fetchPaginatedProjects = async (projectId: number): Promise<UserDto[]> => {
