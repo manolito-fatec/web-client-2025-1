@@ -1,8 +1,7 @@
 import {api} from './AxiosConfig';
 import type {UserPag} from "@/types/PagUser.ts";
 
-const BASE_URL_USERS_PAG = 'http://localhost:8080/users/paginated';
-
+const BASE_URL_USERS_PAG = '/users/paginated';
 
 export const fetchPaginatedUsers = async (): Promise<UserPag[]> => {
     try{

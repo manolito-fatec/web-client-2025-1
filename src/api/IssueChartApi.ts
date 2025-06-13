@@ -1,7 +1,7 @@
 import { api } from "@/api/AxiosConfig.ts";
 import type { MultiOptions } from "@/types/MultiSelect.ts";
 
-const BASE_URL_ISSUE = 'http://localhost:8080/issues/gestor/filtered';
+const BASE_URL_ISSUE = '/issues/gestor/filtered';
 
 export const fetchIssuesDetailed = async (
     projectId: number,

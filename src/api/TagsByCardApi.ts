@@ -1,6 +1,6 @@
 import {api} from './AxiosConfig';
 
-const BASE_URL_STATUS = 'http://localhost:8080/tasks/get-by-tag';
+const BASE_URL_STATUS = '/tasks/get-by-tag';
 
 /**
  * Fetches tags associated with a project by its project original ID.

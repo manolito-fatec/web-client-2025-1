@@ -1,6 +1,6 @@
 import {api} from "@/api/AxiosConfig.ts";
 
-const BASE_URL_STATUS = 'http://localhost:8080/status';
+const BASE_URL_STATUS = '/status';
 
 export const fetchTaskStatus = async (userId: number, projectOriginalId: number) => {
     try{

@@ -1,6 +1,6 @@
 import {api} from "@/api/AxiosConfig.ts";
 
-const BASE_URL_TASKS = 'http://localhost:8080/logs';
+const BASE_URL_TASKS = 'http://localhost:3439/logs';
 
 export const fetchAuditLogs = async () => {
     try{
