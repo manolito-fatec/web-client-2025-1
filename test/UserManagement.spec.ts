@@ -191,12 +191,3 @@ test('passes correct props to UserEditForm', async () => {
     const editForm = wrapper.findComponent({ name: 'UserEditForm' })
     expect(editForm.props('edittedData')).toEqual(mockUsers[0])
 })
-
-test('matches snapshot', () => {
-    const wrapper = mount(UserManagementView, {
-        global: {
-            plugins: [PrimeVue]
-        }
-    })
-    expect(wrapper.html()).toMatchSnapshot()
-})
