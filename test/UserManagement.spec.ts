@@ -191,7 +191,3 @@ test('passes correct props to UserEditForm', async () => {
     const editForm = wrapper.findComponent({ name: 'UserEditForm' })
     expect(editForm.props('edittedData')).toEqual(mockUsers[0])
 })
-
-test ("is break", () =>{
-    assert.equal(1,2)
-})
