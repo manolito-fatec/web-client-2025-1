@@ -1,4 +1,4 @@
-import {expect, vi, test, beforeEach} from 'vitest'
+import {assert, expect, vi, test, beforeEach} from 'vitest'
 import {nextTick} from 'vue'
 import {mount} from "@vue/test-utils";
 import PrimeVue from 'primevue/config'
@@ -190,4 +190,8 @@ test('passes correct props to UserEditForm', async () => {
 
     const editForm = wrapper.findComponent({ name: 'UserEditForm' })
     expect(editForm.props('edittedData')).toEqual(mockUsers[0])
+})
+
+test ("is break", () =>{
+    assert.equal(1,2)
 })
